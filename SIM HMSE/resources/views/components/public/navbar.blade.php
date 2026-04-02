@@ -1,64 +1,60 @@
 <nav
     x-data="{
         mobileOpen: false,
-        relatedOpen: false,
         scrolled: false,
         init() {
             window.addEventListener('scroll', () => {
-                this.scrolled = window.scrollY > 20;
+                this.scrolled = window.scrollY > 10;
             });
         }
     }"
-    :class="scrolled ? 'bg-white shadow-md' : 'bg-white/95 backdrop-blur-sm shadow-sm'"
+    :class="scrolled ? 'shadow-md bg-white' : 'bg-white/95 backdrop-blur-sm'"
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
 >
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
 
             {{-- Logo --}}
-            <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-hmse-primary flex items-center justify-center shadow-sm group-hover:bg-hmse-primary-light transition-colors duration-200">
-                    <span class="text-white font-black text-sm tracking-tight">HMSE</span>
+            <a href="{{ route('home') }}" class="flex items-center gap-2.5 group">
+                {{-- Sparkle/Star Icon --}}
+                <div class="w-9 h-9 relative flex-shrink-0">
+                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <path d="M20 4L23.5 16.5L36 20L23.5 23.5L20 36L16.5 23.5L4 20L16.5 16.5L20 4Z" fill="#2C3DA6"/>
+                        <path d="M20 4L22 14L28 8L22 18L32 20L22 22L28 32L22 26L20 36L18 26L12 32L18 22L8 20L18 18L12 8L18 14L20 4Z" fill="#00C4D8" opacity="0.6"/>
+                    </svg>
                 </div>
                 <div class="hidden sm:block">
-                    <p class="text-sm font-bold text-hmse-primary leading-tight">HMSE</p>
-                    <p class="text-xs text-hmse-text-muted leading-tight">Tel-U Purwokerto</p>
+                    <span class="text-sm font-black text-[#2C3DA6] tracking-tight leading-none block">HMSE</span>
+                    <span class="text-[10px] text-gray-400 leading-none">Tel-U Purwokerto</span>
                 </div>
             </a>
 
             {{-- Desktop Menu --}}
             <div class="hidden md:flex items-center gap-1">
-
                 <a href="{{ route('home') }}"
-                   class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 hover:bg-hmse-primary/5
-                          {{ request()->routeIs('home') ? 'text-hmse-primary font-semibold bg-hmse-primary/5' : 'text-gray-600 hover:text-hmse-primary' }}">
+                   class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
+                          {{ request()->routeIs('home') ? 'text-[#2C3DA6] font-semibold' : 'text-gray-500 hover:text-[#2C3DA6]' }}">
                     Home
                 </a>
-
                 <a href="{{ route('about') }}"
-                   class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 hover:bg-hmse-primary/5
-                          {{ request()->routeIs('about') ? 'text-hmse-primary font-semibold bg-hmse-primary/5' : 'text-gray-600 hover:text-hmse-primary' }}">
+                   class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
+                          {{ request()->routeIs('about') ? 'text-[#2C3DA6] font-semibold' : 'text-gray-500 hover:text-[#2C3DA6]' }}">
                     About Us
                 </a>
-
                 <a href="{{ route('news.index') }}"
-                   class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 hover:bg-hmse-primary/5
-                          {{ request()->routeIs('news.*') ? 'text-hmse-primary font-semibold bg-hmse-primary/5' : 'text-gray-600 hover:text-hmse-primary' }}">
+                   class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
+                          {{ request()->routeIs('news.*') ? 'text-[#2C3DA6] font-semibold' : 'text-gray-500 hover:text-[#2C3DA6]' }}">
                     News
                 </a>
 
                 {{-- Related Dropdown --}}
                 <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
                     <button
-                        class="nav-link px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 hover:bg-hmse-primary/5 text-gray-600 hover:text-hmse-primary flex items-center gap-1"
-                        :class="open ? 'text-hmse-primary bg-hmse-primary/5' : ''"
+                        class="px-5 py-2 text-sm font-bold text-white uppercase tracking-wider rounded-full transition-all duration-200 hover:opacity-90 hover:shadow-md"
+                        style="background-color: #00C4D8;"
                     >
                         Related
-                        <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
                     </button>
-
                     <div
                         x-show="open"
                         x-transition:enter="transition ease-out duration-150"
@@ -67,18 +63,18 @@
                         x-transition:leave="transition ease-in duration-100"
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 translate-y-1"
-                        class="absolute top-full left-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50"
+                        class="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50"
                     >
                         <a href="https://zetech.telkomuniversity.ac.id" target="_blank"
-                           class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 hover:text-hmse-primary hover:bg-hmse-primary/5 transition-colors duration-150">
-                            <svg class="w-4 h-4 text-hmse-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50 transition-colors duration-150">
+                            <svg class="w-4 h-4 text-[#00C4D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                             </svg>
                             Zetech
                         </a>
                         <a href="#" target="_blank"
-                           class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 hover:text-hmse-primary hover:bg-hmse-primary/5 transition-colors duration-150">
-                            <svg class="w-4 h-4 text-hmse-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50 transition-colors duration-150">
+                            <svg class="w-4 h-4 text-[#00C4D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                             </svg>
                             Web Prodi
@@ -86,21 +82,17 @@
                     </div>
                 </div>
 
-            </div>
-
-            {{-- CTA Button (Desktop) --}}
-            <div class="hidden md:flex items-center gap-3">
+                {{-- Login Dashboard Button --}}
                 <a href="{{ route('login') }}"
-                   class="px-4 py-2 text-sm font-semibold text-hmse-primary border-2 border-hmse-primary rounded-lg hover:bg-hmse-primary hover:text-white transition-all duration-200">
+                   class="ml-2 px-5 py-2 text-sm font-semibold text-[#2C3DA6] border-2 border-[#2C3DA6] rounded-full transition-all duration-200 hover:bg-[#2C3DA6] hover:text-white">
                     Login
                 </a>
             </div>
 
-            {{-- Hamburger (Mobile) --}}
+            {{-- Hamburger Mobile --}}
             <button
                 @click="mobileOpen = !mobileOpen"
-                class="md:hidden p-2 rounded-lg text-gray-500 hover:text-hmse-primary hover:bg-hmse-primary/5 transition-colors duration-200"
-                aria-label="Toggle menu"
+                class="md:hidden p-2 rounded-lg text-gray-500 hover:text-[#2C3DA6] hover:bg-blue-50 transition-colors duration-200"
             >
                 <svg x-show="!mobileOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -126,31 +118,24 @@
         @click.outside="mobileOpen = false"
     >
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-1">
-
             <a href="{{ route('home') }}"
                class="px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-150
-                      {{ request()->routeIs('home') ? 'text-hmse-primary font-semibold bg-hmse-primary/5' : 'text-gray-600 hover:text-hmse-primary hover:bg-hmse-primary/5' }}">
+                      {{ request()->routeIs('home') ? 'text-[#2C3DA6] font-semibold bg-blue-50' : 'text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50' }}">
                 Home
             </a>
-
             <a href="{{ route('about') }}"
                class="px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-150
-                      {{ request()->routeIs('about') ? 'text-hmse-primary font-semibold bg-hmse-primary/5' : 'text-gray-600 hover:text-hmse-primary hover:bg-hmse-primary/5' }}">
+                      {{ request()->routeIs('about') ? 'text-[#2C3DA6] font-semibold bg-blue-50' : 'text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50' }}">
                 About Us
             </a>
-
             <a href="{{ route('news.index') }}"
                class="px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-150
-                      {{ request()->routeIs('news.*') ? 'text-hmse-primary font-semibold bg-hmse-primary/5' : 'text-gray-600 hover:text-hmse-primary hover:bg-hmse-primary/5' }}">
+                      {{ request()->routeIs('news.*') ? 'text-[#2C3DA6] font-semibold bg-blue-50' : 'text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50' }}">
                 News
             </a>
-
-            {{-- Related Mobile Accordion --}}
             <div x-data="{ open: false }">
-                <button
-                    @click="open = !open"
-                    class="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-hmse-primary hover:bg-hmse-primary/5 transition-colors duration-150"
-                >
+                <button @click="open = !open"
+                    class="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50">
                     Related
                     <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -158,23 +143,22 @@
                 </button>
                 <div x-show="open" x-transition class="pl-4 flex flex-col gap-1 mt-1">
                     <a href="https://zetech.telkomuniversity.ac.id" target="_blank"
-                       class="px-4 py-2.5 rounded-lg text-sm text-gray-500 hover:text-hmse-primary hover:bg-hmse-primary/5 transition-colors duration-150">
-                        → Zetech
+                       class="px-4 py-2.5 rounded-lg text-sm text-gray-500 hover:text-[#2C3DA6] hover:bg-blue-50">
+                        &rarr; Zetech
                     </a>
                     <a href="#" target="_blank"
-                       class="px-4 py-2.5 rounded-lg text-sm text-gray-500 hover:text-hmse-primary hover:bg-hmse-primary/5 transition-colors duration-150">
-                        → Web Prodi
+                       class="px-4 py-2.5 rounded-lg text-sm text-gray-500 hover:text-[#2C3DA6] hover:bg-blue-50">
+                        &rarr; Web Prodi
                     </a>
                 </div>
             </div>
-
             <div class="pt-2 pb-1 border-t border-gray-100 mt-1">
                 <a href="{{ route('login') }}"
-                   class="block w-full text-center px-4 py-2.5 text-sm font-semibold text-white bg-hmse-primary rounded-lg hover:bg-hmse-primary-light transition-colors duration-200">
+                   class="block w-full text-center px-4 py-2.5 text-sm font-bold text-white rounded-full"
+                   style="background-color: #00C4D8;">
                     Login Dashboard
                 </a>
             </div>
-
         </div>
     </div>
 </nav>
