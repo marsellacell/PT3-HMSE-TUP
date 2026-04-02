@@ -2,7 +2,7 @@
 
 > Proyek Tingkat III — Tugas Besar
 
-Aplikasi web untuk mengelola kegiatan organisasi Himpunan Mahasiswa Sistem Energi (HMSE), mencakup manajemen program kerja, pengelolaan proposal kegiatan, keuangan, struktur organisasi, dan dokumentasi.
+Aplikasi web untuk mengelola kegiatan organisasi Himpunan Mahasiswa Software Engineering (HMSE), mencakup manajemen program kerja, pengelolaan proposal kegiatan, keuangan, struktur organisasi, dan dokumentasi.
 
 ---
 
