@@ -9,11 +9,8 @@
     {{-- Logo Area --}}
     <div class="flex items-center h-16 px-4 border-b border-gray-100 flex-shrink-0">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-3 overflow-hidden">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                 style="background: linear-gradient(135deg, #2C3DA6, #00C4D8);">
-                <svg viewBox="0 0 40 40" fill="none" class="w-6 h-6">
-                    <path d="M20 4L23.5 16.5L36 20L23.5 23.5L20 36L16.5 23.5L4 20L16.5 16.5L20 4Z" fill="white"/>
-                </svg>
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 flex-shrink-0">
+                <img src="{{ asset('images/logo-zenit.png') }}" alt="HMSE Logo" class="w-full h-full object-contain">
             </div>
             <div x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200" class="overflow-hidden">
                 <span class="text-sm font-black text-[#2C3DA6] tracking-tight leading-none block">SIM HMSE</span>

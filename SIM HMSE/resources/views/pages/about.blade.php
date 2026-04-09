@@ -46,17 +46,12 @@
 
                 {{-- Logo & Filosofi --}}
                 <div class="flex flex-col items-center lg:items-start text-center lg:text-left">
-                    <div class="w-48 h-48 rounded-3xl bg-gradient-to-br from-[#1e3a5f] to-[#2e86ab] flex items-center justify-center shadow-2xl mb-8 mx-auto lg:mx-0">
-                        {{-- Ganti dengan logo kabinet --}}
-                        <span class="text-white font-black text-5xl tracking-tighter">Z</span>
+                    <div class="w-48 h-48 rounded-3xl bg-white flex items-center justify-center shadow-2xl mb-8 mx-auto lg:mx-0 p-4">
+                        <img src="{{ asset('images/logo-zenit.png') }}" alt="Logo Zenith" class="w-full h-full object-contain">
                     </div>
                     <h3 class="text-2xl font-bold text-[#1e3a5f] mb-4">Filosofi Kabinet</h3>
                     <p class="text-gray-600 leading-relaxed text-justify">
-                        <strong class="text-[#1e3a5f]">Zenith</strong> berasal dari kata bahasa Inggris yang berarti
-                        <em>"titik tertinggi yang dapat dicapai"</em> — menggambarkan tekad HMSE untuk terus
-                        berkembang, berinovasi, dan mencapai puncak prestasi dalam setiap bidang yang digeluti.
-                        Kabinet Zenith hadir sebagai wujud komitmen untuk membawa HMSE ke level tertinggi,
-                        baik dalam akademik, organisasi, maupun kontribusi nyata kepada masyarakat.
+                        Kabinet Zenith mengusung filosofi perjalanan kolektif menuju titik tertinggi potensi, dimana setiap individu dan elemen organisasi didorong untuk terus bertumbuh, berkembang, dan melampaui batas dirinya. Dengan menjunjing tinggi kolaborasi, progres berkelanjutan, serta visi yang jelas dan berdampak, Kabinet Zenith percaya bahwa setiap langkah kecil dalam proses pertumbuhan adalah fondasi menuju pencapaian yang lebih besar. Melalui semangat kebersamaan dan dedikasi untuk memberikan yang terbaik, kabinet ini hadir sebagai wadah yang tidak hanya mencetak perkembangan, tetapi juga melahirkan keunggulan. <strong class="text-[#1e3a5f]">From Growth to Greatness.</strong>
                     </p>
                 </div>
 
@@ -74,9 +69,7 @@
                             <h4 class="text-lg font-bold text-white">Visi</h4>
                         </div>
                         <p class="text-white/85 leading-relaxed text-justify text-sm">
-                            Mewujudkan HMSE sebagai himpunan mahasiswa yang unggul, inovatif, dan berdaya saing
-                            tinggi dalam bidang rekayasa perangkat lunak, serta mampu memberikan kontribusi nyata
-                            bagi masyarakat dan dunia industri teknologi.
+                            Mewujudkan organisasi sebagai ruang bertumbuh yang progresif dan kolaboratif, hingga mencapai kebermanfaatan dan pencapaian yang unggul bersama.
                         </p>
                     </div>
 
@@ -92,11 +85,11 @@
                         </div>
                         <ul class="space-y-3">
                             @foreach([
-                                'Meningkatkan kualitas akademik dan kompetensi teknis anggota melalui kegiatan edukatif dan pelatihan.',
-                                'Membangun budaya kolaborasi, inovasi, dan kepemimpinan yang bertanggung jawab.',
-                                'Menjalin hubungan sinergis dengan instansi, industri, dan komunitas teknologi.',
-                                'Menyelenggarakan program kerja yang relevan, berdampak, dan berkelanjutan.',
-                                'Menciptakan lingkungan himpunan yang inklusif, transparan, dan profesional.',
+                                'Menciptakan ruang pengembangan diri yang inklusif dan suportif.',
+                                'Mengoptimalkan potensi menjadi prestasi nyata.',
+                                'Membangun budaya disiplin dan kolaborasi.',
+                                'Menghadirkan inovasi yang relevan dan solutif.',
+                                'Menciptakan tata kelola yang profesional dan berintegritas.',
                             ] as $index => $misi)
                             <li class="flex items-start gap-3">
                                 <span class="flex-shrink-0 w-6 h-6 rounded-full bg-[#f4a261] text-white text-xs font-bold flex items-center justify-center mt-0.5">

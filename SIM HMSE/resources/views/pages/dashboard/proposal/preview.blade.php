@@ -56,7 +56,7 @@
             {{-- Title --}}
             <div class="text-center my-8">
                 <h1 class="text-[14pt] font-black uppercase underline decoration-2 underline-offset-4">PROPOSAL KEGIATAN</h1>
-                <p class="text-[13pt] font-bold mt-2 uppercase">"WORKSHOP UI/UX DESIGN 2026"</p>
+                <p class="text-[13pt] font-bold mt-2 uppercase">{{ $proposal?->title ?? '"WORKSHOP UI/UX DESIGN 2026"' }}</p>
             </div>
 
             {{-- BAB I: PENDAHULUAN --}}
@@ -65,29 +65,20 @@
 
                 <h3 class="text-[12pt] font-bold mb-2">1.1 Latar Belakang</h3>
                 <p class="text-justify indent-[1.27cm] mb-4">
-                    Perkembangan teknologi informasi yang semakin pesat menuntut mahasiswa untuk memiliki kompetensi
-                    yang relevan dengan kebutuhan industri. Salah satu bidang yang sangat dibutuhkan saat ini adalah
-                    UI/UX Design, dimana kemampuan merancang antarmuka dan pengalaman pengguna yang baik menjadi
-                    kunci keberhasilan sebuah produk digital.
-                </p>
-                <p class="text-justify indent-[1.27cm] mb-4">
-                    Sebagai wadah pengembangan mahasiswa di bidang Software Engineering, HMSE Telkom University
-                    Purwokerto memandang perlu untuk mengadakan kegiatan pelatihan yang dapat meningkatkan
-                    keterampilan mahasiswa dalam bidang desain produk digital.
+                    {{ $proposal?->background ?? 'Perkembangan teknologi informasi yang semakin pesat menuntut mahasiswa untuk memiliki kompetensi yang relevan dengan kebutuhan industri.' }}
                 </p>
 
                 <h3 class="text-[12pt] font-bold mb-2">1.2 Tujuan</h3>
-                <ol class="list-decimal ml-8 mb-4 space-y-1">
-                    <li>Meningkatkan pemahaman mahasiswa mengenai prinsip-prinsip dasar UI/UX Design.</li>
-                    <li>Memberikan pengalaman langsung dalam menggunakan tools desain seperti Figma.</li>
-                    <li>Membangun portofolio awal bagi mahasiswa dalam bidang desain produk digital.</li>
-                </ol>
-
-                <h3 class="text-[12pt] font-bold mb-2">1.3 Manfaat</h3>
                 <p class="text-justify indent-[1.27cm] mb-4">
-                    Kegiatan ini diharapkan dapat memberikan bekal keterampilan praktis bagi mahasiswa
-                    yang dapat langsung diterapkan dalam proyek perkuliahan maupun dunia kerja.
+                    {{ $proposal?->objective ?? 'Kegiatan ini bertujuan untuk meningkatkan kemampuan mahasiswa.' }}
                 </p>
+
+                @if($proposal?->risk_description)
+                <h3 class="text-[12pt] font-bold mb-2">1.3 Catatan Risiko</h3>
+                <p class="text-justify indent-[1.27cm] mb-4">
+                    {{ $proposal->risk_description }}
+                </p>
+                @endif
             </div>
 
             {{-- BAB II: DETAIL KEGIATAN --}}
@@ -97,53 +88,30 @@
                 <h3 class="text-[12pt] font-bold mb-2">2.1 Informasi Umum</h3>
                 <table class="w-full mb-4 text-[11pt]">
                     <tbody>
-                        @foreach([
-                            ['Nama Kegiatan', 'Workshop UI/UX Design 2026'],
-                            ['Tema', 'Designing Digital Tomorrow'],
-                            ['Hari/Tanggal', 'Selasa, 15 April 2026'],
-                            ['Waktu', '08:00 — 16:00 WIB'],
-                            ['Tempat', 'Laboratorium Komputer Lt.3, Gedung Bersama'],
-                            ['Sasaran Peserta', 'Mahasiswa Prodi RPL Semester 2–6'],
-                            ['Jumlah Peserta', '50 Mahasiswa'],
-                        ] as $row)
-                            <tr>
-                                <td class="py-1 pr-4 font-semibold w-40 align-top">{{ $row[0] }}</td>
-                                <td class="py-1 pr-2 w-4 align-top">:</td>
-                                <td class="py-1">{{ $row[1] }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-
-                <h3 class="text-[12pt] font-bold mb-2">2.2 Susunan Acara</h3>
-                <table class="w-full border border-gray-400 mb-4 text-[11pt]">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border border-gray-400 px-3 py-2 text-left font-bold">Waktu</th>
-                            <th class="border border-gray-400 px-3 py-2 text-left font-bold">Durasi</th>
-                            <th class="border border-gray-400 px-3 py-2 text-left font-bold">Kegiatan</th>
+                        <tr>
+                            <td class="w-1/3 font-bold">Nama Kegiatan</td>
+                            <td>: {{ $proposal?->title ?? '-' }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach([
-                            ['08:00', '30 menit', 'Registrasi Peserta'],
-                            ['08:30', '15 menit', 'Pembukaan & Sambutan'],
-                            ['08:45', '90 menit', 'Sesi 1: Fundamental UI/UX Design'],
-                            ['10:15', '15 menit', 'Coffee Break'],
-                            ['10:30', '90 menit', 'Sesi 2: Hands-on Figma'],
-                            ['12:00', '60 menit', 'Istirahat & Sholat'],
-                            ['13:00', '120 menit', 'Sesi 3: Prototyping & User Testing'],
-                            ['15:00', '30 menit', 'Presentasi Karya & Evaluasi'],
-                            ['15:30', '30 menit', 'Penutupan & Foto Bersama'],
-                        ] as $acara)
-                            <tr>
-                                <td class="border border-gray-400 px-3 py-1.5">{{ $acara[0] }}</td>
-                                <td class="border border-gray-400 px-3 py-1.5">{{ $acara[1] }}</td>
-                                <td class="border border-gray-400 px-3 py-1.5">{{ $acara[2] }}</td>
-                            </tr>
-                        @endforeach
+                        <tr>
+                            <td class="font-bold">Tingkat Risiko</td>
+                            <td>: {{ $proposal?->risk_level === 'high' ? 'Tinggi' : 'Rendah' ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">Timeline</td>
+                            <td>: {{ $proposal?->timeline ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">Anggaran</td>
+                            <td>: Rp {{ $proposal ? number_format($proposal->budget, 0, ',', '.') : '0' }}</td>
+                        </tr>
                     </tbody>
                 </table>
+            </div>
+
+            @if($proposal?->objective)
+                <h3 class="text-[12pt] font-bold mb-2">2.2 Deskripsi Rinci</h3>
+                <p class="text-justify text-[11pt] mb-4">{{ $proposal->objective }}</p>
+                @endif
             </div>
 
             {{-- BAB III: ANGGARAN --}}
@@ -151,43 +119,12 @@
                 <h2 class="text-[13pt] font-bold mb-4">BAB III — RENCANA ANGGARAN BIAYA</h2>
 
                 <table class="w-full border border-gray-400 mb-4 text-[11pt]">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border border-gray-400 px-3 py-2 text-center font-bold w-10">No</th>
-                            <th class="border border-gray-400 px-3 py-2 text-left font-bold">Uraian</th>
-                            <th class="border border-gray-400 px-3 py-2 text-center font-bold w-16">Vol</th>
-                            <th class="border border-gray-400 px-3 py-2 text-center font-bold w-20">Satuan</th>
-                            <th class="border border-gray-400 px-3 py-2 text-right font-bold">Harga Satuan</th>
-                            <th class="border border-gray-400 px-3 py-2 text-right font-bold">Jumlah</th>
-                        </tr>
-                    </thead>
                     <tbody>
-                        @php $total = 0; @endphp
-                        @foreach([
-                            [1, 'Sewa Ruangan Lab', 1, 'Hari', 500000],
-                            [2, 'Snack & Makan Siang Peserta', 50, 'Pax', 25000],
-                            [3, 'Honor Pemateri', 2, 'Sesi', 500000],
-                            [4, 'Cetak Sertifikat', 50, 'Lembar', 3000],
-                            [5, 'Publikasi & Dekorasi', 1, 'Paket', 300000],
-                            [6, 'Dokumentasi', 1, 'Paket', 200000],
-                        ] as $budget)
-                            @php $subtotal = $budget[2] * $budget[4]; $total += $subtotal; @endphp
-                            <tr>
-                                <td class="border border-gray-400 px-3 py-1.5 text-center">{{ $budget[0] }}</td>
-                                <td class="border border-gray-400 px-3 py-1.5">{{ $budget[1] }}</td>
-                                <td class="border border-gray-400 px-3 py-1.5 text-center">{{ $budget[2] }}</td>
-                                <td class="border border-gray-400 px-3 py-1.5 text-center">{{ $budget[3] }}</td>
-                                <td class="border border-gray-400 px-3 py-1.5 text-right">Rp {{ number_format($budget[4], 0, ',', '.') }}</td>
-                                <td class="border border-gray-400 px-3 py-1.5 text-right">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                    <tfoot>
-                        <tr class="bg-gray-100 font-bold">
-                            <td colspan="5" class="border border-gray-400 px-3 py-2 text-right">TOTAL</td>
-                            <td class="border border-gray-400 px-3 py-2 text-right">Rp {{ number_format($total, 0, ',', '.') }}</td>
+                        <tr>
+                            <td class="border border-gray-400 px-3 py-2 font-bold w-1/2">Total Anggaran</td>
+                            <td class="border border-gray-400 px-3 py-2 text-right font-bold">Rp {{ $proposal ? number_format($proposal->budget, 0, ',', '.') : '0' }}</td>
                         </tr>
-                    </tfoot>
+                    </tbody>
                 </table>
             </div>
 
@@ -195,7 +132,7 @@
             <div class="mb-8">
                 <h2 class="text-[13pt] font-bold mb-4">BAB IV — PENUTUP</h2>
                 <p class="text-justify indent-[1.27cm] mb-4">
-                    Demikian proposal kegiatan Workshop UI/UX Design 2026 ini kami susun. Besar harapan kami
+                    Demikian proposal kegiatan {{ $proposal?->title ?? 'ini' }} kami susun. Besar harapan kami
                     kegiatan ini dapat terlaksana dengan baik dan memberikan manfaat bagi seluruh peserta.
                     Atas perhatian dan dukungan Bapak/Ibu, kami ucapkan terima kasih.
                 </p>
@@ -208,22 +145,22 @@
                 <div class="grid grid-cols-2 gap-8 text-center text-[11pt]">
                     {{-- Left: Ketua Panitia --}}
                     <div>
-                        <p class="font-bold mb-1">Ketua Panitia,</p>
+                        <p class="font-bold mb-1">Pembuat Proposal,</p>
                         <div class="h-20 flex items-center justify-center">
                             <span class="text-gray-300 italic text-[10pt]">(tanda tangan)</span>
                         </div>
-                        <p class="font-bold underline">Ahmad Fauzi</p>
-                        <p class="text-[10pt] text-gray-600">NIM. 1301210011</p>
+                        <p class="font-bold underline">{{ $proposal?->user?->name ?? 'Nama Pembuat' }}</p>
+                        <p class="text-[10pt] text-gray-600">{{ $proposal?->user?->email ?? 'Email' }}</p>
                     </div>
 
-                    {{-- Right: Ketua Umum --}}
+                    {{-- Right: Tanggal Dibuat --}}
                     <div>
-                        <p class="font-bold mb-1">Ketua Umum HMSE,</p>
+                        <p class="font-bold mb-1">Dibuat pada,</p>
                         <div class="h-20 flex items-center justify-center">
-                            <span class="text-gray-300 italic text-[10pt]">(tanda tangan)</span>
+                            <span class="text-[10pt]">{{ $proposal?->created_at?->translatedFormat('d F Y') ?? 'Tanggal' }}</span>
                         </div>
-                        <p class="font-bold underline">Budi Hartono</p>
-                        <p class="text-[10pt] text-gray-600">NIM. 1301210001</p>
+                        <p class="font-bold underline">Purwokerto</p>
+                        <p class="text-[10pt] text-gray-600">{{ $proposal?->status ?? 'Draft' }}</p>
                     </div>
                 </div>
 

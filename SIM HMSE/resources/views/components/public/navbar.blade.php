@@ -16,12 +16,9 @@
 
             {{-- Logo --}}
             <a href="{{ route('home') }}" class="flex items-center gap-2.5 group">
-                {{-- Sparkle/Star Icon --}}
+                {{-- Logo Image --}}
                 <div class="w-9 h-9 relative flex-shrink-0">
-                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                        <path d="M20 4L23.5 16.5L36 20L23.5 23.5L20 36L16.5 23.5L4 20L16.5 16.5L20 4Z" fill="#2C3DA6"/>
-                        <path d="M20 4L22 14L28 8L22 18L32 20L22 22L28 32L22 26L20 36L18 26L12 32L18 22L8 20L18 18L12 8L18 14L20 4Z" fill="#00C4D8" opacity="0.6"/>
-                    </svg>
+                    <img src="{{ asset('images/logo-zenit.png') }}" alt="HMSE Logo" class="w-full h-full object-contain">
                 </div>
                 <div class="hidden sm:block">
                     <span class="text-sm font-black text-[#2C3DA6] tracking-tight leading-none block">HMSE</span>

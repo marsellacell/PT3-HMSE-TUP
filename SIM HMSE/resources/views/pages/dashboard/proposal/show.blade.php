@@ -232,10 +232,14 @@
                     @endforeach
                 </div>
 
-                <div class="mt-6 pt-4 border-t border-gray-100 flex gap-3">
+                <div class="mt-6 pt-4 border-t border-gray-100 flex gap-3 flex-wrap">
                     <a href="{{ route('dashboard.proposal.preview', $id) }}" class="px-4 py-2.5 text-sm font-semibold text-[#2C3DA6] bg-blue-50 rounded-xl hover:bg-blue-100 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         Preview Dokumen
+                    </a>
+                    <a href="{{ route('proposals.generate-filled', $id) }}" class="px-4 py-2.5 text-sm font-semibold text-emerald-600 bg-emerald-50 rounded-xl hover:bg-emerald-100 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Download Template Isi
                     </a>
                     <button class="px-4 py-2.5 text-sm font-semibold text-red-600 bg-red-50 rounded-xl hover:bg-red-100 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>

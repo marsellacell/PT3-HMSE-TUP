@@ -43,11 +43,9 @@
             {{-- Content --}}
             <div class="relative z-10 max-w-lg px-12 text-center">
                 {{-- Logo --}}
-                <div class="mb-8 inline-flex items-center justify-center">
-                    <div class="w-20 h-20 rounded-2xl flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl">
-                        <svg viewBox="0 0 40 40" fill="none" class="w-10 h-10">
-                            <path d="M20 4L23.5 16.5L36 20L23.5 23.5L20 36L16.5 23.5L4 20L16.5 16.5L20 4Z" fill="white"/>
-                        </svg>
+                <div class="mt-12 mb-12 inline-flex items-center justify-center">
+                    <div class="w-40 h-40 flex items-center justify-center">
+                        <img src="{{ asset('images/logo-zenit.png') }}" alt="HMSE Logo" class="w-24 h-24 object-contain">
                     </div>
                 </div>
 
@@ -93,11 +91,9 @@
             <div class="w-full max-w-md">
 
                 {{-- Mobile Logo (hidden on desktop) --}}
-                <div class="lg:hidden text-center mb-10">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-                         style="background: linear-gradient(135deg, #2C3DA6, #00C4D8);">
-                        <svg viewBox="0 0 40 40" fill="none" class="w-8 h-8">
-                            <path d="M20 4L23.5 16.5L36 20L23.5 23.5L20 36L16.5 23.5L4 20L16.5 16.5L20 4Z" fill="white"/>
+                <div class="lg:hidden text-center mb-12">
+                    <div class="inline-flex items-center justify-center w-24 h-24 mb-6">
+                        <img src="{{ asset('images/logo-zenit.png') }}" alt="HMSE Logo" class="w-16 h-16 object-contain">
                         </svg>
                     </div>
                     <h1 class="text-2xl font-black text-gray-800">SIM HMSE</h1>

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProposalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,6 +55,9 @@ Route::prefix('dashboard')->name('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'proposalIndex'])->name('.index');
         Route::get('/create', [DashboardController::class, 'proposalCreate'])->name('.create');
         Route::get('/preview/{id}', [DashboardController::class, 'proposalPreview'])->name('.preview');
+        Route::get('/test-download', function() {
+            return response()->json(['message' => 'test ok', 'time' => now()]);
+        })->name('.test');
         Route::get('/{id}', [DashboardController::class, 'proposalShow'])->name('.show');
     });
 
@@ -83,4 +87,30 @@ Route::prefix('dashboard')->name('dashboard')->group(function () {
     // Pengaturan
     Route::get('/settings', [DashboardController::class, 'settings'])->name('.settings');
 
+});
+
+/*
+|--------------------------------------------------------------------------
+| Proposal Generator Routes
+|--------------------------------------------------------------------------
+*/
+// Public template download (no auth required)
+Route::get('/proposals/template/{riskLevel}', [ProposalController::class, 'downloadTemplate'])->name('proposals.download-template');
+
+// Protected proposal routes
+Route::middleware(['auth'])->prefix('proposals')->name('proposals')->group(function () {
+    Route::get('/', [ProposalController::class, 'index'])->name('.index');
+    Route::get('/create', [ProposalController::class, 'create'])->name('.create');
+    Route::post('/', [ProposalController::class, 'store'])->name('.store');
+    Route::get('/{proposal}', [ProposalController::class, 'show'])->name('.show');
+    Route::get('/{proposal}/edit', [ProposalController::class, 'edit'])->name('.edit');
+    Route::put('/{proposal}', [ProposalController::class, 'update'])->name('.update');
+    Route::post('/{proposal}/submit', [ProposalController::class, 'submit'])->name('.submit');
+    Route::post('/{proposal}/generate-pdf', [ProposalController::class, 'generatePdf'])->name('.generate-pdf');
+    Route::get('/{proposal}/download-pdf', [ProposalController::class, 'downloadPdf'])->name('.download-pdf');
+    Route::get('/{proposal}/generate-filled', [ProposalController::class, 'generateFilledDocument'])->name('.generate-filled');
+    Route::get('/{proposal}/preview-filled', [ProposalController::class, 'previewFilledDocument'])->name('.preview-filled');
+    Route::post('/approval/{approval}/approve', [ProposalController::class, 'approve'])->name('.approve');
+    Route::post('/approval/{approval}/reject', [ProposalController::class, 'reject'])->name('.reject');
+    Route::delete('/{proposal}', [ProposalController::class, 'destroy'])->name('.destroy');
 });

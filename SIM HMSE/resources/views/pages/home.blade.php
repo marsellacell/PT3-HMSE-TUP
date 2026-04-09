@@ -62,22 +62,11 @@
                 {{-- Kiri: Foto --}}
                 <div class="flex justify-center lg:justify-start">
                     <div class="relative w-full max-w-md">
-                        {{-- Placeholder foto --}}
-                        <div class="aspect-[4/5] rounded-2xl overflow-hidden shadow-xl" style="background: linear-gradient(135deg, #e8ecff 0%, #c5cdf7 100%);">
-                            @if(isset($heroImage) && $heroImage)
-                                <img src="{{ $heroImage }}" alt="Foto HMSE" class="w-full h-full object-cover object-top">
-                            @else
-                                <div class="w-full h-full flex flex-col items-center justify-center" style="color: #2C3DA6; opacity: 0.35;">
-                                    <svg class="w-20 h-20 mb-3" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
-                                    </svg>
-                                    <p class="text-sm font-medium">Foto Pengurus HMSE</p>
-                                </div>
-                            @endif
-                        </div>
+                        {{-- Foto Pengurus --}}
+                        <img src="{{ asset('images/pengurus.png') }}" alt="Foto Pengurus HMSE" class="w-full h-auto rounded-2xl" style="filter: drop-shadow(0 20px 25px rgba(0,0,0,0.15)); background: transparent;">
                         {{-- Dekorasi --}}
-                        <div class="absolute -bottom-4 -right-4 w-24 h-24 rounded-2xl -z-10" style="background: #00C4D8; opacity: 0.2;"></div>
-                        <div class="absolute -top-4 -left-4 w-16 h-16 rounded-xl -z-10" style="background: #2C3DA6; opacity: 0.1;"></div>
+                        <div class="absolute -bottom-8 -right-8 w-32 h-32 rounded-full -z-10" style="background: #00C4D8; opacity: 0.15; filter: blur(40px);"></div>
+                        <div class="absolute -top-8 -left-8 w-24 h-24 rounded-full -z-10" style="background: #2C3DA6; opacity: 0.08; filter: blur(40px);"></div>
                     </div>
                 </div>
 
@@ -91,11 +80,7 @@
 
                     <div class="space-y-4 text-gray-600 leading-relaxed text-justify mb-8">
                         <p>
-                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                            when an unknown printer took a galley of type and scrambled it to make a type
-                            specimen book. It has survived not only five centuries, but also the leap into
-                            electronic typesetting, remaining essentially unchanged.
+                            Himpunan Mahasiswa Software Engineering (HMSE) merupakan organisasi kemahasiswaan yang menjadi wadah bagi mahasiswa Software Engineering untuk berkembang, berkolaborasi, dan berkontribusi secara aktif dalam lingkungan akademik maupun non-akademik. HMSE hadir sebagai penghubung antara mahasiswa, dosen, serta pihak eksternal dalam mendukung peningkatan kualitas diri, baik dalam aspek keilmuan, keterampilan, maupun soft skills. Dengan semangat kebersamaan dan inovasi, HMSE berkomitmen untuk menciptakan lingkungan yang inspiratif dan progresif, sehingga mampu mendorong setiap anggotanya untuk terus bertumbuh dan mencapai potensi terbaiknya, sejalan dengan visi menuju keunggulan bersama.
                         </p>
                     </div>
 

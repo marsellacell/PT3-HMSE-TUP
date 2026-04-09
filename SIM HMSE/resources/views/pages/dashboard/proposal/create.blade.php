@@ -165,6 +165,47 @@
                             </select>
                         </div>
                     </div>
+
+                    {{-- Risk Level Selection --}}
+                    <div class="pt-4 border-t border-gray-200">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Tingkat Risiko</label>
+                        <div x-data="{ riskLevel: 'low' }" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition"
+                                       :class="riskLevel === 'low' ? 'border-green-400 bg-green-50' : 'border-gray-200'">
+                                    <input type="radio" name="risk_level" value="low" x-model="riskLevel">
+                                    <span class="font-semibold text-gray-800">Resiko Rendah</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition"
+                                       :class="riskLevel === 'high' ? 'border-red-400 bg-red-50' : 'border-gray-200'">
+                                    <input type="radio" name="risk_level" value="high" x-model="riskLevel">
+                                    <span class="font-semibold text-gray-800">Resiko Tinggi</span>
+                                </label>
+                            </div>
+
+                            {{-- Template Download Section --}}
+                            <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                                <p class="text-sm font-semibold text-gray-800 mb-3">📥 Download Template Standar</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <a href="{{ route('proposals.download-template', 'low') }}"
+                                       class="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-green-600 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                        </svg>
+                                        Template Risiko Rendah
+                                    </a>
+                                    <a href="{{ route('proposals.download-template', 'high') }}"
+                                       class="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                        </svg>
+                                        Template Risiko Tinggi
+                                    </a>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">Unduh template DOCX sesuai tingkat risiko kegiatan Anda untuk referensi dan pengerjaan awal proposal.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

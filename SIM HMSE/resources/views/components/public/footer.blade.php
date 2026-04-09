@@ -13,20 +13,24 @@
                         </svg>
                         Lokasi Sekretariat
                     </h3>
-                    <div class="rounded-xl overflow-hidden shadow-lg h-52" style="border: 1px solid rgba(255,255,255,0.2);">
+                    <a href="https://www.google.com/maps/search/Jl.+D.+I.+Panjaitan+No.+128+Purwokerto+Gedung+IOT+Lantai+3,+Telkom+University+Purwokerto,+Purwokerto+Selatan,+Banyumas,+Jawa+Tengah,+53147" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="block rounded-xl overflow-hidden shadow-lg h-52 hover:shadow-xl transition-shadow duration-300" 
+                       style="border: 1px solid rgba(255,255,255,0.2);">
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.0!2d109.3!3d-7.4!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sTelkom+University+Purwokerto!5e0!3m2!1sid!2sid!4v1"
                             width="100%"
                             height="100%"
-                            style="border:0;"
+                            style="border:0; pointer-events: none;"
                             allowfullscreen=""
                             loading="lazy"
                             referrerpolicy="no-referrer-when-downgrade"
                             class="grayscale hover:grayscale-0 transition-all duration-300"
                         ></iframe>
-                    </div>
+                    </a>
                     <p class="text-sm mt-2" style="color: rgba(255,255,255,0.6);">
-                        Telkom University Purwokerto, Jl. D.I. Panjaitan No.128, Purwokerto
+                        Jl. D. I. Panjaitan No. 128 Purwokerto Gedung IOT Lantai 3, Telkom University Purwokerto, Purwokerto Selatan, Banyumas, Jawa Tengah, 53147
                     </p>
                 </div>
 
@@ -58,19 +62,19 @@
                         <div class="flex items-center gap-3">
 
                             {{-- WhatsApp --}}
-                            <a href="https://wa.me/628xxxxxxxxxx" target="_blank"
+                            <a href="https://wa.me/6285385782684" target="_blank"
                                class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
                                style="background: rgba(255,255,255,0.1);"
                                onmouseover="this.style.background='#25D366'"
                                onmouseout="this.style.background='rgba(255,255,255,0.1)'"
-                               title="WhatsApp">
+                               title="WhatsApp: +62 853-8578-2684">
                                 <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                                 </svg>
                             </a>
 
                             {{-- Instagram --}}
-                            <a href="https://instagram.com/hmse_telyu" target="_blank"
+                            <a href="https://www.instagram.com/hmse_telkompurwokerto?igsh=ZGJ1dWl6YmVpOGNo" target="_blank"
                                class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
                                style="background: rgba(255,255,255,0.1);"
                                onmouseover="this.style.background='#E1306C'"
@@ -82,7 +86,7 @@
                             </a>
 
                             {{-- LinkedIn --}}
-                            <a href="https://linkedin.com/company/hmse-telyu" target="_blank"
+                            <a href="https://www.linkedin.com/company/hmse-tup/" target="_blank"
                                class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
                                style="background: rgba(255,255,255,0.1);"
                                onmouseover="this.style.background='#0A66C2'"
@@ -93,8 +97,20 @@
                                 </svg>
                             </a>
 
+                            {{-- YouTube --}}
+                            <a href="https://www.youtube.com/@softwareengineeringtup/videos" target="_blank"
+                               class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+                               style="background: rgba(255,255,255,0.1);"
+                               onmouseover="this.style.background='#FF0000'"
+                               onmouseout="this.style.background='rgba(255,255,255,0.1)'"
+                               title="YouTube">
+                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                </svg>
+                            </a>
+
                             {{-- Email --}}
-                            <a href="mailto:hmse@tup.telkomuniversity.ac.id"
+                            <a href="mailto:hmse@ittelkom-pwt.ac.id"
                                class="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
                                style="background: rgba(255,255,255,0.1);"
                                onmouseover="this.style.background='#00C4D8'"

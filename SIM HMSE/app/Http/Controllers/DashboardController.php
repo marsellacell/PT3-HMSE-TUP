@@ -81,7 +81,67 @@ class DashboardController extends Controller
 
     public function proposalPreview(string $id)
     {
-        return view('pages.dashboard.proposal.preview', compact('id'));
+        // If ID is "new", cannot preview without saved proposal
+        if ($id === 'new') {
+            return response()->json([
+                'error' => 'Tidak bisa preview proposal yang belum disimpan. Silakan save proposal terlebih dahulu.',
+                'action' => 'create'
+            ], 400);
+        }
+
+        try {
+            // Load proposal
+            $proposal = \App\Models\Proposal::findOrFail($id);
+            
+            // Check if template files exist
+            $templateDir = storage_path('app/templates/proposals');
+            if (!is_dir($templateDir)) {
+                return response()->json([
+                    'error' => 'Folder template tidak ada di storage/app/templates/proposals/',
+                    'path' => $templateDir
+                ], 500);
+            }
+            
+            $files = scandir($templateDir);
+            $docxFiles = array_filter($files, function($f) { return strpos($f, '.docx') !== false; });
+            
+            if (empty($docxFiles)) {
+                return response()->json([
+                    'error' => 'Tidak ada file template DOCX di folder storage/app/templates/proposals/',
+                    'found_files' => $files
+                ], 500);
+            }
+            
+            // Generate filled DOCX
+            $templateService = new \App\Services\ProposalTemplateFillerService();
+            $filledDocPath = $templateService->generateFilledProposal($proposal);
+            
+            // Check if file was created
+            if (!file_exists($filledDocPath)) {
+                return response()->json([
+                    'error' => 'Gagal generate dokumen',
+                    'path_attempted' => $filledDocPath
+                ], 500);
+            }
+            
+            // Download the filled DOCX
+            return response()->download($filledDocPath, $proposal->title . '.docx', [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ]);
+            
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Proposal dengan ID "' . $id . '" tidak ditemukan',
+                'id' => $id
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => config('app.debug') ? $e->getTrace() : []
+            ], 500);
+        }
     }
 
     // ─── Keuangan ────────────────────────────────────

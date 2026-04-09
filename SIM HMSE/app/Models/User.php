@@ -46,4 +46,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get all proposals created by this user
+     */
+    public function proposals()
+    {
+        return $this->hasMany(Proposal::class);
+    }
 }
