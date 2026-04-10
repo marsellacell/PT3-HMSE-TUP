@@ -7,6 +7,7 @@ use App\Models\ProposalApproval;
 use App\Services\ProposalGeneratorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProposalController extends Controller
 {
@@ -15,6 +16,7 @@ class ProposalController extends Controller
     public function __construct(ProposalGeneratorService $proposalService)
     {
         $this->proposalService = $proposalService;
+        $this->middleware('auth');
     }
 
     /**

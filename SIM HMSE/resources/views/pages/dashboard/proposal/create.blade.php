@@ -10,27 +10,35 @@
         </div>
     </div>
 
-    <div x-data="{
-        activeSection: 'info',
-        sections: [
-            { id: 'info', label: 'Informasi Umum', icon: 'info' },
-            { id: 'pendahuluan', label: 'Pendahuluan', icon: 'book' },
-            { id: 'kegiatan', label: 'Detail Kegiatan', icon: 'calendar' },
-            { id: 'anggaran', label: 'Anggaran', icon: 'money' },
-            { id: 'penutup', label: 'Penutup & Lampiran', icon: 'flag' },
-        ],
-        completedSections: [],
+    <form action="{{ route('proposals.store') }}" method="POST">
+        @csrf
 
-        markComplete(id) {
-            if (!this.completedSections.includes(id)) this.completedSections.push(id);
-        },
-        isComplete(id) {
-            return this.completedSections.includes(id);
-        },
-        get progress() {
-            return Math.round((this.completedSections.length / this.sections.length) * 100);
-        }
-    }" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div x-data="{
+            activeSection: 'info',
+            sections: [
+                { id: 'info', label: 'Informasi Umum', icon: 'info' },
+                { id: 'pendahuluan', label: 'Pendahuluan', icon: 'book' },
+                { id: 'kegiatan', label: 'Detail Kegiatan', icon: 'calendar' },
+                { id: 'anggaran', label: 'Anggaran', icon: 'money' },
+                { id: 'penutup', label: 'Penutup & Lampiran', icon: 'flag' },
+            ],
+            completedSections: [],
+            isSaving: false,
+
+            markComplete(id) {
+                if (!this.completedSections.includes(id)) this.completedSections.push(id);
+            },
+            isComplete(id) {
+                return this.completedSections.includes(id);
+            },
+            get progress() {
+                return Math.round((this.completedSections.length / this.sections.length) * 100);
+            },
+            saveDraft() {
+                this.isSaving = true;
+                this.$root.querySelector('form').submit();
+            }
+        }" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
         {{-- Left: Section Navigation --}}
         <div class="lg:col-span-1">
@@ -71,14 +79,16 @@
 
                 {{-- Action Buttons --}}
                 <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+                    <button type="submit" @click="saveDraft()" :disabled="isSaving" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-[#2C3DA6] border border-[#2C3DA6] rounded-xl hover:bg-[#2C3DA6]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg x-show="!isSaving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <svg x-show="isSaving" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                        <span x-text="isSaving ? 'Menyimpan...' : '💾 Simpan Draft'"></span>
+                    </button>
                     <a href="{{ route('dashboard.proposal.preview', 'new') }}"
                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#2C3DA6] bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         Preview Proposal
                     </a>
-                    <button class="w-full px-4 py-2.5 text-sm font-semibold text-gray-500 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors">
-                        💾 Simpan Draft
-                    </button>
                 </div>
             </div>
         </div>
@@ -98,7 +108,7 @@
             </div>
 
             {{-- Section 1: Info Umum --}}
-            <div x-show="activeSection === 'info'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <div x-show="activeSection === 'info'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" style="display: block;">
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-bold text-gray-800">📋 Informasi Umum</h3>
@@ -110,7 +120,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Kegiatan *</label>
-                        <input type="text" placeholder="Contoh: Workshop UI/UX Design 2026" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 transition-all">
+                        <input type="text" name="title" placeholder="Contoh: Workshop UI/UX Design 2026" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 transition-all" required>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -147,6 +157,10 @@
                             <input type="text" placeholder="Lokasi" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6]">
                         </div>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Timeline Pelaksanaan *</label>
+                        <input type="text" name="timeline" placeholder="Contoh: 15 Januari - 20 Januari 2024" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 transition-all" required>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -210,7 +224,7 @@
             </div>
 
             {{-- Section 2: Pendahuluan --}}
-            <div x-show="activeSection === 'pendahuluan'" style="display:none" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <div x-show="activeSection === 'pendahuluan'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-bold text-gray-800">📖 Pendahuluan</h3>
@@ -223,38 +237,30 @@
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Latar Belakang *</label>
                         <p class="text-xs text-gray-400 mb-2">Jelaskan alasan dan konteks mengapa kegiatan ini perlu dilaksanakan.</p>
-                        <textarea rows="6" placeholder="Tuliskan latar belakang kegiatan di sini..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 resize-none transition-all"></textarea>
+                        <textarea rows="6" name="background" placeholder="Tuliskan latar belakang kegiatan di sini..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 resize-none transition-all" required></textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tujuan Kegiatan *</label>
                         <p class="text-xs text-gray-400 mb-2">Sebutkan tujuan yang ingin dicapai dari kegiatan ini.</p>
-                        <div x-data="{ items: [''] }" class="space-y-2">
-                            <template x-for="(item, i) in items" :key="i">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-6 h-6 rounded-full bg-[#2C3DA6]/10 text-[#2C3DA6] text-[10px] font-bold flex items-center justify-center flex-shrink-0" x-text="i+1"></span>
-                                    <input type="text" x-model="items[i]" placeholder="Tujuan kegiatan" class="flex-1 px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
-                                    <button @click="items.splice(i,1)" x-show="items.length > 1" class="text-gray-400 hover:text-red-500 transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
-                                </div>
-                            </template>
-                            <button @click="items.push('')" class="text-xs font-semibold text-[#2C3DA6] flex items-center gap-1 hover:text-[#00C4D8]">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                                Tambah Tujuan
-                            </button>
-                        </div>
+                        <textarea rows="4" name="objective" placeholder="Tuliskan tujuan kegiatan di sini..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 resize-none transition-all" required></textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Manfaat Kegiatan</label>
                         <textarea rows="4" placeholder="Manfaat yang diharapkan..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] resize-none transition-all"></textarea>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Identifikasi & Mitigasi Risiko *</label>
+                        <p class="text-xs text-gray-400 mb-2">Jelaskan potensi risiko yang mungkin terjadi dan cara mengantisipasi/mengatasi risiko tersebut.</p>
+                        <textarea rows="4" name="risk_description" placeholder="Tuliskan identifikasi dan rencana mitigasi risiko di sini..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 resize-none transition-all" required></textarea>
+                    </div>
                 </div>
             </div>
 
             {{-- Section 3: Detail Kegiatan --}}
-            <div x-show="activeSection === 'kegiatan'" style="display:none" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <div x-show="activeSection === 'kegiatan'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-bold text-gray-800">📅 Detail Kegiatan</h3>
@@ -320,7 +326,7 @@
             </div>
 
             {{-- Section 4: Anggaran --}}
-            <div x-show="activeSection === 'anggaran'" style="display:none" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <div x-show="activeSection === 'anggaran'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-bold text-gray-800">💰 Rencana Anggaran Biaya</h3>
@@ -334,7 +340,10 @@
                         {no:1, item:'Sewa Ruangan', vol:1, satuan:'Ruangan', harga:500000},
                         {no:2, item:'Snack & Makan Siang', vol:50, satuan:'Pax', harga:25000},
                         {no:3, item:'', vol:1, satuan:'', harga:0}
-                    ] }">
+                    ], get totalBudget() { return this.items.reduce((s,r) => s + ((r.vol||0)*(r.harga||0)), 0); } }">
+                        {{-- Hidden budget field --}}
+                        <input type="hidden" name="budget" :value="totalBudget">
+                        
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead>
@@ -379,7 +388,7 @@
             </div>
 
             {{-- Section 5: Penutup --}}
-            <div x-show="activeSection === 'penutup'" style="display:none" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <div x-show="activeSection === 'penutup'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-bold text-gray-800">🏁 Penutup</h3>
@@ -406,15 +415,18 @@
                 {{-- Final Actions --}}
                 <div class="mt-6 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                     <div class="flex flex-col sm:flex-row gap-3">
+                        <button type="submit" @click="$el.form.submit()"
+                           class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold text-white bg-[#2C3DA6] rounded-xl hover:bg-[#2C3DA6]/90 shadow-lg shadow-[#2C3DA6]/20 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="isSaving">
+                            <svg x-show="!isSaving" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <svg x-show="isSaving" class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                            <span x-text="isSaving ? 'Menyimpan...' : '💾 Simpan Draft'"></span>
+                        </button>
                         <a href="{{ route('dashboard.proposal.preview', 'new') }}"
-                           class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold text-white bg-[#2C3DA6] rounded-xl hover:bg-[#2C3DA6]/90 shadow-lg shadow-[#2C3DA6]/20 transition-all hover:-translate-y-0.5">
+                           class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold text-[#2C3DA6] bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-all">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             Preview Proposal
                         </a>
-                        <button class="px-6 py-3 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
-                            💾 Simpan Draft
-                        </button>
-                        <button class="px-6 py-3 text-sm font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors">
+                        <button type="button" class="px-6 py-3 text-sm font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors">
                             📨 Submit untuk Persetujuan
                         </button>
                     </div>
@@ -422,6 +434,7 @@
             </div>
 
         </div>
-    </div>
+        </div>
+    </form>
 
 </x-layouts.dashboard>
