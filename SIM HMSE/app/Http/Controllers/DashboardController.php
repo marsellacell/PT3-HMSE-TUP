@@ -24,14 +24,12 @@ class DashboardController extends Controller
             'password.min' => 'Password minimal 6 karakter.',
         ]);
 
-        // ─── Dummy auth: terima semua credentials ────
-        // TODO: Ganti dengan Auth::attempt() saat backend siap
+        // Dummy auth: terima semua credentials.
         return redirect()->route('dashboard')->with('success', 'Login berhasil!');
     }
 
     public function logout(Request $request)
     {
-        // TODO: Auth::logout() saat backend siap
         return redirect()->route('login');
     }
 
@@ -39,22 +37,6 @@ class DashboardController extends Controller
     public function index()
     {
         return view('pages.dashboard.index');
-    }
-
-    // ─── Program Kerja ───────────────────────────────
-    public function prokerIndex()
-    {
-        return view('pages.dashboard.proker.index');
-    }
-
-    public function prokerCreate()
-    {
-        return view('pages.dashboard.proker.create');
-    }
-
-    public function prokerShow(string $id)
-    {
-        return view('pages.dashboard.proker.show', compact('id'));
     }
 
     // ─── Kalender ────────────────────────────────────
@@ -81,7 +63,6 @@ class DashboardController extends Controller
 
     public function proposalPreview(string $id)
     {
-        // If ID is "new", cannot preview without saved proposal
         if ($id === 'new') {
             return response()->json([
                 'error' => 'Tidak bisa preview proposal yang belum disimpan. Silakan save proposal terlebih dahulu.',
@@ -90,10 +71,8 @@ class DashboardController extends Controller
         }
 
         try {
-            // Load proposal
             $proposal = \App\Models\Proposal::findOrFail($id);
-            
-            // Check if template files exist
+
             $templateDir = storage_path('app/templates/proposals');
             if (!is_dir($templateDir)) {
                 return response()->json([
@@ -101,34 +80,31 @@ class DashboardController extends Controller
                     'path' => $templateDir
                 ], 500);
             }
-            
+
             $files = scandir($templateDir);
-            $docxFiles = array_filter($files, function($f) { return strpos($f, '.docx') !== false; });
-            
+            $docxFiles = array_filter($files, fn ($f) => strpos($f, '.docx') !== false);
+
             if (empty($docxFiles)) {
                 return response()->json([
                     'error' => 'Tidak ada file template DOCX di folder storage/app/templates/proposals/',
                     'found_files' => $files
                 ], 500);
             }
-            
-            // Generate filled DOCX
+
             $templateService = new \App\Services\ProposalTemplateFillerService();
             $filledDocPath = $templateService->generateFilledProposal($proposal);
-            
-            // Check if file was created
+
             if (!file_exists($filledDocPath)) {
                 return response()->json([
                     'error' => 'Gagal generate dokumen',
                     'path_attempted' => $filledDocPath
                 ], 500);
             }
-            
-            // Download the filled DOCX
+
             return response()->download($filledDocPath, $proposal->title . '.docx', [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             ]);
-            
+
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'error' => 'Proposal dengan ID "' . $id . '" tidak ditemukan',
@@ -152,13 +128,11 @@ class DashboardController extends Controller
 
     public function financeInternal()
     {
-        // Redirect ke tab internal di finance index
         return view('pages.dashboard.finance.index');
     }
 
     public function financeProker()
     {
-        // Redirect ke tab proker di finance index
         return view('pages.dashboard.finance.index');
     }
 

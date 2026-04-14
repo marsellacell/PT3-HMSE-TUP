@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProkerController;
 use App\Http\Controllers\ProposalController;
 
 /*
@@ -42,9 +43,12 @@ Route::prefix('dashboard')->name('dashboard')->group(function () {
 
     // Program Kerja
     Route::prefix('/proker')->name('.proker')->group(function () {
-        Route::get('/', [DashboardController::class, 'prokerIndex'])->name('.index');
-        Route::get('/create', [DashboardController::class, 'prokerCreate'])->name('.create');
-        Route::get('/{id}', [DashboardController::class, 'prokerShow'])->name('.show');
+        Route::get('/', [ProkerController::class, 'index'])->name('.index');
+        Route::get('/create', [ProkerController::class, 'create'])->name('.create');
+        Route::post('/', [ProkerController::class, 'store'])->name('.store');
+        Route::get('/{id}/edit', [ProkerController::class, 'edit'])->name('.edit');
+        Route::put('/{id}', [ProkerController::class, 'update'])->name('.update');
+        Route::get('/{id}', [ProkerController::class, 'show'])->name('.show');
     });
 
     // Kalender
