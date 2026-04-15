@@ -161,7 +161,7 @@
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Timeline Pelaksanaan *</label>
                         <input type="text" name="timeline" placeholder="Contoh: 15 Januari - 20 Januari 2024" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 transition-all" required>
-
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Ketua Panitia *</label>
@@ -343,7 +343,7 @@
                     ], get totalBudget() { return this.items.reduce((s,r) => s + ((r.vol||0)*(r.harga||0)), 0); } }">
                         {{-- Hidden budget field --}}
                         <input type="hidden" name="budget" :value="totalBudget">
-                        
+
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead>
