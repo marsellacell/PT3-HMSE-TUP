@@ -1,15 +1,15 @@
-<x-layouts.dashboard title="Tambah Program Kerja">
+<x-layouts.dashboard title="Edit Program Kerja">
 
     <div class="flex items-center gap-3 mb-6">
-        <a href="{{ route('dashboard.proker.index') }}"
+        <a href="{{ route('dashboard.proker.show', $formState['id']) }}"
             class="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
         </a>
         <div>
-            <h2 class="text-xl font-black text-gray-800">Tambah Program Kerja</h2>
-            <p class="text-sm text-gray-400">Buat program kerja baru untuk himpunan</p>
+            <h2 class="text-xl font-black text-gray-800">Edit Program Kerja</h2>
+            <p class="text-sm text-gray-400">Ubah data program kerja yang sudah tersimpan</p>
         </div>
     </div>
 
@@ -24,14 +24,45 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('dashboard.proker.store') }}" x-data="{
+    @php
+        $timelineItems = collect($formState['timeline'] ?? [])
+            ->map(function ($item) {
+                return [
+                    'title' => $item['title'] ?? '',
+                    'date' => $item['date'] ?? '',
+                ];
+            })
+            ->values();
+
+        if ($timelineItems->isEmpty()) {
+            $timelineItems = collect([['title' => '', 'date' => '']]);
+        }
+
+        $budgetItems = collect($formState['budget_items'] ?? [])
+            ->map(function ($item) {
+                return [
+                    'name' => $item['item'] ?? '',
+                    'qty' => $item['qty'] ?? '',
+                    'price' => $item['price'] ?? 0,
+                ];
+            })
+            ->values();
+
+        if ($budgetItems->isEmpty()) {
+            $budgetItems = collect([['name' => '', 'qty' => '', 'price' => 0]]);
+        }
+    @endphp
+
+    <form method="POST" action="{{ route('dashboard.proker.update', $formState['id']) }}" x-data="{
         step: 1,
         totalSteps: 4,
         stepLabels: ['Info Dasar', 'Jadwal', 'Anggaran', 'Review'],
-        milestones: [{ title: '', date: '' }],
-        items: [{ name: '', qty: '', price: 0 }],
-    }" class="max-w-4xl">
+        milestones: @js($timelineItems),
+        items: @js($budgetItems),
+    }"
+        class="max-w-4xl">
         @csrf
+        @method('PUT')
 
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
             <div class="flex items-center w-full">
@@ -39,11 +70,9 @@
                     <div class="flex items-center" :class="i < stepLabels.length - 1 ? 'flex-1' : ''">
                         <div class="flex flex-col items-center">
                             <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
-                                :class="i + 1 < step ?
-                                    'bg-emerald-500 text-white' :
-                                    (i + 1 === step ?
-                                        'bg-[#2C3DA6] text-white ring-4 ring-[#2C3DA6]/20' :
-                                        'bg-gray-200 text-gray-400')">
+                                :class="i + 1 < step ? 'bg-emerald-500 text-white' : (i + 1 === step ?
+                                    'bg-[#2C3DA6] text-white ring-4 ring-[#2C3DA6]/20' : 'bg-gray-200 text-gray-400'
+                                    )">
                                 <template x-if="i + 1 < step">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -72,7 +101,7 @@
 
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Program Kerja *</label>
-                <input type="text" name="name" value="{{ old('name') }}"
+                <input type="text" name="name" value="{{ old('name', $formState['name']) }}"
                     placeholder="Contoh: Workshop UI/UX Design"
                     class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
             </div>
@@ -84,7 +113,7 @@
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] text-gray-600">
                         <option value="">Pilih Divisi</option>
                         @foreach ($divisionOptions as $division)
-                            <option value="{{ $division }}" @selected(old('division') === $division)>{{ $division }}
+                            <option value="{{ $division }}" @selected(old('division', $formState['division']) === $division)>{{ $division }}
                             </option>
                         @endforeach
                     </select>
@@ -95,7 +124,7 @@
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] text-gray-600">
                         <option value="">Pilih Penanggung Jawab</option>
                         @foreach ($accounts as $account)
-                            <option value="{{ $account['id'] }}" @selected((string) old('pj_user_id') === (string) $account['id'])>{{ $account['name'] }}
+                            <option value="{{ $account['id'] }}" @selected((string) old('pj_user_id', $formState['pj_user_id']) === (string) $account['id'])>{{ $account['name'] }}
                                 ({{ $account['division'] }})</option>
                         @endforeach
                     </select>
@@ -103,40 +132,50 @@
             </div>
 
             <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Status *</label>
+                <select name="status"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] text-gray-600">
+                    @foreach (['draft' => 'Draft', 'preparation' => 'Persiapan', 'on-progress' => 'On Progress', 'completed' => 'Selesai', 'cancelled' => 'Dibatalkan'] as $value => $label)
+                        <option value="{{ $value }}" @selected(old('status', $formState['status']) === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi</label>
                 <textarea rows="4" name="description" placeholder="Deskripsi singkat program kerja..."
-                    class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all resize-none">{{ old('description') }}</textarea>
+                    class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all resize-none">{{ old('description', $formState['description']) }}</textarea>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Lokasi</label>
-                    <input type="text" name="location" value="{{ old('location') }}"
+                    <input type="text" name="location" value="{{ old('location', $formState['location']) }}"
                         placeholder="Lokasi pelaksanaan"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Target Peserta</label>
-                    <input type="number" name="target_participants" value="{{ old('target_participants') }}"
+                    <input type="number" name="target_participants"
+                        value="{{ old('target_participants', $formState['target_participants']) }}"
                         placeholder="Jumlah peserta"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                 </div>
             </div>
         </div>
 
-        <div x-show="step === 2" style="display: none;"
+        <div x-show="step === 2" style="display:none;"
             class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
             <h3 class="text-sm font-bold text-gray-800">Jadwal & Timeline</h3>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Mulai *</label>
-                    <input type="date" name="date_start" value="{{ old('date_start') }}"
+                    <input type="date" name="date_start" value="{{ old('date_start', $formState['date_start']) }}"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Selesai *</label>
-                    <input type="date" name="date_end" value="{{ old('date_end') }}"
+                    <input type="date" name="date_end" value="{{ old('date_end', $formState['date_end']) }}"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                 </div>
             </div>
@@ -175,10 +214,9 @@
             </div>
         </div>
 
-        <div x-show="step === 3" style="display: none;"
+        <div x-show="step === 3" style="display:none;"
             class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
             <h3 class="text-sm font-bold text-gray-800">Rencana Anggaran</h3>
-
             <div class="space-y-3">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
@@ -244,14 +282,14 @@
             </div>
         </div>
 
-        <div x-show="step === 4" style="display: none;"
+        <div x-show="step === 4" style="display:none;"
             class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <h3 class="text-sm font-bold text-gray-800 mb-4">Review & Kirim</h3>
             <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-700 mb-4">
                 <p class="font-semibold mb-1">Semua data siap disimpan</p>
-                <p class="text-xs text-emerald-600">Klik simpan untuk membuat program kerja baru.</p>
+                <p class="text-xs text-emerald-600">Klik simpan untuk memperbarui program kerja.</p>
             </div>
-            <p class="text-sm text-gray-500">Data akan disimpan sebagai draft terlebih dahulu.</p>
+            <p class="text-sm text-gray-500">Perubahan akan disimpan ke database.</p>
         </div>
 
         <div class="flex items-center justify-between mt-6">
@@ -268,7 +306,7 @@
                 </button>
                 <button type="submit" x-show="step === totalSteps"
                     class="px-6 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-md shadow-emerald-600/20">
-                    Simpan Proker
+                    Simpan Perubahan
                 </button>
             </div>
         </div>
