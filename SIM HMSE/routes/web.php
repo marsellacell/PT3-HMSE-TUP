@@ -114,3 +114,10 @@ Route::middleware(['auth'])->prefix('proposals')->name('proposals')->group(funct
     Route::post('/approval/{approval}/reject', [ProposalController::class, 'reject'])->name('.reject');
     Route::delete('/{proposal}', [ProposalController::class, 'destroy'])->name('.destroy');
 });
+
+
+Route::post('/proposal/preview', [ProposalController::class, 'preview'])
+    ->name('dashboard.proposal.preview.post');
+
+Route::post('/proposal/download-docx', [ProposalController::class, 'downloadPreviewDocx'])
+    ->name('dashboard.proposal.download-docx');

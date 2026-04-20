@@ -6,10 +6,10 @@
         sidebarMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
     ]"
 >
-    {{-- Logo Area --}}
-    <div class="flex items-center h-16 px-4 border-b border-gray-100 flex-shrink-0">
+    {{-- Logo Area with Collapse Toggle --}}
+    <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100 flex-shrink-0">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-3 overflow-hidden">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 flex-shrink-0">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
                 <img src="{{ asset('images/logo-zenit.png') }}" alt="HMSE Logo" class="w-full h-full object-contain">
             </div>
             <div x-show="sidebarOpen" x-transition:enter="transition-opacity duration-200" class="overflow-hidden">
@@ -17,6 +17,17 @@
                 <span class="text-[10px] text-gray-400 leading-none whitespace-nowrap">Management System</span>
             </div>
         </a>
+
+        {{-- Collapse Toggle (Hamburger) --}}
+        <button
+            @click="sidebarOpen = !sidebarOpen"
+            class="hidden lg:flex items-center justify-center w-9 h-9 rounded-lg text-gray-400 hover:text-[#2C3DA6] hover:bg-blue-50 transition-all duration-200 flex-shrink-0"
+            title="Toggle Sidebar"
+        >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
     </div>
 
     {{-- Navigation --}}
@@ -90,17 +101,4 @@
         />
 
     </nav>
-
-    {{-- Bottom: Collapse Toggle --}}
-    <div class="border-t border-gray-100 p-3 flex-shrink-0">
-        <button
-            @click="sidebarOpen = !sidebarOpen"
-            class="hidden lg:flex w-full items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-gray-400 hover:text-[#2C3DA6] hover:bg-blue-50 transition-all duration-200"
-        >
-            <svg class="w-5 h-5 transition-transform duration-300" :class="!sidebarOpen && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-            </svg>
-            <span x-show="sidebarOpen" class="text-xs font-medium">Collapse</span>
-        </button>
-    </div>
 </aside>

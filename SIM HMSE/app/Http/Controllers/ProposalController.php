@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
+
 class ProposalController extends Controller
 {
     protected ProposalGeneratorService $proposalService;
@@ -16,7 +17,6 @@ class ProposalController extends Controller
     public function __construct(ProposalGeneratorService $proposalService)
     {
         $this->proposalService = $proposalService;
-        $this->middleware('auth');
     }
 
     /**
@@ -328,6 +328,50 @@ class ProposalController extends Controller
         }
 
         return Storage::download($filePath, $filename);
+    }
+
+    public function preview(Request $request)
+    {
+        // Cast form data to object so blade can use $proposal->field syntax
+        $proposal = (object) [
+            'title'            => $request->input('title', 'Judul Proposal'),
+            'background'       => $request->input('background', '-'),
+            'objective'        => $request->input('objective', '-'),
+            'risk_level'       => $request->input('risk_level', 'low'),
+            'risk_description' => $request->input('risk_description', '-'),
+            'budget'           => $request->input('budget', 0),
+            'timeline'         => $request->input('timeline', '-'),
+            'user'             => (object) ['name' => $request->input('ketua_panitia', 'Nama')],
+        ];
+
+        // Pass raw form data too so the download button can use it
+        $formData = $request->except('_token');
+
+        return view('pages.dashboard.proposal.preview', compact('proposal', 'formData'));
+    }
+
+    /**
+     * Generate and download DOCX from template using form data
+     */
+    public function downloadPreviewDocx(Request $request)
+    {
+        try {
+            $data = $request->except('_token');
+
+            $service = new \App\Services\ProposalDocxFillerService();
+            $filePath = $service->generateFromFormData($data);
+
+            $filename = 'Proposal_' . ($data['title'] ?? 'Kegiatan') . '.docx';
+            // Sanitize filename
+            $filename = preg_replace('/[^A-Za-z0-9_\-\.]/', '_', $filename);
+
+            return response()->download($filePath, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ])->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal generate DOCX: ' . $e->getMessage());
+        }
     }
 }
 

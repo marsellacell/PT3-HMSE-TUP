@@ -84,11 +84,13 @@
                         <svg x-show="isSaving" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
                         <span x-text="isSaving ? 'Menyimpan...' : '💾 Simpan Draft'"></span>
                     </button>
-                    <a href="{{ route('dashboard.proposal.preview', 'new') }}"
-                       class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#2C3DA6] bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
+                    <button type="submit"
+                            formaction="{{ route('dashboard.proposal.preview.post') }}"
+                            formmethod="POST"
+                            class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#2C3DA6] bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         Preview Proposal
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -161,21 +163,33 @@
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Timeline Pelaksanaan *</label>
                         <input type="text" name="timeline" placeholder="Contoh: 15 Januari - 20 Januari 2024" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 transition-all" required>
+                    </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Ketua Panitia *</label>
-                            <input type="text" placeholder="Nama ketua panitia" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6]">
+                            <input type="text" name="ketua_panitia" placeholder="Nama ketua panitia" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6]">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Divisi / Bidang</label>
-                            <select class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] text-gray-600">
+                            <select name="divisi" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] text-gray-600">
                                 <option value="">Pilih Divisi</option>
-                                <option>Divisi Akademik</option>
-                                <option>Divisi Kreatif</option>
-                                <option>Divisi Eksternal</option>
-                                <option>Divisi Kewirausahaan</option>
-                                <option>Divisi Olahraga & Seni</option>
+                                <option>President</option>
+                                <option>Vice President</option>
+                                <option>Secretary 1</option>
+                                <option>Secretary 2</option>
+                                <option>Finance 1</option>
+                                <option>Finance 2</option>
+                                <option>Head of Resource Management</option>
+                                <option>Staff Resource Management</option>
+                                <option>Head of Internal and External Communication</option>
+                                <option>Staff of Internal and External Communication</option>
+                                <option>Head of Research and Creativity</option>
+                                <option>Staff of Research and Creativity</option>
+                                <option>Head of Economy Creative</option>
+                                <option>Staff of Economy Creative</option>
+                                <option>Head of Creative Media and Information</option>
+                                <option>Staff of Creative Media and Information</option>
                             </select>
                         </div>
                     </div>
@@ -421,11 +435,13 @@
                             <svg x-show="isSaving" class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
                             <span x-text="isSaving ? 'Menyimpan...' : '💾 Simpan Draft'"></span>
                         </button>
-                        <a href="{{ route('dashboard.proposal.preview', 'new') }}"
-                           class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold text-[#2C3DA6] bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-all">
+                        <button type="submit"
+                            formaction="{{ route('dashboard.proposal.preview.post') }}"
+                            formmethod="POST"
+                            class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-[#2C3DA6] bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             Preview Proposal
-                        </a>
+                        </button>
                         <button type="button" class="px-6 py-3 text-sm font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors">
                             📨 Submit untuk Persetujuan
                         </button>
