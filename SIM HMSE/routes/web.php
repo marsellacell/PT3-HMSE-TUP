@@ -23,7 +23,8 @@ Route::get('/news/{slug}', [PageController::class, 'newsShow'])->name('news.show
 |--------------------------------------------------------------------------
 */
 
-Route::get('/login', [DashboardController::class, 'loginForm'])->name('login');
+Route::get('/login', [DashboardController::class, 'loginSelect'])->name('login');
+Route::get('/login/{role}', [DashboardController::class, 'loginForm'])->name('login.form')->where('role', 'pengurus|pembina');
 Route::post('/login', [DashboardController::class, 'loginSubmit'])->name('login.submit');
 Route::post('/logout', [DashboardController::class, 'logout'])->name('logout');
 

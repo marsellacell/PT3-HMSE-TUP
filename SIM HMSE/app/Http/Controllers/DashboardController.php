@@ -7,9 +7,14 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
     // ─── Auth ────────────────────────────────────────
-    public function loginForm()
+    public function loginSelect()
     {
-        return view('pages.auth.login');
+        return view('pages.auth.login-select');
+    }
+
+    public function loginForm(string $role)
+    {
+        return view('pages.auth.login', compact('role'));
     }
 
     public function loginSubmit(Request $request)

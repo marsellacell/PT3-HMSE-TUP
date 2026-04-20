@@ -14,13 +14,13 @@
 
     {{-- Bagan Organisasi (visual) --}}
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
-        <h3 class="text-sm font-bold text-gray-800 mb-6">Bagan Organisasi Kabinet Zenith</h3>
+        <h3 class="text-sm font-bold text-gray-800 mb-6">Bagan Organisasi HMSE</h3>
         <div class="flex flex-col items-center gap-3">
-            {{-- Pembina & Kaprodi --}}
+            {{-- Kaprodi & Pembina --}}
             <div class="flex gap-3">
                 @foreach([
-                    ['role' => 'Pembina', 'name' => 'Dr. Ir. Dosen Pembina'],
-                    ['role' => 'Kaprodi', 'name' => 'Dr. Kaprodi RPL'],
+                    ['role' => 'Kaprodi', 'name' => '-'],
+                    ['role' => 'Pembina', 'name' => '-'],
                 ] as $top)
                     <div class="bg-gray-50 border border-gray-200 rounded-xl px-5 py-3 text-center">
                         <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">{{ $top['role'] }}</p>
@@ -29,18 +29,25 @@
                 @endforeach
             </div>
             <div class="w-0.5 h-4 bg-gray-300"></div>
-            {{-- Ketua --}}
+            {{-- President --}}
             <div class="bg-gradient-to-br from-[#2C3DA6] to-[#00C4D8] text-white rounded-2xl px-8 py-4 text-center shadow-lg">
-                <p class="text-[10px] uppercase tracking-widest text-white/70 font-medium mb-1">Pimpinan Umum</p>
-                <p class="text-base font-bold">Budi Hartono</p>
-                <p class="text-xs text-white/60">Ketua Umum</p>
+                <p class="text-[10px] uppercase tracking-widest text-white/70 font-medium mb-1">President</p>
+                <p class="text-base font-bold">Quratu Ayun Defaren</p>
             </div>
             <div class="w-0.5 h-4 bg-gray-300"></div>
-            {{-- Sekretaris & Bendahara --}}
-            <div class="flex gap-3">
+            {{-- Vice President --}}
+            <div class="bg-white border-2 border-[#2C3DA6]/20 rounded-xl px-6 py-3 text-center">
+                <p class="text-[10px] text-[#2C3DA6] uppercase font-semibold tracking-wider">Vice President</p>
+                <p class="text-sm font-bold text-gray-700">Muhammad Rasyid Ridho</p>
+            </div>
+            <div class="w-0.5 h-4 bg-gray-300"></div>
+            {{-- Secretary & Finance --}}
+            <div class="flex flex-wrap justify-center gap-3">
                 @foreach([
-                    ['role' => 'Sekretaris', 'name' => 'Siti Nurhaliza'],
-                    ['role' => 'Bendahara', 'name' => 'Diana Putri'],
+                    ['role' => 'Secretary 1', 'name' => 'Andini Pratiwi'],
+                    ['role' => 'Secretary 2', 'name' => 'Dwi Wulan Ramadhani'],
+                    ['role' => 'Finance 1', 'name' => 'Radita Putri Nuraini'],
+                    ['role' => 'Finance 2', 'name' => 'Salumita Ardiana'],
                 ] as $sup)
                     <div class="bg-white border-2 border-[#2C3DA6]/20 rounded-xl px-5 py-3 text-center">
                         <p class="text-[10px] text-[#2C3DA6] uppercase font-semibold tracking-wider">{{ $sup['role'] }}</p>
@@ -51,9 +58,9 @@
             <div class="w-0.5 h-4 bg-gray-300"></div>
             {{-- Divisi --}}
             <div class="flex flex-wrap justify-center gap-2">
-                @foreach(['Akademik', 'Kreatif', 'Eksternal', 'Kewirausahaan', 'Olahraga & Seni'] as $div)
+                @foreach(['Resource Management', 'Internal and External Communication', 'Research and Creativity', 'Economy Creative', 'Creative Media and Information'] as $div)
                     <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-center">
-                        <p class="text-xs font-semibold text-gray-700">Div. {{ $div }}</p>
+                        <p class="text-xs font-semibold text-gray-700">{{ $div }}</p>
                     </div>
                 @endforeach
             </div>
@@ -62,21 +69,46 @@
 
     {{-- Member List per Division --}}
     @foreach([
-        ['division' => 'Pimpinan Inti', 'color' => '#2C3DA6', 'members' => [
-            ['name' => 'Budi Hartono', 'nim' => '1301210001', 'role' => 'Ketua Umum'],
-            ['name' => 'Andi Wijaya', 'nim' => '1301210002', 'role' => 'Wakil Ketua'],
-            ['name' => 'Siti Nurhaliza', 'nim' => '1301210003', 'role' => 'Sekretaris I'],
-            ['name' => 'Rina Amelia', 'nim' => '1301210004', 'role' => 'Sekretaris II'],
-            ['name' => 'Diana Putri', 'nim' => '1301210005', 'role' => 'Bendahara'],
+        ['division' => 'Pimpinan', 'color' => '#2C3DA6', 'members' => [
+            ['name' => 'Quratu Ayun Defaren', 'nim' => '103122400064', 'role' => 'President'],
+            ['name' => 'Muhammad Rasyid Ridho', 'nim' => '103122400018', 'role' => 'Vice President'],
         ]],
-        ['division' => 'Divisi Akademik', 'color' => '#00C4D8', 'members' => [
-            ['name' => 'Ahmad Fauzi', 'nim' => '1301210011', 'role' => 'Kepala Divisi'],
-            ['name' => 'Layla Kusuma', 'nim' => '1301210012', 'role' => 'Anggota'],
-            ['name' => 'Farhan Malik', 'nim' => '1301210013', 'role' => 'Anggota'],
+        ['division' => 'Sekretaris & Keuangan', 'color' => '#6366f1', 'members' => [
+            ['name' => 'Andini Pratiwi', 'nim' => '103122400060', 'role' => 'Secretary 1'],
+            ['name' => 'Dwi Wulan Ramadhani', 'nim' => '109092530006', 'role' => 'Secretary 2'],
+            ['name' => 'Radita Putri Nuraini', 'nim' => '103122400056', 'role' => 'Finance 1'],
+            ['name' => 'Salumita Ardiana', 'nim' => '109092530004', 'role' => 'Finance 2'],
         ]],
-        ['division' => 'Divisi Kreatif', 'color' => '#ec4899', 'members' => [
-            ['name' => 'Rony Setiawan', 'nim' => '1301210021', 'role' => 'Kepala Divisi'],
-            ['name' => 'Mega Sari', 'nim' => '1301210022', 'role' => 'Anggota'],
+        ['division' => 'Resource Management', 'color' => '#00C4D8', 'members' => [
+            ['name' => 'Cikal Chrestella Cora', 'nim' => '103122400051', 'role' => 'Head of Resource Management'],
+            ['name' => 'Eko Rifki Setyawan', 'nim' => '109092500036', 'role' => 'Staff Resource Management'],
+            ['name' => 'Khilma \'Ainunnajah', 'nim' => '109092530002', 'role' => 'Staff Resource Management'],
+        ]],
+        ['division' => 'Internal and External Communication', 'color' => '#10b981', 'members' => [
+            ['name' => 'Najwa Areefa Ghaisani', 'nim' => '103122400028', 'role' => 'Head of Internal and External Communication'],
+            ['name' => 'Abidah Fatimatuzzahrah', 'nim' => '103122400004', 'role' => 'Staff of Internal and External Communication'],
+            ['name' => 'Felda Ardelia Oktrianti', 'nim' => '109092500023', 'role' => 'Staff of Internal and External Communication'],
+            ['name' => 'Riyan Hidayat Tuafik', 'nim' => '103122400050', 'role' => 'Staff of Internal and External Communication'],
+            ['name' => 'Andhika Abipraya Saputra', 'nim' => '109092500028', 'role' => 'Staff of Internal and External Communication'],
+        ]],
+        ['division' => 'Research and Creativity', 'color' => '#f59e0b', 'members' => [
+            ['name' => 'Haryanto Wifakul Azmi', 'nim' => '103122400037', 'role' => 'Head of Research and Creativity'],
+            ['name' => 'Ulung Putra Sadewo', 'nim' => '103122400013', 'role' => 'Staff of Research and Creativity'],
+            ['name' => 'Putra Anugrah Pamungkas', 'nim' => '103122400007', 'role' => 'Staff of Research and Creativity'],
+            ['name' => 'Muhammad Farel Alghazali', 'nim' => '109092500033', 'role' => 'Staff of Research and Creativity'],
+            ['name' => 'Geusan Edurais Aria Daffa', 'nim' => '103122400026', 'role' => 'Staff of Research and Creativity'],
+        ]],
+        ['division' => 'Economy Creative', 'color' => '#ec4899', 'members' => [
+            ['name' => 'Marta Safitri', 'nim' => '10312240047', 'role' => 'Head of Economy Creative'],
+            ['name' => 'Rizqi Nawaf', 'nim' => '103122430010', 'role' => 'Staff of Economy Creative'],
+            ['name' => 'Danu Warisman', 'nim' => '103122400041', 'role' => 'Staff of Economy Creative'],
+        ]],
+        ['division' => 'Creative Media and Information', 'color' => '#8b5cf6', 'members' => [
+            ['name' => 'Putri Naila Salsabila', 'nim' => '103122400048', 'role' => 'Head of Creative Media and Information'],
+            ['name' => 'Apriani Putri', 'nim' => '109092500019', 'role' => 'Staff of Creative Media and Information'],
+            ['name' => 'Fatikhah Sukma Arti', 'nim' => '103122400019', 'role' => 'Staff of Creative Media and Information'],
+            ['name' => 'Muhammad Rizqi Amartia Putra', 'nim' => '109092500025', 'role' => 'Staff of Creative Media and Information'],
+            ['name' => 'Rahmadanis Danang Kumala', 'nim' => '103122400066', 'role' => 'Staff of Creative Media and Information'],
         ]],
     ] as $group)
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
@@ -90,7 +122,7 @@
                     <div class="flex items-center gap-4 px-6 py-3.5 hover:bg-gray-50/50 transition-colors">
                         <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
                              style="background: {{ $group['color'] }}20; color: {{ $group['color'] }};">
-                            <span class="text-xs font-bold">{{ mb_substr($m['name'], 0, 1) }}</span>
+                            <span class="text-xs font-bold">{{ $m['name'] === '-' ? '?' : mb_substr($m['name'], 0, 1) }}</span>
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-semibold text-gray-700">{{ $m['name'] }}</p>
@@ -112,3 +144,4 @@
     @endforeach
 
 </x-layouts.dashboard>
+
