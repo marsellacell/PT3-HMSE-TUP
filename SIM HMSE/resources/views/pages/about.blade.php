@@ -134,10 +134,14 @@
                 {{-- Connector --}}
                 <div class="w-0.5 h-6 bg-[#1e3a5f]/30"></div>
 
-                {{-- Level 2: Ketua --}}
-                <div class="bg-gradient-to-br from-[#1e3a5f] to-[#2e86ab] text-white rounded-2xl px-8 py-4 text-center shadow-lg">
-                    <p class="text-xs uppercase tracking-widest text-white/70 font-medium mb-1">Pimpinan Umum</p>
-                    <p class="text-base font-bold">Ketua & Wakil Ketua</p>
+                {{-- Level 2: President & Vice President --}}
+                <div class="flex flex-wrap justify-center gap-4">
+                    <div class="bg-gradient-to-br from-[#1e3a5f] to-[#2e86ab] text-white rounded-2xl px-8 py-4 text-center shadow-lg">
+                        <p class="text-base font-bold">President</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-[#1e3a5f] to-[#2e86ab] text-white rounded-2xl px-8 py-4 text-center shadow-lg">
+                        <p class="text-base font-bold">Vice President</p>
+                    </div>
                 </div>
 
                 {{-- Connector --}}
@@ -145,7 +149,7 @@
 
                 {{-- Level 3: Sekretaris & Bendahara --}}
                 <div class="flex flex-wrap justify-center gap-4">
-                    @foreach(['Sekretaris', 'Bendahara'] as $jabatan)
+                    @foreach(['Secretary', 'Finance'] as $jabatan)
                     <div class="bg-white border-2 border-[#2e86ab]/30 rounded-xl px-6 py-3 text-center shadow-sm">
                         <p class="text-xs text-[#2e86ab] uppercase tracking-wide font-semibold">{{ $jabatan }}</p>
                     </div>
@@ -157,7 +161,7 @@
 
                 {{-- Level 4: Divisi-Divisi --}}
                 <div class="flex flex-wrap justify-center gap-3">
-                    @foreach(['Divisi Akademik', 'Divisi Kreatif', 'Divisi Eksternal', 'Divisi Kewirausahaan', 'Divisi Olahraga & Seni'] as $divisi)
+                    @foreach(['Resource Management', 'Internal and External Communication', 'Research and Creativity', 'Economy Creative', 'Creative Media and Information'] as $divisi)
                     <div class="bg-[#f4a261]/10 border border-[#f4a261]/40 rounded-xl px-4 py-3 text-center shadow-sm">
                         <p class="text-xs text-[#1e3a5f] font-semibold leading-tight">{{ $divisi }}</p>
                     </div>
@@ -169,63 +173,139 @@
             {{-- Profil Pengurus per Divisi --}}
             <div class="space-y-14">
 
-                {{-- Pimpinan Utama --}}
+                {{-- Executive Board --}}
                 <div>
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-1 h-6 bg-[#f4a261] rounded-full"></div>
-                        <h3 class="text-xl font-bold text-[#1e3a5f]">Pimpinan Utama</h3>
+                        <h3 class="text-xl font-bold text-[#1e3a5f]">Executive Board</h3>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         @foreach([
-                            ['jabatan' => 'Ketua Umum', 'nama' => 'Nama Ketua'],
-                            ['jabatan' => 'Wakil Ketua', 'nama' => 'Nama Wakil'],
-                            ['jabatan' => 'Sekretaris I', 'nama' => 'Nama Sekretaris I'],
-                            ['jabatan' => 'Sekretaris II', 'nama' => 'Nama Sekretaris II'],
-                            ['jabatan' => 'Bendahara', 'nama' => 'Nama Bendahara'],
+                            ['jabatan' => 'President', 'nama' => 'Quratu Ayun Defaren', 'foto' => 'images/pengurus/quratu-ayun-defaren.jpg', 'fotoPosition' => 'center'],
+                            ['jabatan' => 'Vice President', 'nama' => 'Muhammad Rasyid Ridho', 'foto' => 'images/pengurus/m-rasyid-ridho.jpg', 'fotoPosition' => 'center'],
+                            ['jabatan' => 'Secretary 1', 'nama' => 'Andini Pratiwi', 'foto' => 'images/pengurus/andini.jpg', 'fotoPosition' => 'center'],
+                            ['jabatan' => 'Secretary 2', 'nama' => 'Dwi Wulan Ramadhani', 'foto' => 'images/pengurus/wulan.jpg', 'fotoPosition' => 'center'],
+                            ['jabatan' => 'Finance 1', 'nama' => 'Radita Putri Nuraini', 'foto' => 'images/pengurus/radita.jpg', 'fotoPosition' => 'center 15%'],
+                            ['jabatan' => 'Finance 2', 'nama' => 'Salumita Ardiana', 'foto' => 'images/pengurus/salumita.jpg', 'fotoPosition' => 'top'],
                         ] as $member)
                         <x-public.member-card
                             :nama="$member['nama']"
                             :jabatan="$member['jabatan']"
+                            :foto="$member['foto']"
+                            :fotoPosition="$member['fotoPosition']"
                         />
                         @endforeach
                     </div>
                 </div>
 
-                {{-- Divisi Akademik --}}
+                {{-- Resource Management --}}
                 <div>
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-1 h-6 bg-[#2e86ab] rounded-full"></div>
-                        <h3 class="text-xl font-bold text-[#1e3a5f]">Divisi Akademik</h3>
+                        <h3 class="text-xl font-bold text-[#1e3a5f]">Resource Management</h3>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         @foreach([
-                            ['jabatan' => 'Kepala Divisi', 'nama' => 'Nama Kadiv'],
-                            ['jabatan' => 'Anggota', 'nama' => 'Nama Anggota 1'],
-                            ['jabatan' => 'Anggota', 'nama' => 'Nama Anggota 2'],
+                            ['jabatan' => 'Head', 'nama' => 'Cikal Chrestella Cora', 'foto' => 'images/pengurus/RSMG-Cikal.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => 'Eko Rifki Setyawan', 'foto' => 'images/pengurus/RSMG-Eko.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => "Khilma 'Ainunnajah", 'foto' => 'images/pengurus/RSMG-Khilma.jpg'],
                         ] as $member)
                         <x-public.member-card
                             :nama="$member['nama']"
                             :jabatan="$member['jabatan']"
+                            :foto="$member['foto']"
                         />
                         @endforeach
                     </div>
                 </div>
 
-                {{-- Divisi Kreatif --}}
+                {{-- Internal and External Communication --}}
                 <div>
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-1 h-6 bg-[#f4a261] rounded-full"></div>
-                        <h3 class="text-xl font-bold text-[#1e3a5f]">Divisi Kreatif</h3>
+                        <h3 class="text-xl font-bold text-[#1e3a5f]">Internal and External Communication</h3>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         @foreach([
-                            ['jabatan' => 'Kepala Divisi', 'nama' => 'Nama Kadiv'],
-                            ['jabatan' => 'Anggota', 'nama' => 'Nama Anggota 1'],
-                            ['jabatan' => 'Anggota', 'nama' => 'Nama Anggota 2'],
+                            ['jabatan' => 'Head', 'nama' => 'Najwa Areefa Ghaisani', 'foto' => 'images/pengurus/iec-najwa.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => 'Abidah Fatimatuzzahrah', 'foto' => 'images/pengurus/iec-abidah.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => 'Felda Ardelia Oktrianti', 'foto' => 'images/pengurus/iec-felda.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => 'Riyan Hidayat Tuafik', 'foto' => 'images/pengurus/iec-rehan.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => 'Andhika Abipraya Saputra', 'foto' => 'images/pengurus/iec-andhika.jpg'],
                         ] as $member)
                         <x-public.member-card
                             :nama="$member['nama']"
                             :jabatan="$member['jabatan']"
+                            :foto="$member['foto']"
+                        />
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Research and Creativity --}}
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-1 h-6 bg-[#2e86ab] rounded-full"></div>
+                        <h3 class="text-xl font-bold text-[#1e3a5f]">Research and Creativity</h3>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        @foreach([
+                            ['jabatan' => 'Head', 'nama' => 'Haryanto Wifakul Azmi', 'foto' => 'images/pengurus/rac-hary.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => 'Ulung Putra Sadewo', 'foto' => 'images/pengurus/rac-ulung.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => 'Putra Anugrah Pamungkas', 'foto' => 'images/pengurus/rac-putra.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => 'Muhammad Farel Alghazali', 'foto' => 'images/pengurus/rac-farel.jpg'],
+                            ['jabatan' => 'Staff', 'nama' => 'Geusan Edurais Aria Daffa', 'foto' => 'images/pengurus/rac-geusan.jpg'],
+                        ] as $member)
+                        <x-public.member-card
+                            :nama="$member['nama']"
+                            :jabatan="$member['jabatan']"
+                            :foto="$member['foto']"
+                        />
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Economy Creative --}}
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-1 h-6 bg-[#f4a261] rounded-full"></div>
+                        <h3 class="text-xl font-bold text-[#1e3a5f]">Economy Creative</h3>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        @foreach([
+                            ['jabatan' => 'Head', 'nama' => 'Marta Safitri', 'foto' => 'images/pengurus/ce-marta.jpg', 'fotoPosition' => 'center 20%'],
+                            ['jabatan' => 'Staff', 'nama' => 'Rizqi Nawaf', 'foto' => 'images/pengurus/ce-nawaf.jpg', 'fotoPosition' => 'center 15%'],
+                            ['jabatan' => 'Staff', 'nama' => 'Danu Warisman', 'foto' => 'images/pengurus/ce-danu.jpg', 'fotoPosition' => 'center 15%'],
+                        ] as $member)
+                        <x-public.member-card
+                            :nama="$member['nama']"
+                            :jabatan="$member['jabatan']"
+                            :foto="$member['foto']"
+                            :fotoPosition="$member['fotoPosition']"
+                        />
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Creative Media and Information --}}
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-1 h-6 bg-[#2e86ab] rounded-full"></div>
+                        <h3 class="text-xl font-bold text-[#1e3a5f]">Creative Media and Information</h3>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        @foreach([
+                            ['jabatan' => 'Head', 'nama' => 'Putri Naila Salsabila', 'foto' => 'images/pengurus/cmi-naia.jpg', 'fotoPosition' => 'center 15%'],
+                            ['jabatan' => 'Staff', 'nama' => 'Apriani Putri', 'foto' => 'images/pengurus/cmi-putri.jpg', 'fotoPosition' => 'center'],
+                            ['jabatan' => 'Staff', 'nama' => 'Fatikhah Sukma Arti', 'foto' => 'images/pengurus/cmi-sukma.jpg', 'fotoPosition' => 'center'],
+                            ['jabatan' => 'Staff', 'nama' => 'Muhammad Rizqi Amartia Putra', 'foto' => 'images/pengurus/cmi-iqi.jpg', 'fotoPosition' => 'center'],
+                            ['jabatan' => 'Staff', 'nama' => 'Rahmadanis Danang Kumala', 'foto' => 'images/pengurus/cmi-danang.jpg', 'fotoPosition' => 'center'],
+                        ] as $member)
+                        <x-public.member-card
+                            :nama="$member['nama']"
+                            :jabatan="$member['jabatan']"
+                            :foto="$member['foto']"
+                            :fotoPosition="$member['fotoPosition']"
                         />
                         @endforeach
                     </div>

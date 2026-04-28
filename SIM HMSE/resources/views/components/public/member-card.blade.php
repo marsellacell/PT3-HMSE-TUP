@@ -2,6 +2,7 @@
     'nama' => 'Nama Anggota',
     'jabatan' => 'Jabatan',
     'foto' => null,
+    'fotoPosition' => 'center',
     'instagram' => null,
     'linkedin' => null,
     'email' => null,
@@ -14,9 +15,10 @@
         <div class="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-[#1e3a5f]/10 to-[#2e86ab]/20 shadow-sm">
             @if($foto)
                 <img
-                    src="{{ asset('storage/' . $foto) }}"
+                    src="{{ asset($foto) }}"
                     alt="{{ $nama }}"
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    style="object-position: {{ $fotoPosition }};"
                     loading="lazy"
                 >
             @else

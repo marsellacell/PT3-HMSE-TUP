@@ -102,8 +102,8 @@ Route::prefix('dashboard')->name('dashboard')->group(function () {
 // Public template download (no auth required)
 Route::get('/proposals/template/{riskLevel}', [ProposalController::class, 'downloadTemplate'])->name('proposals.download-template');
 
-// Protected proposal routes
-Route::middleware(['auth'])->prefix('proposals')->name('proposals')->group(function () {
+// Protected proposal routes (auth temporarily disabled)
+Route::prefix('proposals')->name('proposals')->group(function () {
     Route::get('/', [ProposalController::class, 'index'])->name('.index');
     Route::get('/create', [ProposalController::class, 'create'])->name('.create');
     Route::post('/', [ProposalController::class, 'store'])->name('.store');

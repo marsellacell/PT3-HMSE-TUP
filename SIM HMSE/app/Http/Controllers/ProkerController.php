@@ -311,12 +311,12 @@ class ProkerController extends Controller
     private function dummyAccounts(): array
     {
         return [
-            ['id' => 1, 'name' => 'Ahmad Fauzi', 'email' => 'ahmad.fauzi@hmse.local', 'role' => 'Ketua Panitia', 'division' => 'Divisi Akademik'],
-            ['id' => 2, 'name' => 'Siti Nurhaliza', 'email' => 'siti.nurhaliza@hmse.local', 'role' => 'Sekretaris', 'division' => 'Divisi Eksternal'],
-            ['id' => 3, 'name' => 'Budi Hartono', 'email' => 'budi.hartono@hmse.local', 'role' => 'Bendahara', 'division' => 'Divisi Akademik'],
-            ['id' => 4, 'name' => 'Diana Putri', 'email' => 'diana.putri@hmse.local', 'role' => 'Sie Acara', 'division' => 'Divisi Kewirausahaan'],
-            ['id' => 5, 'name' => 'Rizky Pratama', 'email' => 'rizky.pratama@hmse.local', 'role' => 'Sie Pubdekdok', 'division' => 'Divisi Olahraga & Seni'],
-            ['id' => 6, 'name' => 'Rony Setiawan', 'email' => 'rony.setiawan@hmse.local', 'role' => 'Sie Konsumsi', 'division' => 'Divisi Kreatif'],
+            ['id' => 1, 'name' => 'Ahmad Fauzi', 'email' => 'ahmad.fauzi@hmse.local', 'role' => 'Ketua Panitia', 'division' => 'Research and Creativity'],
+            ['id' => 2, 'name' => 'Siti Nurhaliza', 'email' => 'siti.nurhaliza@hmse.local', 'role' => 'Sekretaris', 'division' => 'Internal and External Communication'],
+            ['id' => 3, 'name' => 'Budi Hartono', 'email' => 'budi.hartono@hmse.local', 'role' => 'Bendahara', 'division' => 'Resource Management'],
+            ['id' => 4, 'name' => 'Diana Putri', 'email' => 'diana.putri@hmse.local', 'role' => 'Sie Acara', 'division' => 'Economy Creative'],
+            ['id' => 5, 'name' => 'Rizky Pratama', 'email' => 'rizky.pratama@hmse.local', 'role' => 'Sie Pubdekdok', 'division' => 'Creative Media and Information'],
+            ['id' => 6, 'name' => 'Rony Setiawan', 'email' => 'rony.setiawan@hmse.local', 'role' => 'Sie Konsumsi', 'division' => 'Research and Creativity'],
         ];
     }
 
@@ -334,22 +334,22 @@ class ProkerController extends Controller
     private function defaultDivisionOptions(): array
     {
         return [
-            'Divisi Akademik',
-            'Divisi Kreatif',
-            'Divisi Eksternal',
-            'Divisi Kewirausahaan',
-            'Divisi Olahraga & Seni',
+            'Resource Management',
+            'Internal and External Communication',
+            'Research and Creativity',
+            'Economy Creative',
+            'Creative Media and Information',
         ];
     }
 
     private function prokerDivisionColor(string $division): string
     {
         return match ($division) {
-            'Divisi Akademik' => '#2C3DA6',
-            'Divisi Kreatif' => '#ec4899',
-            'Divisi Eksternal' => '#00C4D8',
-            'Divisi Kewirausahaan' => '#f59e0b',
-            'Divisi Olahraga & Seni' => '#6b7280',
+            'Resource Management' => '#2C3DA6',
+            'Internal and External Communication' => '#00C4D8',
+            'Research and Creativity' => '#ec4899',
+            'Economy Creative' => '#f59e0b',
+            'Creative Media and Information' => '#6b7280',
             default => '#2C3DA6',
         };
     }

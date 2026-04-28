@@ -10,11 +10,19 @@
         </div>
     </div>
 
-    <form action="{{ route('proposals.store') }}" method="POST">
-        @csrf
+    @if ($errors->any())
+        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6">
+            <p class="font-bold mb-1">Ada beberapa kolom yang belum diisi dengan benar:</p>
+            <ul class="list-disc list-inside text-sm">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-        <div x-data="{
-            activeSection: 'info',
+    <form action="{{ route('proposals.store') }}" method="POST" x-data="{
+        activeSection: 'info',
             sections: [
                 { id: 'info', label: 'Informasi Umum', icon: 'info' },
                 { id: 'pendahuluan', label: 'Pendahuluan', icon: 'book' },
@@ -33,12 +41,10 @@
             },
             get progress() {
                 return Math.round((this.completedSections.length / this.sections.length) * 100);
-            },
-            saveDraft() {
-                this.isSaving = true;
-                this.$root.querySelector('form').submit();
             }
-        }" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        }" @submit="isSaving = true">
+        @csrf
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
         {{-- Left: Section Navigation --}}
         <div class="lg:col-span-1">
@@ -79,12 +85,13 @@
 
                 {{-- Action Buttons --}}
                 <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
-                    <button type="submit" @click="saveDraft()" :disabled="isSaving" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-[#2C3DA6] border border-[#2C3DA6] rounded-xl hover:bg-[#2C3DA6]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button type="submit" :disabled="isSaving" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-[#2C3DA6] border border-[#2C3DA6] rounded-xl hover:bg-[#2C3DA6]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg x-show="!isSaving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         <svg x-show="isSaving" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
                         <span x-text="isSaving ? 'Menyimpan...' : '💾 Simpan Draft'"></span>
                     </button>
                     <button type="submit"
+                            formnovalidate
                             formaction="{{ route('dashboard.proposal.preview.post') }}"
                             formmethod="POST"
                             class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#2C3DA6] bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
@@ -128,11 +135,11 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Tema Kegiatan</label>
-                            <input type="text" placeholder="Tema kegiatan" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 transition-all">
+                            <input type="text" name="tema_kegiatan" placeholder="Tema kegiatan" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/10 transition-all">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Jenis Kegiatan</label>
-                            <select class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] text-gray-600">
+                            <select name="jenis_kegiatan" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] text-gray-600">
                                 <option value="">Pilih Jenis</option>
                                 <option>Seminar</option>
                                 <option>Workshop</option>
@@ -148,15 +155,15 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Pelaksanaan *</label>
-                            <input type="date" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6]">
+                            <input type="date" name="tanggal_pelaksanaan" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6]">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Waktu</label>
-                            <input type="time" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6]">
+                            <input type="time" name="waktu_pelaksanaan" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6]">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Tempat *</label>
-                            <input type="text" placeholder="Lokasi" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6]">
+                            <input type="text" name="tempat_pelaksanaan" placeholder="Lokasi" class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6]">
                         </div>
                     </div>
 
@@ -262,7 +269,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Manfaat Kegiatan</label>
-                        <textarea rows="4" placeholder="Manfaat yang diharapkan..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] resize-none transition-all"></textarea>
+                        <textarea rows="4" name="manfaat_kegiatan" placeholder="Manfaat yang diharapkan..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] resize-none transition-all"></textarea>
                     </div>
 
                     <div>
@@ -286,12 +293,12 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Bentuk Kegiatan *</label>
-                        <textarea rows="3" placeholder="Contoh: Kegiatan berbentuk workshop satu hari penuh dengan sesi teori dan praktik langsung..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] resize-none transition-all"></textarea>
+                        <textarea rows="3" name="bentuk_kegiatan" placeholder="Contoh: Kegiatan berbentuk workshop satu hari penuh dengan sesi teori dan praktik langsung..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] resize-none transition-all"></textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Sasaran Peserta</label>
-                        <textarea rows="2" placeholder="Contoh: Mahasiswa Prodi RPL semester 2–6..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] resize-none transition-all"></textarea>
+                        <textarea rows="2" name="sasaran_peserta" placeholder="Contoh: Mahasiswa Prodi RPL semester 2–6..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] resize-none transition-all"></textarea>
                     </div>
 
                     <div>
@@ -414,7 +421,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Penutup</label>
-                        <textarea rows="4" placeholder="Contoh: Demikian proposal ini kami susun dengan harapan kegiatan Workshop UI/UX Design 2026 dapat terlaksana dengan baik..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] resize-none transition-all"></textarea>
+                        <textarea rows="4" name="penutup" placeholder="Contoh: Demikian proposal ini kami susun dengan harapan kegiatan Workshop UI/UX Design 2026 dapat terlaksana dengan baik..." class="w-full px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] resize-none transition-all"></textarea>
                     </div>
 
                     <div>
@@ -429,13 +436,14 @@
                 {{-- Final Actions --}}
                 <div class="mt-6 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                     <div class="flex flex-col sm:flex-row gap-3">
-                        <button type="submit" @click="$el.form.submit()"
-                           class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold text-white bg-[#2C3DA6] rounded-xl hover:bg-[#2C3DA6]/90 shadow-lg shadow-[#2C3DA6]/20 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="isSaving">
+                        <button type="submit" :disabled="isSaving"
+                           class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold text-white bg-[#2C3DA6] rounded-xl hover:bg-[#2C3DA6]/90 shadow-lg shadow-[#2C3DA6]/20 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg x-show="!isSaving" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                             <svg x-show="isSaving" class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
                             <span x-text="isSaving ? 'Menyimpan...' : '💾 Simpan Draft'"></span>
                         </button>
                         <button type="submit"
+                            formnovalidate
                             formaction="{{ route('dashboard.proposal.preview.post') }}"
                             formmethod="POST"
                             class="flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-[#2C3DA6] bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
