@@ -5,6 +5,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProkerController;
 use App\Http\Controllers\ProposalController;
+use App\Http\Controllers\FinanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,3 +127,16 @@ Route::post('/proposal/preview', [ProposalController::class, 'preview'])
 
 Route::post('/proposal/download-docx', [ProposalController::class, 'downloadPreviewDocx'])
     ->name('dashboard.proposal.download-docx');
+
+/*
+|--------------------------------------------------------------------------
+| Keuangan
+|--------------------------------------------------------------------------
+*/
+Route::get('/dashboard/finance', [FinanceController::class, 'index'])->name('dashboard.finance.index');
+Route::get('/dashboard/finance/create', [FinanceController::class, 'create'])->name('dashboard.finance.create');
+Route::post('/dashboard/finance', [FinanceController::class, 'store'])->name('dashboard.finance.store');
+Route::get('/dashboard/finance/{id}/edit', [FinanceController::class, 'edit'])->name('dashboard.finance.edit');
+Route::put('/dashboard/finance/{id}', [FinanceController::class, 'update'])->name('dashboard.finance.update');
+Route::delete('/dashboard/finance/{id}', [FinanceController::class, 'destroy'])->name('dashboard.finance.destroy');
+Route::get('/dashboard/finance/export', [FinanceController::class, 'export'])->name('dashboard.finance.export');

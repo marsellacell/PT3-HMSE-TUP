@@ -125,20 +125,42 @@ class DashboardController extends Controller
         }
     }
 
-    // ─── Keuangan ────────────────────────────────────
+    // ─── Keuangan ────────────────────────────────────    
     public function financeIndex()
     {
-        return view('pages.dashboard.finance.index');
+        $transaksiInternal = \App\Models\Finance::latest()->get();
+    
+        return view('pages.dashboard.finance.index', compact('transaksiInternal'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required',
+            'type' => 'required',
+            'amount' => 'required|numeric',
+        ]);
+        
+        $request->validate([
+            'amount' => 'required|numeric', 
+        ]);
+
+        \App\Models\Finance::create($request->all());
+
+        return redirect()->route('dashboard.finance.index')
+                         ->with('success', 'Laporan berhasil disimpan!');
     }
 
     public function financeInternal()
     {
-        return view('pages.dashboard.finance.index');
+        return redirect()->route('dashboard.finance.index', ['tab' => 'internal'])
+                 ->with('success', 'Laporan berhasil disimpan!');
     }
 
     public function financeProker()
     {
-        return view('pages.dashboard.finance.index');
+        return redirect()->route('dashboard.finance.index', ['tab' => 'proker'])
+                 ->with('success', 'Laporan berhasil disimpan!');
     }
 
     // ─── SOTK / Keanggotaan ─────────────────────────
