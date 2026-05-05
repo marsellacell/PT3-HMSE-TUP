@@ -22,7 +22,51 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'jabatan',
+        'nim_nip',
+        'divisi',
+        'avatar',
     ];
+
+    // ── Jabatan urutan TTD ───────────────────────────────────────────────────
+    // Menentukan di langkah ke berapa user ini bisa TTD proposal
+    const TTD_ORDER = [
+        'ketua_panitia'   => 1,
+        'sekretaris'      => 2,
+        'ketua_hmse'      => 3,
+        'pembina'         => 4,
+        'kaprodi'         => 5,
+    ];
+
+    /** Apakah user ini bisa TTD proposal? */
+    public function canSign(): bool
+    {
+        return array_key_exists($this->jabatan, self::TTD_ORDER);
+    }
+
+    /** Urutan TTD user ini (null jika tidak bisa TTD) */
+    public function ttdOrder(): ?int
+    {
+        return self::TTD_ORDER[$this->jabatan] ?? null;
+    }
+
+    /** Label jabatan yang ditampilkan ke user */
+    public function jabatanLabel(): string
+    {
+        return match($this->jabatan) {
+            'ketua_hmse'      => 'Ketua HMSE',
+            'wakil_ketua_hmse'=> 'Wakil Ketua HMSE',
+            'sekretaris'      => 'Sekretaris HMSE',
+            'bendahara'       => 'Bendahara HMSE',
+            'ketua_panitia'   => 'Ketua Panitia',
+            'head_divisi'     => 'Head of Division',
+            'staff'           => 'Staff',
+            'pembina'         => 'Pembina HMSE',
+            'kaprodi'         => 'Kaprodi RPL',
+            default           => ucfirst(str_replace('_', ' ', $this->jabatan ?? 'Pengurus')),
+        };
+    }
 
     /**
      * The attributes that should be hidden for serialization.

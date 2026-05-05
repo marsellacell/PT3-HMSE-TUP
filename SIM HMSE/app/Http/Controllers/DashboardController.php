@@ -20,23 +20,37 @@ class DashboardController extends Controller
     public function loginSubmit(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'email'    => 'required|email',
             'password' => 'required|min:6',
         ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
+            'email.required'    => 'Email wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
             'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal 6 karakter.',
+            'password.min'      => 'Password minimal 6 karakter.',
         ]);
 
-        // Dummy auth: terima semua credentials.
-        return redirect()->route('dashboard')->with('success', 'Login berhasil!');
+        $credentials = $request->only('email', 'password');
+        $remember    = $request->boolean('remember');
+
+        if (\Illuminate\Support\Facades\Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+            return redirect()->route('dashboard')->with('success', 'Login berhasil! Selamat datang, ' . auth()->user()->name . '.');
+        }
+
+        return back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => 'Email atau password salah. Periksa kembali kredensial kamu.']);
     }
+
 
     public function logout(Request $request)
     {
+        \Illuminate\Support\Facades\Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect()->route('login');
     }
+
 
     // ─── Dashboard Overview ──────────────────────────
     public function index()
@@ -53,7 +67,8 @@ class DashboardController extends Controller
     // ─── Proposal ────────────────────────────────────
     public function proposalIndex()
     {
-        return view('pages.dashboard.proposal.index');
+        $proposals = \App\Models\Proposal::latest()->get();
+        return view('pages.dashboard.proposal.index', compact('proposals'));
     }
 
     public function proposalCreate()
@@ -63,72 +78,71 @@ class DashboardController extends Controller
 
     public function proposalShow(string $id)
     {
-        return view('pages.dashboard.proposal.show', compact('id'));
+        $proposal = \App\Models\Proposal::findOrFail($id);
+
+        // Hitung berapa langkah TTD yang sudah selesai berdasarkan status
+        $signedCount = match($proposal->status) {
+            'draft'     => 0,
+            'reviewing' => 2, // Ketua Panitia + Sekretaris sudah TTD
+            'pending'   => 3, // + Ketua HMSE sudah TTD
+            'approved'  => 5, // Semua sudah TTD
+            'rejected'  => 0,
+            default     => 0,
+        };
+
+        return view('pages.dashboard.proposal.show', compact('proposal', 'signedCount'));
     }
+
 
     public function proposalPreview(string $id)
     {
-        if ($id === 'new') {
-            return response()->json([
-                'error' => 'Tidak bisa preview proposal yang belum disimpan. Silakan save proposal terlebih dahulu.',
-                'action' => 'create'
-            ], 400);
-        }
-
         try {
             $proposal = \App\Models\Proposal::findOrFail($id);
-
-            $templateDir = storage_path('app/templates/proposals');
-            if (!is_dir($templateDir)) {
-                return response()->json([
-                    'error' => 'Folder template tidak ada di storage/app/templates/proposals/',
-                    'path' => $templateDir
-                ], 500);
-            }
-
-            $files = scandir($templateDir);
-            $docxFiles = array_filter($files, fn ($f) => strpos($f, '.docx') !== false);
-
-            if (empty($docxFiles)) {
-                return response()->json([
-                    'error' => 'Tidak ada file template DOCX di folder storage/app/templates/proposals/',
-                    'found_files' => $files
-                ], 500);
-            }
-
-            $templateService = new \App\Services\ProposalTemplateFillerService();
-            $filledDocPath = $templateService->generateFilledProposal($proposal);
-
-            if (!file_exists($filledDocPath)) {
-                return response()->json([
-                    'error' => 'Gagal generate dokumen',
-                    'path_attempted' => $filledDocPath
-                ], 500);
-            }
-
-            return response()->download($filledDocPath, $proposal->title . '.docx', [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-            ]);
-
+            return view('pages.dashboard.proposal.preview', compact('proposal'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'error' => 'Proposal dengan ID "' . $id . '" tidak ditemukan',
-                'id' => $id
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => config('app.debug') ? $e->getTrace() : []
-            ], 500);
+            abort(404, 'Proposal tidak ditemukan');
         }
     }
 
     // ─── Keuangan ────────────────────────────────────
     public function financeIndex()
     {
-        return view('pages.dashboard.finance.index');
+        $proposals = \App\Models\Proposal::whereNotNull('proker')->latest()->get();
+        // Ambil semua transaksi urut berdasarkan tanggal, lalu id
+        $transactions = \App\Models\Transaction::with(['proposal', 'user'])
+                            ->orderBy('date', 'asc')
+                            ->orderBy('id', 'asc')
+                            ->get();
+
+        return view('pages.dashboard.finance.index', compact('proposals', 'transactions'));
+    }
+
+    public function storeTransaction(Request $request)
+    {
+        $request->validate([
+            'date'        => 'required|date',
+            'type'        => 'required|in:pemasukan,pengeluaran',
+            'description' => 'required|string|max:255',
+            'amount'      => 'required|numeric|min:0',
+            'method'      => 'required|in:Transfer,Cash,E-Wallet',
+            'proof_file'  => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // bukti transaksi wajib
+            'proposal_id' => 'nullable|exists:proposals,id'
+        ]);
+
+        $proofPath = $request->file('proof_file')->store('finance_proofs', 'public');
+
+        \App\Models\Transaction::create([
+            'date'        => $request->date,
+            'type'        => $request->type,
+            'description' => $request->description,
+            'amount'      => $request->amount,
+            'method'      => $request->method,
+            'proof_path'  => $proofPath,
+            'proposal_id' => $request->proposal_id,
+            'user_id'     => auth()->id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Transaksi berhasil ditambahkan!');
     }
 
     public function financeInternal()

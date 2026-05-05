@@ -13,6 +13,17 @@
         </a>
     </div>
 
+    {{-- Status color map --}}
+    @php
+        $statusMap = [
+            'approved'  => ['label' => 'Disetujui',               'color' => 'emerald', 'pulse' => false],
+            'pending'   => ['label' => 'Menunggu TTD Pembina',    'color' => 'amber',   'pulse' => true],
+            'reviewing' => ['label' => 'Menunggu TTD Ketua',      'color' => 'blue',    'pulse' => true],
+            'draft'     => ['label' => 'Draft',                   'color' => 'gray',    'pulse' => false],
+            'rejected'  => ['label' => 'Ditolak',                 'color' => 'red',     'pulse' => false],
+        ];
+    @endphp
+
     {{-- Table --}}
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
@@ -27,40 +38,50 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
-                    @foreach([
-                        ['name' => 'Proposal Workshop UI/UX Design 2026', 'proker' => 'Workshop UI/UX', 'status' => 'approved', 'status_label' => 'Disetujui', 'status_color' => 'emerald', 'date' => '10 Mar 2026'],
-                        ['name' => 'Proposal Seminar Nasional Tech Week', 'proker' => 'Seminar Tech Week', 'status' => 'pending', 'status_label' => 'Menunggu TTD Pembina', 'status_color' => 'amber', 'date' => '18 Mar 2026'],
-                        ['name' => 'Proposal Bootcamp Web Development', 'proker' => 'Bootcamp Web Dev', 'status' => 'approved', 'status_label' => 'Disetujui', 'status_color' => 'emerald', 'date' => '05 Feb 2026'],
-                        ['name' => 'Proposal Turnamen E-Sport HMSE Cup', 'proker' => 'E-Sport HMSE Cup', 'status' => 'draft', 'status_label' => 'Draft', 'status_color' => 'gray', 'date' => '25 Mar 2026'],
-                        ['name' => 'Proposal Bazaar Kewirausahaan', 'proker' => 'Bazaar Kewirausahaan', 'status' => 'reviewing', 'status_label' => 'Menunggu TTD Ketua', 'status_color' => 'blue', 'date' => '20 Mar 2026'],
-                        ['name' => 'Proposal Creative Content Competition', 'proker' => 'Content Competition', 'status' => 'rejected', 'status_label' => 'Ditolak', 'status_color' => 'red', 'date' => '15 Mar 2026'],
-                    ] as $i => $prop)
+                    @forelse($proposals as $prop)
+                        @php
+                            $st = $statusMap[$prop->status] ?? ['label' => ucfirst($prop->status), 'color' => 'gray', 'pulse' => false];
+                        @endphp
                         <tr class="hover:bg-gray-50/50 transition-colors">
                             <td class="px-6 py-4">
-                                <a href="{{ route('dashboard.proposal.show', $i + 1) }}" class="font-semibold text-gray-700 hover:text-[#2C3DA6] transition-colors">
-                                    {{ $prop['name'] }}
+                                <a href="{{ route('dashboard.proposal.show', $prop->id) }}" class="font-semibold text-gray-700 hover:text-[#2C3DA6] transition-colors">
+                                    {{ $prop->title }}
                                 </a>
                             </td>
-                            <td class="px-4 py-4 text-gray-500">{{ $prop['proker'] }}</td>
+                            <td class="px-4 py-4 text-gray-500">{{ $prop->proker ?? '-' }}</td>
                             <td class="px-4 py-4">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-{{ $prop['status_color'] }}-50 text-{{ $prop['status_color'] }}-700">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-{{ $prop['status_color'] }}-500 {{ $prop['status'] === 'pending' || $prop['status'] === 'reviewing' ? 'animate-pulse' : '' }}"></span>
-                                    {{ $prop['status_label'] }}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-{{ $st['color'] }}-50 text-{{ $st['color'] }}-700">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-{{ $st['color'] }}-500 {{ $st['pulse'] ? 'animate-pulse' : '' }}"></span>
+                                    {{ $st['label'] }}
                                 </span>
                             </td>
-                            <td class="px-4 py-4 text-gray-400">{{ $prop['date'] }}</td>
+                            <td class="px-4 py-4 text-gray-400">{{ $prop->created_at->format('d M Y') }}</td>
                             <td class="px-4 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('dashboard.proposal.show', $i + 1) }}" class="p-2 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-[#2C3DA6] transition-colors" title="Lihat">
+                                    {{-- Preview (mata) → langsung ke preview proposal lengkap --}}
+                                    <a href="{{ route('dashboard.proposal.preview', $prop->id) }}"
+                                       class="p-2 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-[#2C3DA6] transition-colors"
+                                       title="Preview Proposal">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </a>
-                                    <button class="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors" title="Download PDF">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    </button>
+                                    {{-- Detail → halaman detail/approval --}}
+                                    <a href="{{ route('dashboard.proposal.show', $prop->id) }}"
+                                       class="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                                       title="Lihat Detail">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-16 text-center text-gray-400">
+                                <svg class="w-12 h-12 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <p class="font-semibold">Belum ada proposal</p>
+                                <p class="text-sm mt-1">Klik "Buat Proposal" untuk membuat proposal baru.</p>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

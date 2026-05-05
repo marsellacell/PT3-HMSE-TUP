@@ -69,6 +69,7 @@ Route::prefix('dashboard')->name('dashboard')->group(function () {
     // Keuangan
     Route::prefix('/finance')->name('.finance')->group(function () {
         Route::get('/', [DashboardController::class, 'financeIndex'])->name('.index');
+        Route::post('/transaction', [DashboardController::class, 'storeTransaction'])->name('.store');
         Route::get('/internal', [DashboardController::class, 'financeInternal'])->name('.internal');
         Route::get('/proker', [DashboardController::class, 'financeProker'])->name('.proker');
     });

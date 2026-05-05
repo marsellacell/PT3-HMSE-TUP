@@ -1,14 +1,23 @@
 <x-layouts.dashboard title="Preview Proposal">
 
+    @php
+        // Deteksi apakah preview dari form create (plain object) atau dari DB (Eloquent model)
+        $isFromForm  = !isset($proposal->id) || $proposal->id === null;
+        $proposalId  = $isFromForm ? null : $proposal->id;
+        $backUrl     = $isFromForm
+            ? route('dashboard.proposal.create')
+            : route('dashboard.proposal.show', $proposalId);
+    @endphp
+
     {{-- Top Action Bar --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div class="flex items-center gap-3">
-            <a href="{{ route('dashboard.proposal.create') }}" class="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+            <a href="{{ $backUrl }}" class="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </a>
             <div>
                 <h2 class="text-xl font-black text-gray-800">Preview Proposal</h2>
-                <p class="text-sm text-gray-400">Periksa sebelum finalisasi</p>
+                <p class="text-sm text-gray-400">{{ $isFromForm ? 'Preview sementara — belum disimpan' : 'Periksa sebelum finalisasi' }}</p>
             </div>
         </div>
 
@@ -20,6 +29,25 @@
                     @foreach($formData as $key => $value)
                         <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                     @endforeach
+                @elseif(!$isFromForm)
+                    {{-- Preview dari DB: kirim semua field proposal sebagai form data --}}
+                    <input type="hidden" name="title"               value="{{ $proposal->title }}">
+                    <input type="hidden" name="tema_kegiatan"       value="{{ $proposal->tema_kegiatan }}">
+                    <input type="hidden" name="jenis_kegiatan"      value="{{ $proposal->jenis_kegiatan }}">
+                    <input type="hidden" name="tanggal_pelaksanaan" value="{{ $proposal->tanggal_pelaksanaan }}">
+                    <input type="hidden" name="waktu_pelaksanaan"   value="{{ $proposal->waktu_pelaksanaan }}">
+                    <input type="hidden" name="tempat_pelaksanaan"  value="{{ $proposal->tempat_pelaksanaan }}">
+                    <input type="hidden" name="timeline"            value="{{ $proposal->timeline }}">
+                    <input type="hidden" name="background"          value="{{ $proposal->background }}">
+                    <input type="hidden" name="objective"           value="{{ $proposal->objective }}">
+                    <input type="hidden" name="manfaat_kegiatan"    value="{{ $proposal->manfaat_kegiatan }}">
+                    <input type="hidden" name="bentuk_kegiatan"     value="{{ $proposal->bentuk_kegiatan }}">
+                    <input type="hidden" name="sasaran_peserta"     value="{{ $proposal->sasaran_peserta }}">
+                    <input type="hidden" name="risk_level"          value="{{ $proposal->risk_level }}">
+                    <input type="hidden" name="risk_description"    value="{{ $proposal->risk_description }}">
+                    <input type="hidden" name="budget"              value="{{ $proposal->budget }}">
+                    <input type="hidden" name="penutup"             value="{{ $proposal->penutup }}">
+                    <input type="hidden" name="ketua_panitia"       value="{{ $proposal->ketua_panitia }}">
                 @endif
                 <button type="submit"
                     class="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-[#2C3DA6] rounded-xl hover:bg-[#2C3DA6]/90 shadow-lg shadow-[#2C3DA6]/20 transition-all hover:-translate-y-0.5">
