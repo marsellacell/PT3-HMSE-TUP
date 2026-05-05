@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('proposals', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('proker_id')->constrained('program_kerjas')->onDelete('cascade');
+            $table->string('title');
+            $table->string('file_path');
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            // Relasi ke pembuat proposal (User)
+            $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });
     }

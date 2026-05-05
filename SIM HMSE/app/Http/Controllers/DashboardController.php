@@ -104,55 +104,22 @@ class DashboardController extends Controller
         }
     }
 
-    // ─── Keuangan ────────────────────────────────────
+    // ─── Keuangan ────────────────────────────────────    
     public function financeIndex()
     {
-        $proposals = \App\Models\Proposal::whereNotNull('proker')->latest()->get();
-        // Ambil semua transaksi urut berdasarkan tanggal, lalu id
-        $transactions = \App\Models\Transaction::with(['proposal', 'user'])
-                            ->orderBy('date', 'asc')
-                            ->orderBy('id', 'asc')
-                            ->get();
-
-        return view('pages.dashboard.finance.index', compact('proposals', 'transactions'));
-    }
-
-    public function storeTransaction(Request $request)
-    {
-        $request->validate([
-            'date'        => 'required|date',
-            'type'        => 'required|in:pemasukan,pengeluaran',
-            'description' => 'required|string|max:255',
-            'amount'      => 'required|numeric|min:0',
-            'method'      => 'required|in:Transfer,Cash,E-Wallet',
-            'proof_file'  => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // bukti transaksi wajib
-            'proposal_id' => 'nullable|exists:proposals,id'
-        ]);
-
-        $proofPath = $request->file('proof_file')->store('finance_proofs', 'public');
-
-        \App\Models\Transaction::create([
-            'date'        => $request->date,
-            'type'        => $request->type,
-            'description' => $request->description,
-            'amount'      => $request->amount,
-            'method'      => $request->method,
-            'proof_path'  => $proofPath,
-            'proposal_id' => $request->proposal_id,
-            'user_id'     => auth()->id(),
-        ]);
-
-        return redirect()->back()->with('success', 'Transaksi berhasil ditambahkan!');
+        return view('pages.dashboard.finance.index');
     }
 
     public function financeInternal()
     {
-        return view('pages.dashboard.finance.index');
+        return redirect()->route('dashboard.finance.index', ['tab' => 'internal'])
+                 ->with('success', 'Laporan berhasil disimpan!');
     }
 
     public function financeProker()
     {
-        return view('pages.dashboard.finance.index');
+        return redirect()->route('dashboard.finance.index', ['tab' => 'proker'])
+                 ->with('success', 'Laporan berhasil disimpan!');
     }
 
     // ─── SOTK / Keanggotaan ─────────────────────────

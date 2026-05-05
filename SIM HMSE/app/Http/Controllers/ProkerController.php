@@ -345,11 +345,11 @@ class ProkerController extends Controller
     private function prokerDivisionColor(string $division): string
     {
         return match ($division) {
-            'Resource Management' => '#2C3DA6',
-            'Internal and External Communication' => '#00C4D8',
-            'Research and Creativity' => '#ec4899',
-            'Economy Creative' => '#f59e0b',
-            'Creative Media and Information' => '#6b7280',
+            'Divisi Akademik' => '#2C3DA6',
+            'Divisi Kreatif' => '#ec4899',
+            'Divisi Eksternal' => '#00C4D8',
+            'Divisi Kewirausahaan' => '#f59e0b',
+            'Divisi Olahraga & Seni' => '#6b7280',
             default => '#2C3DA6',
         };
     }

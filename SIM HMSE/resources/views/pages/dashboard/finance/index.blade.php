@@ -1,17 +1,7 @@
 <x-layouts.dashboard title="Keuangan">
 
     {{-- Tabs: Internal / Per-Proker --}}
-    <div x-data="{ tab: 'overview', showAddModal: false, showDetailModal: false, selectedTx: null }" class="space-y-6">
-
-        {{-- Success Alert --}}
-        @if(session('success'))
-            <div class="p-4 mb-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
-                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <p class="text-sm text-emerald-700 font-semibold">{{ session('success') }}</p>
-            </div>
-        @endif
+    <div x-data="{ tab: 'overview' }" class="space-y-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -19,10 +9,12 @@
                 <p class="text-sm text-gray-400 mt-0.5">Kelola keuangan internal dan per-proker</p>
             </div>
             <div class="flex items-center gap-2">
-                <button class="px-4 py-2.5 text-sm font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 flex items-center gap-2 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Ekspor Excel
-                </button>
+                <a href="{{ route('dashboard.finance.export') }}" class="...">
+                    <button class="px-4 py-2.5 text-sm font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 flex items-center gap-2 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Ekspor Excel
+                    </button>
+                </a>
             </div>
         </div>
 
@@ -37,10 +29,10 @@
         <div x-show="tab === 'overview'">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 @foreach([
-                    ['label' => 'Total Pemasukan', 'value' => 'Rp 8.500.000', 'icon' => 'trending-up', 'color' => 'emerald', 'change' => '+15%'],
-                    ['label' => 'Total Pengeluaran', 'value' => 'Rp 4.250.000', 'icon' => 'trending-down', 'color' => 'red', 'change' => '+8%'],
-                    ['label' => 'Saldo Kas', 'value' => 'Rp 4.250.000', 'icon' => 'wallet', 'color' => 'blue', 'change' => 'Aktif'],
-                    ['label' => 'Anggaran Proker', 'value' => 'Rp 12.800.000', 'icon' => 'chart', 'color' => 'purple', 'change' => '5 proker'],
+                    ['label' => 'Total Pemasukan', 'value' => 'Rp ' . number_format($totalPemasukan, 0, ',', '.'), 'icon' => 'trending-up', 'color' => 'emerald', 'change' => '+15%'],
+                    ['label' => 'Total Pengeluaran', 'value' => 'Rp ' . number_format($totalPengeluaran, 0, ',', '.'), 'icon' => 'trending-down', 'color' => 'red', 'change' => '+8%'],
+                    ['label' => 'Saldo Kas', 'value' => 'Rp ' . number_format($saldoKas, 0, ',', '.'), 'icon' => 'wallet', 'color' => 'blue', 'change' => 'Aktif'],
+                    ['label' => 'Anggaran Proker', 'value' => 'Rp ' . number_format($anggaranProker, 0, ',', '.'), 'icon' => 'chart', 'color' => 'purple', 'change' => '5 proker'],
                 ] as $stat)
                     <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
                         <div class="flex items-center justify-between mb-3">
@@ -90,60 +82,50 @@
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                     <h3 class="text-sm font-bold text-gray-800">Catatan Kas Internal</h3>
-                    <button @click="showAddModal = true" class="text-xs font-semibold text-[#2C3DA6] hover:text-[#00C4D8] flex items-center gap-1">
+                    <button class="text-xs font-semibold text-[#2C3DA6] hover:text-[#00C4D8] flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                         Tambah Transaksi
-                    </button>
+                    </a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead><tr class="bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                             <th class="px-6 py-3 text-left">Tanggal</th>
                             <th class="px-4 py-3 text-left">Keterangan</th>
-                            <th class="px-4 py-3 text-right">Debit (Masuk)</th>
-                            <th class="px-4 py-3 text-right">Kredit (Keluar)</th>
+                            <th class="px-4 py-3 text-right">Pemasukan</th>
+                            <th class="px-4 py-3 text-right">Pengeluaran</th>
                             <th class="px-4 py-3 text-right">Saldo</th>
-                            <th class="px-4 py-3 text-center">Metode</th>
+                            <th class="px-4 py-3 text-right">Metode</th>
+                            <th class="px-4 py-3 text-center">Deskripsi Tambahan</th>
                             <th class="px-4 py-3 text-center">Bukti</th>
+                            <th class="px-4 py-3 text-center">Aksi</th>
                         </tr></thead>
                         <tbody class="divide-y divide-gray-50">
                             @php $saldo = 0; @endphp
-                            @forelse($transactions as $tx)
-                                @php 
-                                    if ($tx->type === 'pemasukan') $saldo += $tx->amount; 
-                                    else $saldo -= $tx->amount; 
-                                @endphp
-
-                                <tr @click="selectedTx = {{ json_encode(['id' => $tx->id, 'date' => \Carbon\Carbon::parse($tx->date)->format('d M Y'), 'desc' => $tx->description, 'type' => $tx->type, 'amount' => number_format($tx->amount, 0, ',', '.'), 'method' => $tx->method, 'proof_url' => Storage::url($tx->proof_path), 'proker' => $tx->proposal ? $tx->proposal->proker : '-']) }}; showDetailModal = true" class="hover:bg-gray-50/50 transition-colors cursor-pointer">
-                                    <td class="px-6 py-3 text-gray-500">{{ \Carbon\Carbon::parse($tx->date)->format('d M Y') }}</td>
-                                    <td class="px-4 py-3 font-medium text-gray-700">
-                                        {{ $tx->description }}
-                                        @if($tx->proposal)
-                                            <div class="text-[10px] text-[#2C3DA6] mt-0.5 font-semibold">Proker: {{ $tx->proposal->proker }}</div>
-                                        @endif
+                            @foreach([
+                                ['date' => '01 Mar', 'desc' => 'Iuran anggota Maret', 'debit' => 1600000, 'credit' => 0, 'method' => 'Transfer'],
+                                ['date' => '05 Mar', 'desc' => 'Cetak sertifikat Bootcamp', 'debit' => 0, 'credit' => 150000, 'method' => 'Cash'],
+                                ['date' => '10 Mar', 'desc' => 'Sponsor Tech Week', 'debit' => 3000000, 'credit' => 0, 'method' => 'Transfer'],
+                                ['date' => '15 Mar', 'desc' => 'Sewa sound system', 'debit' => 0, 'credit' => 750000, 'method' => 'Transfer'],
+                                ['date' => '20 Mar', 'desc' => 'Penjualan merchandise', 'debit' => 850000, 'credit' => 0, 'method' => 'Cash'],
+                                ['date' => '25 Mar', 'desc' => 'Konsumsi rapat koordinasi', 'debit' => 0, 'credit' => 300000, 'method' => 'E-Wallet'],
+                            ] as $tx)
+                                @php $saldo += $tx['debit'] - $tx['credit']; @endphp
+                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                    <td class="px-6 py-3 text-gray-500">{{ $tx['date'] }}</td>
+                                    <td class="px-4 py-3 font-medium text-gray-700">{{ $tx['desc'] }}</td>
+                                    <td class="px-4 py-3 text-right {{ $tx['debit'] > 0 ? 'text-emerald-600 font-semibold' : 'text-gray-300' }}">
+                                        {{ $tx['debit'] > 0 ? '+ Rp ' . number_format($tx['debit'], 0, ',', '.') : '-' }}
                                     </td>
-                                    <td class="px-4 py-3 text-right {{ $tx->type === 'pemasukan' ? 'text-emerald-600 font-semibold' : 'text-gray-300' }}">
-                                        {{ $tx->type === 'pemasukan' ? '+ Rp ' . number_format($tx->amount, 0, ',', '.') : '-' }}
-                                    </td>
-                                    <td class="px-4 py-3 text-right {{ $tx->type === 'pengeluaran' ? 'text-red-500 font-semibold' : 'text-gray-300' }}">
-                                        {{ $tx->type === 'pengeluaran' ? '- Rp ' . number_format($tx->amount, 0, ',', '.') : '-' }}
+                                    <td class="px-4 py-3 text-right {{ $tx['credit'] > 0 ? 'text-red-500 font-semibold' : 'text-gray-300' }}">
+                                        {{ $tx['credit'] > 0 ? '- Rp ' . number_format($tx['credit'], 0, ',', '.') : '-' }}
                                     </td>
                                     <td class="px-4 py-3 text-right font-bold text-gray-700">Rp {{ number_format($saldo, 0, ',', '.') }}</td>
-                                    <td class="px-4 py-3 text-center"><span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ $tx->method }}</span></td>
+                                    <td class="px-4 py-3 text-center"><span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ $tx['method'] }}</span></td>
                                     <td class="px-4 py-3 text-center">
-                                        @if($tx->proof_path)
-                                            <a href="{{ Storage::url($tx->proof_path) }}" target="_blank" class="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-[#2C3DA6] transition-colors inline-block" title="Lihat bukti">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            </a>
-                                        @else
-                                            <span class="text-xs text-gray-300">-</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="px-6 py-8 text-center text-gray-400 text-sm">
-                                        Belum ada data transaksi. Silakan tambah transaksi baru.
+                                        <button class="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-[#2C3DA6] transition-colors" title="Upload bukti">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        </button>
                                     </td>
                                 </tr>
                             @endforelse
