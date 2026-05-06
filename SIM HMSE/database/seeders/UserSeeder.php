@@ -110,7 +110,7 @@ class UserSeeder extends Seeder
             DB::table('users')->updateOrInsert(
                 ['email' => $user['email']],
                 array_merge($user, [
-                    'email_verified_at' => now(),
+                    'role_id'           => $user['role'] === 'pengurus' ? 2 : 1,
                     'created_at'        => now(),
                     'updated_at'        => now(),
                 ])

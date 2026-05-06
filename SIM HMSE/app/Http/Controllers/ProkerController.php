@@ -231,6 +231,8 @@ class ProkerController extends Controller
             ->count();
         $totalSteps = $timelineSteps->count();
 
+        $proposal = \App\Models\Proposal::where('proker', $prokerRow->name)->first();
+
         $proker = [
             'id' => $prokerRow->id,
             'name' => $prokerRow->name,
@@ -254,6 +256,7 @@ class ProkerController extends Controller
             'doneSteps' => $doneSteps,
             'totalSteps' => $totalSteps,
             'lastUpdated' => $prokerRow->updated_at?->format('d M Y, H:i') ?? now()->format('d M Y, H:i'),
+            'proposal' => $proposal,
         ]);
     }
 
