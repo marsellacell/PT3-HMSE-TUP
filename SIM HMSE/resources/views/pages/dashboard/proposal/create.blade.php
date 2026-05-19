@@ -205,11 +205,16 @@
                     <div class="pt-4 border-t border-gray-200">
                         <label class="block text-sm font-semibold text-gray-700 mb-3">Tingkat Risiko</label>
                         <div x-data="{ riskLevel: 'low' }" class="space-y-4">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <label class="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition"
                                        :class="riskLevel === 'low' ? 'border-green-400 bg-green-50' : 'border-gray-200'">
                                     <input type="radio" name="risk_level" value="low" x-model="riskLevel">
                                     <span class="font-semibold text-gray-800">Resiko Rendah</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition"
+                                       :class="riskLevel === 'medium' ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'">
+                                    <input type="radio" name="risk_level" value="medium" x-model="riskLevel">
+                                    <span class="font-semibold text-gray-800">Resiko Sedang</span>
                                 </label>
                                 <label class="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer transition"
                                        :class="riskLevel === 'high' ? 'border-red-400 bg-red-50' : 'border-gray-200'">
@@ -303,41 +308,68 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-3">Susunan Acara / Rundown</label>
-                        <div x-data="{ rows: [{waktu:'08:00', durasi:'30 menit', kegiatan:'Registrasi'}, {waktu:'08:30', durasi:'60 menit', kegiatan:''}, {waktu:'', durasi:'', kegiatan:''}] }" class="space-y-2">
-                            <div class="grid grid-cols-12 gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider px-1">
-                                <div class="col-span-2">Waktu</div>
-                                <div class="col-span-2">Durasi</div>
-                                <div class="col-span-7">Kegiatan</div>
-                                <div class="col-span-1"></div>
-                            </div>
+                        <div x-data="{ rows: [{kegiatan:'', waktu_mulai:'', waktu_selesai:'', durasi:'', lokasi:'', pic:'', deskripsi:''}] }" class="space-y-4">
                             <template x-for="(r, i) in rows" :key="i">
-                                <div class="grid grid-cols-12 gap-2">
-                                    <input type="time" x-model="r.waktu" class="col-span-2 px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
-                                    <input type="text" x-model="r.durasi" placeholder="30 menit" class="col-span-2 px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
-                                    <input type="text" x-model="r.kegiatan" placeholder="Nama kegiatan/sesi" class="col-span-7 px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
-                                    <div class="col-span-1 flex items-center justify-center">
-                                        <button @click="rows.splice(i,1)" x-show="rows.length > 1" class="text-gray-400 hover:text-red-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                                <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl relative">
+                                    <button type="button" @click="rows.splice(i,1)" x-show="rows.length > 1" class="absolute top-4 right-4 text-gray-400 hover:text-red-500">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                    
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1">Kegiatan</label>
+                                            <input type="text" x-model="r.kegiatan" :name="`rundown_kegiatan[${i}]`" placeholder="Nama kegiatan" class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1">PIC / Penanggung Jawab</label>
+                                            <input type="text" x-model="r.pic" :name="`rundown_pic[${i}]`" placeholder="PIC" class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-3">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1">Waktu Mulai</label>
+                                            <input type="time" x-model="r.waktu_mulai" :name="`rundown_waktu_mulai[${i}]`" class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1">Waktu Selesai</label>
+                                            <input type="time" x-model="r.waktu_selesai" :name="`rundown_waktu_selesai[${i}]`" class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1">Durasi</label>
+                                            <input type="text" x-model="r.durasi" :name="`rundown_durasi[${i}]`" placeholder="30 menit" class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1">Lokasi</label>
+                                            <input type="text" x-model="r.lokasi" :name="`rundown_lokasi[${i}]`" placeholder="Lokasi" class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-500 mb-1">Deskripsi</label>
+                                        <input type="text" x-model="r.deskripsi" :name="`rundown_deskripsi[${i}]`" placeholder="Deskripsi singkat" class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
                                     </div>
                                 </div>
                             </template>
-                            <button @click="rows.push({waktu:'',durasi:'',kegiatan:''})" class="text-xs font-semibold text-[#2C3DA6] flex items-center gap-1">
+                            <button type="button" @click="rows.push({kegiatan:'', waktu_mulai:'', waktu_selesai:'', durasi:'', lokasi:'', pic:'', deskripsi:''})" class="text-xs font-semibold text-[#2C3DA6] flex items-center gap-1 mt-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                                Tambah Baris
+                                Tambah Kegiatan
                             </button>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Susunan Panitia</label>
-                        <div x-data="{ panitia: [{nama:'', jabatan:'Ketua Panitia'},{nama:'', jabatan:'Sekretaris'},{nama:'', jabatan:'Bendahara'}] }" class="space-y-2">
+                        <div x-data="{ panitia: [{nama:'', nim:'', jabatan:'Ketua Panitia'},{nama:'', nim:'', jabatan:'Sekretaris'},{nama:'', nim:'', jabatan:'Bendahara'}] }" class="space-y-2">
                             <template x-for="(p, i) in panitia" :key="i">
                                 <div class="flex gap-2">
-                                    <input type="text" x-model="p.jabatan" placeholder="Jabatan" class="w-40 px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
-                                    <input type="text" x-model="p.nama" placeholder="Nama lengkap" class="flex-1 px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
-                                    <button @click="panitia.splice(i,1)" x-show="panitia.length > 1" class="text-gray-400 hover:text-red-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                                    <input type="text" x-model="p.jabatan" :name="`panitia_jabatan[${i}]`" placeholder="Jabatan" class="w-1/3 px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                    <input type="text" x-model="p.nama" :name="`panitia_nama[${i}]`" placeholder="Nama lengkap" class="w-1/3 px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                    <input type="text" x-model="p.nim" :name="`panitia_nim[${i}]`" placeholder="NIM" class="w-1/3 px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                    <button type="button" @click="panitia.splice(i,1)" x-show="panitia.length > 1" class="text-gray-400 hover:text-red-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
                                 </div>
                             </template>
-                            <button @click="panitia.push({nama:'', jabatan:''})" class="text-xs font-semibold text-[#2C3DA6] flex items-center gap-1">
+                            <button type="button" @click="panitia.push({nama:'', nim:'', jabatan:''})" class="text-xs font-semibold text-[#2C3DA6] flex items-center gap-1 mt-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                                 Tambah Panitia
                             </button>
@@ -357,53 +389,119 @@
                         </button>
                     </div>
 
-                    <div x-data="{ items: [
-                        {no:1, item:'Sewa Ruangan', vol:1, satuan:'Ruangan', harga:500000},
-                        {no:2, item:'Snack & Makan Siang', vol:50, satuan:'Pax', harga:25000},
-                        {no:3, item:'', vol:1, satuan:'', harga:0}
-                    ], get totalBudget() { return this.items.reduce((s,r) => s + ((r.vol||0)*(r.harga||0)), 0); } }">
-                        {{-- Hidden budget field --}}
-                        <input type="hidden" name="budget" :value="totalBudget">
+                    <div x-data="{ 
+                        pemasukan: [
+                            {rincian:'Subsidi Institusi', vol:1, satuan:'Paket', harga:0}
+                        ], 
+                        pengeluaran: [
+                            {divisi:'', rincian:'Sewa Ruangan', vol:1, satuan:'Ruangan', harga:0}
+                        ],
+                        get totalIn() { return this.pemasukan.reduce((s,r) => s + ((r.vol||0)*(r.harga||0)), 0); },
+                        get totalOut() { return this.pengeluaran.reduce((s,r) => s + ((r.vol||0)*(r.harga||0)), 0); }
+                    }">
+                        {{-- Hidden budget field (Total Pengeluaran) --}}
+                        <input type="hidden" name="budget" :value="totalOut">
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b-2 border-gray-200">
-                                        <th class="pb-3 text-left w-10">No</th>
-                                        <th class="pb-3 text-left">Uraian</th>
-                                        <th class="pb-3 text-center w-20">Vol</th>
-                                        <th class="pb-3 text-left w-24">Satuan</th>
-                                        <th class="pb-3 text-right w-36">Harga Satuan (Rp)</th>
-                                        <th class="pb-3 text-right w-36">Jumlah (Rp)</th>
-                                        <th class="pb-3 w-10"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template x-for="(row, i) in items" :key="i">
-                                        <tr class="border-b border-gray-50">
-                                            <td class="py-2 text-gray-400 font-semibold" x-text="i + 1"></td>
-                                            <td class="py-2 pr-2"><input type="text" x-model="row.item" placeholder="Nama item" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]"></td>
-                                            <td class="py-2 pr-2"><input type="number" x-model.number="row.vol" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6] text-center"></td>
-                                            <td class="py-2 pr-2"><input type="text" x-model="row.satuan" placeholder="Pcs" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]"></td>
-                                            <td class="py-2 pr-2"><input type="number" x-model.number="row.harga" placeholder="0" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6] text-right"></td>
-                                            <td class="py-2 text-right font-semibold text-gray-700" x-text="'Rp ' + ((row.vol || 0) * (row.harga || 0)).toLocaleString('id-ID')"></td>
-                                            <td class="py-2"><button @click="items.splice(i,1)" x-show="items.length > 1" class="text-gray-400 hover:text-red-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td>
+                        {{-- Tabel Pemasukan --}}
+                        <div class="mb-8">
+                            <h4 class="text-sm font-bold text-emerald-600 mb-3 border-b border-emerald-100 pb-2">Pemasukan</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b-2 border-gray-200">
+                                            <th class="pb-3 text-left">Rincian</th>
+                                            <th class="pb-3 text-center w-20">Vol</th>
+                                            <th class="pb-3 text-left w-24">Satuan</th>
+                                            <th class="pb-3 text-right w-36">Harga Satuan (Rp)</th>
+                                            <th class="pb-3 text-right w-36">Jumlah (Rp)</th>
+                                            <th class="pb-3 w-10"></th>
                                         </tr>
-                                    </template>
-                                </tbody>
-                                <tfoot>
-                                    <tr class="border-t-2 border-gray-200">
-                                        <td colspan="5" class="py-3 text-right text-sm font-bold text-gray-700">Total Anggaran</td>
-                                        <td class="py-3 text-right text-base font-black text-[#2C3DA6]" x-text="'Rp ' + items.reduce((s,r) => s + ((r.vol||0)*(r.harga||0)), 0).toLocaleString('id-ID')"></td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="(row, i) in pemasukan" :key="'in'+i">
+                                            <tr class="border-b border-gray-50">
+                                                <td class="py-2 pr-2"><input type="text" x-model="row.rincian" :name="`pemasukan_rincian[${i}]`" placeholder="Nama sumber dana" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]"></td>
+                                                <td class="py-2 pr-2"><input type="number" x-model.number="row.vol" :name="`pemasukan_vol[${i}]`" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6] text-center"></td>
+                                                <td class="py-2 pr-2"><input type="text" x-model="row.satuan" :name="`pemasukan_satuan[${i}]`" placeholder="Paket" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]"></td>
+                                                <td class="py-2 pr-2"><input type="number" x-model.number="row.harga" :name="`pemasukan_harga[${i}]`" placeholder="0" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6] text-right"></td>
+                                                <td class="py-2 text-right font-semibold text-gray-700" x-text="'Rp ' + ((row.vol || 0) * (row.harga || 0)).toLocaleString('id-ID')"></td>
+                                                <td class="py-2"><button type="button" @click="pemasukan.splice(i,1)" x-show="pemasukan.length > 1" class="text-gray-400 hover:text-red-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="border-t-2 border-gray-200">
+                                            <td colspan="4" class="py-3 text-right text-sm font-bold text-gray-700">Total Pemasukan</td>
+                                            <td class="py-3 text-right text-base font-black text-emerald-600" x-text="'Rp ' + totalIn.toLocaleString('id-ID')"></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <button type="button" @click="pemasukan.push({rincian:'', vol:1, satuan:'', harga:0})" class="mt-3 text-xs font-semibold text-emerald-600 flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                Tambah Pemasukan
+                            </button>
                         </div>
-                        <button @click="items.push({no:items.length+1, item:'', vol:1, satuan:'', harga:0})" class="mt-3 text-xs font-semibold text-[#2C3DA6] flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                            Tambah Item Anggaran
-                        </button>
+
+                        {{-- Tabel Pengeluaran --}}
+                        <div>
+                            <h4 class="text-sm font-bold text-red-600 mb-3 border-b border-red-100 pb-2">Pengeluaran</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="text-xs font-bold text-gray-400 uppercase tracking-wider border-b-2 border-gray-200">
+                                            <th class="pb-3 text-left w-48">Divisi</th>
+                                            <th class="pb-3 text-left">Rincian</th>
+                                            <th class="pb-3 text-center w-20">Vol</th>
+                                            <th class="pb-3 text-left w-24">Satuan</th>
+                                            <th class="pb-3 text-right w-36">Harga Satuan (Rp)</th>
+                                            <th class="pb-3 text-right w-36">Jumlah (Rp)</th>
+                                            <th class="pb-3 w-10"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="(row, i) in pengeluaran" :key="'out'+i">
+                                            <tr class="border-b border-gray-50">
+                                                <td class="py-2 pr-2">
+                                                    <select x-model="row.divisi" :name="`pengeluaran_divisi[${i}]`" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]">
+                                                        <option value="">Pilih Divisi</option>
+                                                        <option>Acara</option>
+                                                        <option>Humas & Pubdekdok</option>
+                                                        <option>Konsumsi</option>
+                                                        <option>Perlengkapan</option>
+                                                        <option>Kesekretariatan</option>
+                                                        <option>Lain-lain</option>
+                                                    </select>
+                                                </td>
+                                                <td class="py-2 pr-2"><input type="text" x-model="row.rincian" :name="`pengeluaran_rincian[${i}]`" placeholder="Nama item pengeluaran" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]"></td>
+                                                <td class="py-2 pr-2"><input type="number" x-model.number="row.vol" :name="`pengeluaran_vol[${i}]`" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6] text-center"></td>
+                                                <td class="py-2 pr-2"><input type="text" x-model="row.satuan" :name="`pengeluaran_satuan[${i}]`" placeholder="Pcs" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6]"></td>
+                                                <td class="py-2 pr-2"><input type="number" x-model.number="row.harga" :name="`pengeluaran_harga[${i}]`" placeholder="0" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6] text-right"></td>
+                                                <td class="py-2 text-right font-semibold text-gray-700" x-text="'Rp ' + ((row.vol || 0) * (row.harga || 0)).toLocaleString('id-ID')"></td>
+                                                <td class="py-2"><button type="button" @click="pengeluaran.splice(i,1)" x-show="pengeluaran.length > 1" class="text-gray-400 hover:text-red-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="border-t-2 border-gray-200">
+                                            <td colspan="5" class="py-3 text-right text-sm font-bold text-gray-700">Total Pengeluaran</td>
+                                            <td class="py-3 text-right text-base font-black text-red-600" x-text="'Rp ' + totalOut.toLocaleString('id-ID')"></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr class="border-t-2 border-gray-200 bg-gray-50">
+                                            <td colspan="5" class="py-3 text-right text-sm font-bold text-gray-700">Saldo (Pemasukan - Pengeluaran)</td>
+                                            <td class="py-3 text-right text-base font-black" :class="totalIn - totalOut >= 0 ? 'text-[#2C3DA6]' : 'text-red-600'" x-text="'Rp ' + (totalIn - totalOut).toLocaleString('id-ID')"></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <button type="button" @click="pengeluaran.push({divisi:'', rincian:'', vol:1, satuan:'', harga:0})" class="mt-3 text-xs font-semibold text-red-600 flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                Tambah Pengeluaran
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

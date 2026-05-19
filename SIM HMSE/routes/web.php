@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProkerController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\EventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +16,14 @@ use App\Http\Controllers\FinanceController;
 
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
-Route::get('/news', [PageController::class, 'newsIndex'])->name('news.index');
-Route::get('/news/{slug}', [PageController::class, 'newsShow'])->name('news.show');
+
+// Event / Proker Publik (dahulu News)
+Route::get('/events', [EventController::class, 'index'])->name('events.index');
+Route::get('/events/{id}', [EventController::class, 'show'])->name('events.show');
+Route::post('/events/{id}/register', [EventController::class, 'register'])->name('events.register');
+
+// Legacy redirect news → events
+Route::redirect('/news', '/events')->name('news.index');
 
 /*
 |--------------------------------------------------------------------------
@@ -81,9 +88,13 @@ Route::prefix('dashboard')->name('dashboard')->group(function () {
         Route::get('/create', [DashboardController::class, 'sotkCreate'])->name('.create');
     });
 
-    // Events
+    // Events / Proker Publik Management
     Route::prefix('/events')->name('.events')->group(function () {
         Route::get('/', [DashboardController::class, 'eventsIndex'])->name('.index');
+        // Daftar pendaftar per proker
+        Route::get('/{id}/registrations', [DashboardController::class, 'eventRegistrations'])->name('.registrations');
+        // Update status pendaftar
+        Route::patch('/{id}/registrations/{regId}', [DashboardController::class, 'updateRegistrationStatus'])->name('.registrations.update');
     });
 
     // Dokumentasi

@@ -132,11 +132,13 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Mulai *</label>
                     <input type="date" name="date_start" value="{{ old('date_start') }}"
+                        min="{{ date('Y-m-d') }}"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Selesai *</label>
                     <input type="date" name="date_end" value="{{ old('date_end') }}"
+                        min="{{ date('Y-m-d') }}"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                 </div>
             </div>
@@ -153,6 +155,7 @@
                                 x-model="m.title"
                                 class="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6]">
                             <input type="date" :name="`timeline_dates[${i}]`" x-model="m.date"
+                                min="{{ date('Y-m-d') }}"
                                 class="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6]">
                             <button type="button" @click="milestones.splice(i, 1)" x-show="milestones.length > 1"
                                 class="p-1.5 text-gray-400 hover:text-red-500 transition-colors">
@@ -187,6 +190,7 @@
                                 class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-200">
                                 <th class="pb-2 pr-3">Item</th>
                                 <th class="pb-2 pr-3">Qty</th>
+                                <th class="pb-2 pr-3">Satuan</th>
                                 <th class="pb-2 pr-3">Harga (Rp)</th>
                                 <th class="pb-2 text-right">Subtotal</th>
                                 <th class="pb-2 w-10"></th>
@@ -200,7 +204,11 @@
                                             class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
                                     </td>
                                     <td class="py-2 pr-3"><input type="text" :name="`budget_qtys[${i}]`"
-                                            x-model="item.qty" placeholder="1 pcs"
+                                            x-model="item.qty" placeholder="1"
+                                            class="w-20 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
+                                    </td>
+                                    <td class="py-2 pr-3"><input type="text" :name="`budget_units[${i}]`"
+                                            x-model="item.unit" placeholder="pcs"
                                             class="w-24 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
                                     </td>
                                     <td class="py-2 pr-3"><input type="number" :name="`budget_prices[${i}]`"
@@ -224,7 +232,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="border-t-2 border-gray-200">
-                                <td colspan="3" class="py-3 text-right font-bold text-gray-700">Total</td>
+                                <td colspan="4" class="py-3 text-right font-bold text-gray-700">Total</td>
                                 <td class="py-3 text-right font-black text-[#2C3DA6]"
                                     x-text="'Rp ' + items.reduce((s, i) => s + (i.price || 0), 0).toLocaleString('id-ID')">
                                 </td>

@@ -134,7 +134,7 @@
                                     @forelse($proker['budget_items'] as $budget)
                                         <tr class="text-gray-600">
                                             <td class="py-3 pr-4 font-medium">{{ $budget['item'] }}</td>
-                                            <td class="py-3 pr-4 text-gray-400">{{ $budget['qty'] }}</td>
+                                            <td class="py-3 pr-4 text-gray-400">{{ $budget['qty'] }} {{ $budget['unit'] ?? '' }}</td>
                                             <td class="py-3 pr-4 text-right">Rp
                                                 {{ number_format($budget['price'], 0, ',', '.') }}</td>
                                             <td class="py-3 text-right font-semibold">Rp

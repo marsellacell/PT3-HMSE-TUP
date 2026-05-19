@@ -38,10 +38,10 @@
                           {{ request()->routeIs('about') ? 'text-[#2C3DA6] font-semibold' : 'text-gray-500 hover:text-[#2C3DA6]' }}">
                     About Us
                 </a>
-                <a href="{{ route('news.index') }}"
+                <a href="{{ route('events.index') }}"
                    class="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
-                          {{ request()->routeIs('news.*') ? 'text-[#2C3DA6] font-semibold' : 'text-gray-500 hover:text-[#2C3DA6]' }}">
-                    News
+                          {{ request()->routeIs('events.*') ? 'text-[#2C3DA6] font-semibold' : 'text-gray-500 hover:text-[#2C3DA6]' }}">
+                    Event & Proker
                 </a>
 
                 {{-- Related Dropdown --}}
@@ -125,10 +125,10 @@
                       {{ request()->routeIs('about') ? 'text-[#2C3DA6] font-semibold bg-blue-50' : 'text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50' }}">
                 About Us
             </a>
-            <a href="{{ route('news.index') }}"
+            <a href="{{ route('events.index') }}"
                class="px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-150
-                      {{ request()->routeIs('news.*') ? 'text-[#2C3DA6] font-semibold bg-blue-50' : 'text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50' }}">
-                News
+                      {{ request()->routeIs('events.*') ? 'text-[#2C3DA6] font-semibold bg-blue-50' : 'text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50' }}">
+                Event & Proker
             </a>
             <div x-data="{ open: false }">
                 <button @click="open = !open"

@@ -97,40 +97,55 @@
         </div>
     </section>
 
-    {{-- ===== NEWS SECTION ===== --}}
+    {{-- ===== EVENT SECTION ===== --}}
     <section class="py-20" style="background: #f8f9ff;">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
 
             <div class="text-center mb-12">
                 <div class="flex items-center justify-center gap-4 mb-3">
                     <div class="w-8 h-1 rounded-full" style="background: #00C4D8;"></div>
-                    <h2 class="text-3xl font-black" style="color: #2C3DA6;">Berita & Kegiatan</h2>
+                    <h2 class="text-3xl font-black" style="color: #2C3DA6;">Event & Program Kerja</h2>
                     <div class="w-8 h-1 rounded-full" style="background: #00C4D8;"></div>
                 </div>
-                <p class="text-gray-500 text-sm">Tetap update dengan informasi terbaru HMSE</p>
+                <p class="text-gray-500 text-sm">Event terbaru HMSE yang terbuka untuk mahasiswa umum</p>
             </div>
 
-            @if(isset($news) && $news->count() > 0)
+            @php
+                $latestEvents = \App\Models\ProgramKerja::where('is_public', true)
+                    ->orderBy('date_start','asc')->take(3)->get();
+            @endphp
+
+            @if($latestEvents->isNotEmpty())
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                    @foreach($news->take(3) as $item)
+                    @foreach($latestEvents as $ev)
+                        @php
+                            $regCount = $ev->eventRegistrations()->whereIn('status',['pending','confirmed'])->count();
+                            $quota    = $ev->registration_quota ?? $ev->target_participants;
+                        @endphp
                         <article class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                            <div class="aspect-video bg-gray-100">
-                                @if($item->thumbnail)
-                                    <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, #e8ecff, #c5cdf7);">
-                                        <svg class="w-10 h-10 opacity-30" style="color: #2C3DA6;" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-                                        </svg>
-                                    </div>
-                                @endif
-                            </div>
+                            <a href="{{ route('events.show', $ev->id) }}">
+                                <div class="aspect-video bg-gray-100">
+                                    @if($ev->poster)
+                                        <img src="{{ asset('storage/' . $ev->poster) }}" alt="{{ $ev->name }}" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center"
+                                             style="background: linear-gradient(135deg, {{ $ev->color ?? '#2C3DA6' }}18, {{ $ev->color ?? '#2C3DA6' }}35)">
+                                            <svg class="w-10 h-10 opacity-25" fill="none" stroke="{{ $ev->color ?? '#2C3DA6' }}" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </div>
+                            </a>
                             <div class="p-5">
-                                <span class="text-xs text-gray-400">{{ $item->created_at->format('d M Y') }}</span>
-                                <h3 class="font-bold mt-1 mb-2 line-clamp-2" style="color: #1a1a2e;">{{ $item->title }}</h3>
-                                <p class="text-sm text-gray-500 line-clamp-2">{{ Str::limit(strip_tags($item->content ?? ''), 90) }}</p>
-                                <a href="{{ route('news.show', $item->slug) }}" class="inline-flex items-center gap-1 mt-3 text-sm font-semibold" style="color: #00C4D8;">
-                                    Baca →
+                                <p class="text-xs font-semibold mb-1" style="color: #00C4D8;">{{ $ev->division }}</p>
+                                <h3 class="font-bold mt-1 mb-2 line-clamp-2" style="color: #1a1a2e;">{{ $ev->name }}</h3>
+                                <p class="text-xs text-gray-400">
+                                    {{ optional($ev->date_start)->format('d M Y') }}
+                                    @if($ev->location) · {{ $ev->location }} @endif
+                                </p>
+                                <a href="{{ route('events.show', $ev->id) }}" class="inline-flex items-center gap-1 mt-3 text-sm font-semibold" style="color: #00C4D8;">
+                                    Lihat Detail →
                                 </a>
                             </div>
                         </article>
@@ -144,7 +159,6 @@
                             <div class="p-5 space-y-2">
                                 <div class="h-3 bg-gray-100 rounded-full animate-pulse w-1/3"></div>
                                 <div class="h-4 bg-gray-200 rounded-full animate-pulse"></div>
-                                <div class="h-4 bg-gray-200 rounded-full animate-pulse w-4/5"></div>
                                 <div class="h-3 bg-gray-100 rounded-full animate-pulse w-2/5 mt-3"></div>
                             </div>
                         </div>
@@ -153,12 +167,12 @@
             @endif
 
             <div class="text-center">
-                <a href="{{ route('news.index') }}"
+                <a href="{{ route('events.index') }}"
                    class="inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wider border-2 transition-all duration-200 hover:text-white"
                    style="border-color: #2C3DA6; color: #2C3DA6;"
                    onmouseover="this.style.background='#2C3DA6'"
                    onmouseout="this.style.background='transparent'">
-                    Lihat Semua Berita
+                    Lihat Semua Event
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                     </svg>

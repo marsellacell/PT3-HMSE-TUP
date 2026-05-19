@@ -43,17 +43,20 @@
                 return [
                     'name' => $item['item'] ?? '',
                     'qty' => $item['qty'] ?? '',
+                    'unit' => $item['unit'] ?? '',
                     'price' => $item['price'] ?? 0,
                 ];
             })
             ->values();
 
         if ($budgetItems->isEmpty()) {
-            $budgetItems = collect([['name' => '', 'qty' => '', 'price' => 0]]);
+            $budgetItems = collect([['name' => '', 'qty' => '', 'unit' => '', 'price' => 0]]);
         }
     @endphp
 
-    <form method="POST" action="{{ route('dashboard.proker.update', $formState['id']) }}" x-data="{
+    <form method="POST" action="{{ route('dashboard.proker.update', $formState['id']) }}"
+        enctype="multipart/form-data"
+        x-data="{
         step: 1,
         totalSteps: 4,
         stepLabels: ['Info Dasar', 'Jadwal', 'Anggaran', 'Review'],
@@ -162,6 +165,79 @@
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                 </div>
             </div>
+
+            {{-- ═══ PENGATURAN EVENT PUBLIK ═══ --}}
+            <div class="border-t border-gray-100 pt-5">
+                <h4 class="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-[#2C3DA6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+                    </svg>
+                    Pengaturan Event Publik
+                </h4>
+
+                {{-- Poster Upload --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Poster / Banner Event</label>
+                    @php $prokerRow = \App\Models\ProgramKerja::find($formState['id']); @endphp
+                    @if($prokerRow?->poster)
+                        <div class="mb-2">
+                            <img src="{{ asset('storage/' . $prokerRow->poster) }}" alt="Poster" class="h-32 rounded-lg object-cover border border-gray-200">
+                            <p class="text-xs text-gray-400 mt-1">Poster saat ini. Upload baru untuk mengganti.</p>
+                        </div>
+                    @endif
+                    <input type="file" name="poster" accept="image/*"
+                           class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#2C3DA6]/10 file:text-[#2C3DA6] hover:file:bg-[#2C3DA6]/20 transition-all">
+                    <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG, WEBP. Maks 2MB.</p>
+                </div>
+
+                {{-- Toggle & Settings --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {{-- is_public toggle --}}
+                    <div class="flex items-start justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Tampil ke Publik</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Tampilkan proker ini di halaman Event/News publik</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer ml-4 flex-shrink-0">
+                            <input type="hidden" name="is_public" value="0">
+                            <input type="checkbox" name="is_public" value="1" class="sr-only peer"
+                                   {{ old('is_public', $prokerRow?->is_public) ? 'checked' : '' }}>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2C3DA6]"></div>
+                        </label>
+                    </div>
+
+                    {{-- open_registration toggle --}}
+                    <div class="flex items-start justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Buka Pendaftaran</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Izinkan mahasiswa umum mendaftar event ini</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer ml-4 flex-shrink-0">
+                            <input type="hidden" name="open_registration" value="0">
+                            <input type="checkbox" name="open_registration" value="1" class="sr-only peer"
+                                   {{ old('open_registration', $prokerRow?->open_registration) ? 'checked' : '' }}>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2C3DA6]"></div>
+                        </label>
+                    </div>
+
+                    {{-- Batas Pendaftaran --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Batas Waktu Pendaftaran</label>
+                        <input type="datetime-local" name="registration_deadline"
+                               value="{{ old('registration_deadline', $prokerRow?->registration_deadline?->format('Y-m-d\TH:i')) }}"
+                               class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
+                    </div>
+
+                    {{-- Kuota Pendaftaran --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Kuota Pendaftaran</label>
+                        <input type="number" name="registration_quota" min="1"
+                               value="{{ old('registration_quota', $prokerRow?->registration_quota) }}"
+                               placeholder="Kosong = sama dengan target peserta"
+                               class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div x-show="step === 2" style="display:none;"
@@ -171,11 +247,13 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Mulai *</label>
                     <input type="date" name="date_start" value="{{ old('date_start', $formState['date_start']) }}"
+                        min="{{ date('Y-m-d') }}"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Selesai *</label>
                     <input type="date" name="date_end" value="{{ old('date_end', $formState['date_end']) }}"
+                        min="{{ date('Y-m-d') }}"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                 </div>
             </div>
@@ -192,6 +270,7 @@
                                 x-model="m.title"
                                 class="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6]">
                             <input type="date" :name="`timeline_dates[${i}]`" x-model="m.date"
+                                min="{{ date('Y-m-d') }}"
                                 class="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6]">
                             <button type="button" @click="milestones.splice(i, 1)" x-show="milestones.length > 1"
                                 class="p-1.5 text-gray-400 hover:text-red-500 transition-colors">
@@ -225,6 +304,7 @@
                                 class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-200">
                                 <th class="pb-2 pr-3">Item</th>
                                 <th class="pb-2 pr-3">Qty</th>
+                                <th class="pb-2 pr-3">Satuan</th>
                                 <th class="pb-2 pr-3">Harga (Rp)</th>
                                 <th class="pb-2 text-right">Subtotal</th>
                                 <th class="pb-2 w-10"></th>
@@ -238,7 +318,11 @@
                                             class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
                                     </td>
                                     <td class="py-2 pr-3"><input type="text" :name="`budget_qtys[${i}]`"
-                                            x-model="item.qty" placeholder="1 pcs"
+                                            x-model="item.qty" placeholder="1"
+                                            class="w-20 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
+                                    </td>
+                                    <td class="py-2 pr-3"><input type="text" :name="`budget_units[${i}]`"
+                                            x-model="item.unit" placeholder="pcs"
                                             class="w-24 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
                                     </td>
                                     <td class="py-2 pr-3"><input type="number" :name="`budget_prices[${i}]`"
@@ -262,7 +346,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="border-t-2 border-gray-200">
-                                <td colspan="3" class="py-3 text-right font-bold text-gray-700">Total</td>
+                                <td colspan="4" class="py-3 text-right font-bold text-gray-700">Total</td>
                                 <td class="py-3 text-right font-black text-[#2C3DA6]"
                                     x-text="'Rp ' + items.reduce((s, i) => s + (i.price || 0), 0).toLocaleString('id-ID')">
                                 </td>
@@ -271,7 +355,7 @@
                         </tfoot>
                     </table>
                 </div>
-                <button type="button" @click="items.push({ name: '', qty: '', price: 0 })"
+                <button type="button" @click="items.push({ name: '', qty: '', unit: '', price: 0 })"
                     class="text-xs font-semibold text-[#2C3DA6] hover:text-[#00C4D8] flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

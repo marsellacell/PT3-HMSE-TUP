@@ -148,7 +148,18 @@ class ProposalDocxFillerService
         $riskDesc    = $data['risk_description'] ?? '-';
         $budget      = isset($data['budget']) ? 'Rp ' . number_format((float)$data['budget'], 0, ',', '.') : '-';
         $timeline    = $data['timeline'] ?? '-';
-        $ketuaPanitia = $data['ketua_panitia'] ?? '-';
+        $ketuaPanitia = 'Nama Ketua';
+        $sekretaris = 'Nama Sekretaris';
+        if (isset($data['panitia_jabatan'])) {
+            foreach ($data['panitia_jabatan'] as $index => $jabatan) {
+                if (strtolower(trim($jabatan)) === 'ketua panitia') {
+                    $ketuaPanitia = $data['panitia_nama'][$index] ?? 'Nama Ketua';
+                }
+                if (strtolower(trim($jabatan)) === 'sekretaris') {
+                    $sekretaris = $data['panitia_nama'][$index] ?? 'Nama Sekretaris';
+                }
+            }
+        }
         $tema        = $data['tema'] ?? '-';
         $tanggal     = $data['tanggal'] ?? now()->format('d F Y');
         $waktu       = $data['waktu'] ?? '-';
@@ -183,6 +194,7 @@ class ProposalDocxFillerService
             // Halaman Pengesahan
             'Purwokerto, …………………………..' => 'Purwokerto, ' . $tanggal,
             'Nama Ketua'       => $ketuaPanitia,
+            'Nama Sekretaris'  => $sekretaris,
         ];
     }
 }
