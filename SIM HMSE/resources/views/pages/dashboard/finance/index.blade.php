@@ -128,7 +128,7 @@
                                         </button>
                                     </td>
                                 </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -207,7 +207,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="mt-4">
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Keterangan</label>
                         <input type="text" name="description" required placeholder="Contoh: Pembelian alat tulis" class="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-[#2C3DA6] focus:outline-none focus:ring-2 focus:ring-[#2C3DA6]/20">
@@ -274,7 +274,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-400 mb-1">Jenis</p>
-                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold" 
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold"
                                   :class="selectedTx?.type === 'pemasukan' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'"
                                   x-text="selectedTx?.type === 'pemasukan' ? 'Debit (Masuk)' : 'Kredit (Keluar)'"></span>
                         </div>

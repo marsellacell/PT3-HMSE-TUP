@@ -52,7 +52,7 @@
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                 <h3 class="text-sm font-bold text-gray-800 mb-4">Informasi Umum</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    @foreach ([['label' => 'Nama Proker', 'value' => $proker['name']], ['label' => 'Divisi', 'value' => $proker['divisi']], ['label' => 'Penanggung Jawab', 'value' => $pj['name'] ?? 'User Tidak Ditemukan'], ['label' => 'Periode', 'value' => $proker['date_start'] . ' - ' . $proker['date_end']], ['label' => 'Lokasi', 'value' => $proker['location']], ['label' => 'Target Peserta', 'value' => $proker['target_participants'] . ' Mahasiswa']] as $info)
+                    @foreach ([['label' => 'Nama Proker', 'value' => $proker['name']], ['label' => 'Divisi', 'value' => $proker['divisi']], ['label' => 'Penanggung Jawab', 'value' => $pj['name'] ?? 'User Tidak Ditemukan'], ['label' => 'Periode', 'value' => $proker['date_start'] . ' - ' . $proker['date_end']], ['label' => 'Tingkat Risiko', 'value' => $proker['risk_level']], ['label' => 'Lokasi', 'value' => $proker['location']], ['label' => 'Target Peserta', 'value' => $proker['target_participants'] . ' Mahasiswa']] as $info)
                         <div class="p-3 bg-gray-50 rounded-lg">
                             <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
                                 {{ $info['label'] }}</p>
@@ -126,6 +126,7 @@
                                         class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
                                         <th class="pb-3 pr-4">Item</th>
                                         <th class="pb-3 pr-4">Qty</th>
+                                        <th class="pb-3 pr-4">Satuan</th>
                                         <th class="pb-3 pr-4 text-right">Harga</th>
                                         <th class="pb-3 text-right">Subtotal</th>
                                     </tr>
@@ -135,23 +136,24 @@
                                         <tr class="text-gray-600">
                                             <td class="py-3 pr-4 font-medium">{{ $budget['item'] }}</td>
                                             <td class="py-3 pr-4 text-gray-400">{{ $budget['qty'] }}</td>
+                                            <td class="py-3 pr-4 text-gray-400">{{ $budget['unit'] ?? '-' }}</td>
                                             <td class="py-3 pr-4 text-right">Rp
                                                 {{ number_format($budget['price'], 0, ',', '.') }}</td>
                                             <td class="py-3 text-right font-semibold">Rp
-                                                {{ number_format($budget['price'], 0, ',', '.') }}</td>
+                                                {{ number_format((int)($budget['qty'] ?? 0) * $budget['price'], 0, ',', '.') }}</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="py-5 text-center text-sm text-gray-400">Belum ada
+                                            <td colspan="5" class="py-5 text-center text-sm text-gray-400">Belum ada
                                                 rencana anggaran.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                                 <tfoot>
                                     <tr class="border-t-2 border-gray-200 font-bold text-gray-800">
-                                        <td colspan="3" class="py-3 text-right">Total Anggaran</td>
+                                        <td colspan="4" class="py-3 text-right">Total Anggaran</td>
                                         <td class="py-3 text-right text-[#2C3DA6]">Rp
-                                            {{ number_format(collect($proker['budget_items'])->sum('price'), 0, ',', '.') }}
+                                            {{ number_format(collect($proker['budget_items'])->sum(fn($item) => ((int)($item['qty'] ?? 0) * $item['price'])), 0, ',', '.') }}
                                         </td>
                                     </tr>
                                 </tfoot>
