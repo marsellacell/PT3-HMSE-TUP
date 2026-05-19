@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EventRegistration;
+use App\Models\ProgramKerja;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -136,7 +138,34 @@ class DashboardController extends Controller
     // ─── Events ──────────────────────────────────────
     public function eventsIndex()
     {
-        return view('pages.dashboard.events.index');
+        $events = ProgramKerja::withCount([
+            'eventRegistrations as registrations_count' => fn ($q) => $q->whereIn('status', ['pending', 'confirmed']),
+        ])->latest()->get();
+
+        return view('pages.dashboard.events.index', compact('events'));
+    }
+
+    public function eventRegistrations(string $id)
+    {
+        $event = ProgramKerja::findOrFail((int) $id);
+        $registrations = EventRegistration::where('program_kerja_id', $id)
+            ->latest()
+            ->paginate(20);
+
+        return view('pages.dashboard.events.registrations', compact('event', 'registrations'));
+    }
+
+    public function updateRegistrationStatus(Request $request, string $id, string $regId)
+    {
+        $registration = EventRegistration::where('program_kerja_id', $id)->findOrFail((int) $regId);
+
+        $validated = $request->validate([
+            'status' => ['required', 'in:pending,confirmed,cancelled'],
+        ]);
+
+        $registration->update(['status' => $validated['status']]);
+
+        return back()->with('success', 'Status pendaftaran berhasil diperbarui.');
     }
 
     // ─── Dokumentasi ─────────────────────────────────

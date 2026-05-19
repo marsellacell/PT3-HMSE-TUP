@@ -92,20 +92,15 @@ class ProkerController extends Controller
             'budget_item_names' => ['array'],
             'budget_item_names.*' => ['nullable', 'string', 'max:255'],
             'budget_qtys' => ['array'],
-            'budget_qtys.*' => ['nullable', 'integer', 'min:0'],
+            'budget_qtys.*' => ['nullable', 'string', 'max:100'],
             'budget_units' => ['array'],
-            'budget_units.*' => ['nullable', 'string', 'max:50'],
+            'budget_units.*' => ['nullable', 'string', 'max:100'],
             'budget_prices' => ['array'],
             'budget_prices.*' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         $timelines = $this->buildTimeline($request->input('timeline_titles', []), $request->input('timeline_dates', []));
-        $budgetItems = $this->buildBudgetItems(
-            $request->input('budget_item_names', []),
-            $request->input('budget_qtys', []),
-            $request->input('budget_units', []),
-            $request->input('budget_prices', [])
-        );
+        $budgetItems = $this->buildBudgetItems($request->input('budget_item_names', []), $request->input('budget_qtys', []), $request->input('budget_units', []), $request->input('budget_prices', []));
 
         $proker = ProgramKerja::create([
             'name' => $validated['name'],
@@ -164,60 +159,72 @@ class ProkerController extends Controller
         $today = now()->format('Y-m-d');
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'division' => ['required', 'string', 'max:150'],
-            'pj_user_id' => ['required', 'integer', 'in:' . implode(',', $allowedAccountIds)],
-            'description' => ['nullable', 'string'],
-            'location' => ['nullable', 'string', 'max:255'],
-            'target_participants' => ['nullable', 'integer', 'min:1'],
-            'risk_level' => ['required', 'in:rendah,sedang,tinggi'],
-            'date_start' => ['required', 'date', 'date_format:Y-m-d', 'after_or_equal:' . $today],
-            'date_end' => ['required', 'date', 'after_or_equal:date_start'],
-            'timeline_titles' => ['array'],
-            'timeline_titles.*' => ['nullable', 'string', 'max:255'],
-            'timeline_dates' => ['array'],
-            'timeline_dates.*' => ['nullable', 'date'],
-            'budget_item_names' => ['array'],
-            'budget_item_names.*' => ['nullable', 'string', 'max:255'],
-            'budget_qtys' => ['array'],
-            'budget_qtys.*' => ['nullable', 'integer', 'min:0'],
-            'budget_units' => ['array'],
-            'budget_units.*' => ['nullable', 'string', 'max:50'],
-            'budget_prices' => ['array'],
-            'budget_prices.*' => ['nullable', 'numeric', 'min:0'],
-            'status' => ['required', 'in:draft,preparation,on-progress,completed,cancelled'],
+            'name'                  => ['required', 'string', 'max:255'],
+            'division'              => ['required', 'string', 'max:150'],
+            'pj_user_id'            => ['required', 'integer', 'in:' . implode(',', $allowedAccountIds)],
+            'description'           => ['nullable', 'string'],
+            'location'              => ['nullable', 'string', 'max:255'],
+            'target_participants'   => ['nullable', 'integer', 'min:1'],
+            'date_start'            => ['required', 'date'],
+            'date_end'              => ['required', 'date', 'after_or_equal:date_start'],
+            'status'                => ['required', 'in:draft,preparation,on-progress,completed,cancelled'],
+            'timeline_titles'       => ['array'],
+            'timeline_titles.*'     => ['nullable', 'string', 'max:255'],
+            'timeline_dates'        => ['array'],
+            'timeline_dates.*'      => ['nullable', 'date'],
+            'budget_item_names'     => ['array'],
+            'budget_item_names.*'   => ['nullable', 'string', 'max:255'],
+            'budget_qtys'           => ['array'],
+            'budget_qtys.*'         => ['nullable', 'string', 'max:100'],
+            'budget_units'          => ['array'],
+            'budget_units.*'        => ['nullable', 'string', 'max:100'],
+            'budget_prices'         => ['array'],
+            'budget_prices.*'       => ['nullable', 'numeric', 'min:0'],
+            // Public event fields
+            'poster'                => ['nullable', 'image', 'max:2048'],
+            'is_public'             => ['nullable', 'boolean'],
+            'open_registration'     => ['nullable', 'boolean'],
+            'registration_deadline' => ['nullable', 'date'],
+            'registration_quota'    => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $timelines = $this->buildTimeline($request->input('timeline_titles', []), $request->input('timeline_dates', []), true);
-        $budgetItems = $this->buildBudgetItems(
-            $request->input('budget_item_names', []),
-            $request->input('budget_qtys', []),
-            $request->input('budget_units', []),
-            $request->input('budget_prices', [])
-        );
+        $timelines   = $this->buildTimeline($request->input('timeline_titles', []), $request->input('timeline_dates', []), true);
+        $budgetItems = $this->buildBudgetItems($request->input('budget_item_names', []), $request->input('budget_qtys', []), $request->input('budget_units', []), $request->input('budget_prices', []));
+
+        // Handle poster upload
+        $posterPath = $proker->poster;
+        if ($request->hasFile('poster')) {
+            $posterPath = $request->file('poster')->store('posters', 'public');
+        }
 
         $proker->update([
-            'name' => $validated['name'],
-            'division' => $validated['division'],
-            'status' => $validated['status'],
-            'pj_user_id' => $validated['pj_user_id'],
-            'date_start' => $validated['date_start'],
-            'date_end' => $validated['date_end'],
-            'description' => $validated['description'] ?? null,
-            'location' => $validated['location'] ?? null,
-            'target_participants' => $validated['target_participants'] ?? null,
-            'risk_level' => $validated['risk_level'],
-            'progress' => $this->prokerProgressFromStatus($validated['status']),
-            'color' => $this->prokerDivisionColor($validated['division']),
-            'timeline' => $timelines,
-            'budget_items' => $budgetItems,
-            'committee_member_ids' => [$validated['pj_user_id']],
+            'name'                  => $validated['name'],
+            'division'              => $validated['division'],
+            'status'                => $validated['status'],
+            'pj_user_id'            => $validated['pj_user_id'],
+            'date_start'            => $validated['date_start'],
+            'date_end'              => $validated['date_end'],
+            'description'           => $validated['description'] ?? null,
+            'location'              => $validated['location'] ?? null,
+            'target_participants'   => $validated['target_participants'] ?? null,
+            'progress'              => $this->prokerProgressFromStatus($validated['status']),
+            'color'                 => $this->prokerDivisionColor($validated['division']),
+            'timeline'              => $timelines,
+            'budget_items'          => $budgetItems,
+            'committee_member_ids'  => [$validated['pj_user_id']],
+            // Public event fields
+            'poster'                => $posterPath,
+            'is_public'             => (bool) $request->input('is_public', false),
+            'open_registration'     => (bool) $request->input('open_registration', false),
+            'registration_deadline' => $validated['registration_deadline'] ?? null,
+            'registration_quota'    => $validated['registration_quota'] ?? null,
         ]);
 
         return redirect()
             ->route('dashboard.proker.show', $proker->id)
             ->with('success', 'Program kerja berhasil diperbarui.');
     }
+
 
     public function show(string $id)
     {
@@ -252,12 +259,7 @@ class ProkerController extends Controller
             ->count();
         $totalSteps = $timelineSteps->count();
 
-        $riskLevelLabel = match ($prokerRow->risk_level ?? 'rendah') {
-            'rendah' => 'Rendah',
-            'sedang' => 'Sedang',
-            'tinggi' => 'Tinggi',
-            default => 'Tidak Ditentukan',
-        };
+        $proposal = \App\Models\Proposal::where('proker', $prokerRow->name)->first();
 
         $proker = [
             'id' => $prokerRow->id,
@@ -283,6 +285,7 @@ class ProkerController extends Controller
             'doneSteps' => $doneSteps,
             'totalSteps' => $totalSteps,
             'lastUpdated' => $prokerRow->updated_at?->format('d M Y, H:i') ?? now()->format('d M Y, H:i'),
+            'proposal' => $proposal,
         ]);
     }
 
@@ -319,7 +322,7 @@ class ProkerController extends Controller
         return collect($names)
             ->map(function ($name, $index) use ($qtys, $units, $prices) {
                 $name = trim((string) $name);
-                $qty = (int) ($qtys[$index] ?? 0);
+                $qty = trim((string) ($qtys[$index] ?? ''));
                 $unit = trim((string) ($units[$index] ?? ''));
                 $price = (float) ($prices[$index] ?? 0);
 
@@ -329,7 +332,7 @@ class ProkerController extends Controller
 
                 return [
                     'item' => $name !== '' ? $name : 'Item ' . ($index + 1),
-                    'qty' => $qty > 0 ? $qty : 0,
+                    'qty' => $qty !== '' ? $qty : '-',
                     'unit' => $unit !== '' ? $unit : '-',
                     'price' => (int) round($price),
                 ];

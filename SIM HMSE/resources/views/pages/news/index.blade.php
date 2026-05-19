@@ -1,11 +1,22 @@
-<x-layouts.public title="News">
+<x-layouts.public title="Event & Proker" description="Daftar event dan program kerja HMSE yang terbuka untuk umum">
 
     {{-- Page Header --}}
-    <section class="pt-24 pb-10 bg-gradient-to-br from-[#1e3a5f] to-[#2e86ab]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-3xl sm:text-4xl font-bold text-white mb-3">Berita & Informasi</h1>
-            <p class="text-white/70 text-base max-w-xl mx-auto">
-                Ikuti perkembangan terbaru seputar kegiatan dan program kerja HMSE
+    <section class="pt-28 pb-14 bg-gradient-to-br from-[#0f2044] via-[#1e3a5f] to-[#2e86ab] relative overflow-hidden">
+        {{-- Decorative circles --}}
+        <div class="absolute top-0 right-0 w-96 h-96 bg-[#2e86ab]/20 rounded-full -translate-y-1/2 translate-x-1/3 blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-[#f4a261]/10 rounded-full translate-y-1/2 -translate-x-1/4 blur-2xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 text-white/80 text-xs font-semibold rounded-full mb-5 backdrop-blur-sm border border-white/10">
+                <svg class="w-3.5 h-3.5 text-[#f4a261]" fill="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Program Kerja HMSE
+            </span>
+            <h1 class="text-4xl sm:text-5xl font-black text-white mb-4 leading-tight">
+                Event & Program Kerja
+            </h1>
+            <p class="text-white/60 text-base sm:text-lg max-w-2xl mx-auto">
+                Ikuti event dan program kerja HMSE — buka untuk seluruh mahasiswa.
+                Daftar sekarang sebelum kuota habis!
             </p>
         </div>
     </section>
@@ -14,120 +25,183 @@
     <section class="py-12 bg-gray-50 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            {{-- Search & Filter Bar --}}
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-10">
-
-                {{-- Total Info --}}
-                <p class="text-sm text-gray-500">
-                    Menampilkan <span class="font-semibold text-[#1e3a5f]">{{ $news->total() }}</span> berita
-                </p>
+            {{-- Filter & Search Bar --}}
+            <form method="GET" action="{{ route('events.index') }}"
+                  class="flex flex-col sm:flex-row gap-3 mb-10 bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
 
                 {{-- Search --}}
-                <form method="GET" action="{{ route('news.index') }}" class="flex items-center gap-2">
-                    <div class="relative">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
-                        </svg>
-                        <input
-                            type="text"
-                            name="search"
-                            value="{{ request('search') }}"
-                            placeholder="Cari berita..."
-                            class="pl-10 pr-4 py-2.5 w-64 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:border-[#2e86ab] focus:ring-2 focus:ring-[#2e86ab]/20 transition-all duration-200"
-                        >
-                    </div>
-                    <button type="submit"
-                        class="px-4 py-2.5 bg-[#1e3a5f] text-white text-sm font-semibold rounded-lg hover:bg-[#2a4f80] transition-colors duration-200">
-                        Cari
-                    </button>
-                    @if(request('search'))
-                        <a href="{{ route('news.index') }}"
-                           class="px-4 py-2.5 bg-gray-100 text-gray-600 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors duration-200">
-                            Reset
-                        </a>
-                    @endif
-                </form>
-
-            </div>
-
-            {{-- Search Result Info --}}
-            @if(request('search'))
-                <div class="mb-6 px-4 py-3 bg-[#2e86ab]/10 border border-[#2e86ab]/20 rounded-lg text-sm text-[#1e3a5f]">
-                    Hasil pencarian untuk: <span class="font-semibold">"{{ request('search') }}"</span>
-                    — ditemukan <span class="font-semibold">{{ $news->total() }}</span> berita
+                <div class="relative flex-1">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+                    </svg>
+                    <input
+                        id="search-events"
+                        type="text"
+                        name="search"
+                        value="{{ $search }}"
+                        placeholder="Cari event atau program kerja..."
+                        class="pl-10 pr-4 py-2.5 w-full text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-[#2e86ab] focus:ring-2 focus:ring-[#2e86ab]/20 transition-all duration-200"
+                    >
                 </div>
-            @endif
 
-            @if($news->isNotEmpty())
+                {{-- Division Filter --}}
+                <select name="division"
+                        class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-[#2e86ab] focus:ring-2 focus:ring-[#2e86ab]/20 transition-all duration-200 min-w-[180px]">
+                    <option value="">Semua Divisi</option>
+                    @foreach($divisions as $div)
+                        <option value="{{ $div }}" {{ $division === $div ? 'selected' : '' }}>{{ $div }}</option>
+                    @endforeach
+                </select>
 
-                {{-- News Grid (max 3 rows × 3 cols = 9 per page) --}}
+                {{-- Status Filter --}}
+                <select name="status"
+                        class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:border-[#2e86ab] focus:ring-2 focus:ring-[#2e86ab]/20 transition-all duration-200 min-w-[150px]">
+                    <option value="">Semua Status</option>
+                    <option value="preparation" {{ $status === 'preparation' ? 'selected' : '' }}>Persiapan</option>
+                    <option value="on-progress" {{ $status === 'on-progress' ? 'selected' : '' }}>Sedang Berlangsung</option>
+                    <option value="completed" {{ $status === 'completed' ? 'selected' : '' }}>Selesai</option>
+                </select>
+
+                <button type="submit"
+                        class="px-6 py-2.5 bg-[#1e3a5f] text-white text-sm font-semibold rounded-xl hover:bg-[#2a4f80] transition-colors duration-200">
+                    Cari
+                </button>
+                @if($search || $division || $status)
+                    <a href="{{ route('events.index') }}"
+                       class="px-4 py-2.5 bg-gray-100 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-200 transition-colors duration-200 text-center">
+                        Reset
+                    </a>
+                @endif
+            </form>
+
+            {{-- Result Count --}}
+            <p class="text-sm text-gray-500 mb-6">
+                Menampilkan <span class="font-semibold text-[#1e3a5f]">{{ $events->total() }}</span> event
+                @if($search) untuk "<span class="font-semibold">{{ $search }}</span>" @endif
+            </p>
+
+            @if($events->isNotEmpty())
+
+                {{-- Events Grid --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($news as $item)
-                        <article class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                    @foreach($events as $event)
+                        @php
+                            $statusLabel = match($event->status) {
+                                'preparation'  => ['label' => 'Persiapan',  'cls' => 'bg-amber-100 text-amber-700 border-amber-200'],
+                                'on-progress'  => ['label' => 'Berlangsung','cls' => 'bg-blue-100 text-blue-700 border-blue-200'],
+                                'completed'    => ['label' => 'Selesai',    'cls' => 'bg-green-100 text-green-700 border-green-200'],
+                                'cancelled'    => ['label' => 'Dibatalkan', 'cls' => 'bg-red-100 text-red-700 border-red-200'],
+                                default        => ['label' => 'Draft',      'cls' => 'bg-gray-100 text-gray-600 border-gray-200'],
+                            };
+                            $regCount = $event->eventRegistrations()->whereIn('status',['pending','confirmed'])->count();
+                            $quota    = $event->registration_quota ?? $event->target_participants;
+                            $isFull   = $quota && $regCount >= $quota;
+                            $isOpen   = $event->open_registration
+                                        && !$isFull
+                                        && (!$event->registration_deadline || now()->lte($event->registration_deadline));
+                        @endphp
 
-                            {{-- Thumbnail 16:9 --}}
-                            <a href="{{ route('news.show', $item->slug) }}" class="block relative overflow-hidden">
+                        <article class="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col">
+
+                            {{-- Poster / Thumbnail --}}
+                            <a href="{{ route('events.show', $event->id) }}" class="block relative overflow-hidden">
                                 <div class="aspect-video bg-gray-100">
-                                    @if($item->thumbnail)
+                                    @if($event->poster)
                                         <img
-                                            src="{{ asset('storage/' . $item->thumbnail) }}"
-                                            alt="{{ $item->title }}"
-                                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                            src="{{ asset('storage/' . $event->poster) }}"
+                                            alt="Poster {{ $event->name }}"
+                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             loading="lazy"
                                         >
                                     @else
-                                        {{-- Placeholder --}}
-                                        <div class="w-full h-full bg-gradient-to-br from-[#1e3a5f]/10 to-[#2e86ab]/20 flex items-center justify-center">
-                                            <svg class="w-12 h-12 text-[#2e86ab]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                                        <div class="w-full h-full flex items-center justify-center"
+                                             style="background: linear-gradient(135deg, {{ $event->color ?? '#2C3DA6' }}22, {{ $event->color ?? '#2C3DA6' }}44)">
+                                            <svg class="w-14 h-14 opacity-30" fill="none" stroke="{{ $event->color ?? '#2C3DA6' }}" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                             </svg>
                                         </div>
                                     @endif
                                 </div>
-                                {{-- Category Badge --}}
-                                @if($item->category)
-                                    <span class="absolute top-3 left-3 px-2.5 py-1 bg-[#f4a261] text-white text-xs font-bold rounded-full shadow-sm">
-                                        {{ $item->category }}
+
+                                {{-- Status Badge --}}
+                                <span class="absolute top-3 left-3 px-2.5 py-1 text-xs font-bold rounded-full border {{ $statusLabel['cls'] }} shadow-sm backdrop-blur-sm">
+                                    {{ $statusLabel['label'] }}
+                                </span>
+
+                                {{-- Open Registration Badge --}}
+                                @if($isOpen)
+                                    <span class="absolute top-3 right-3 px-2.5 py-1 bg-[#1e3a5f] text-white text-xs font-bold rounded-full shadow-sm animate-pulse">
+                                        Buka Daftar
+                                    </span>
+                                @elseif($isFull)
+                                    <span class="absolute top-3 right-3 px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-sm">
+                                        Penuh
                                     </span>
                                 @endif
                             </a>
 
-                            {{-- Content --}}
+                            {{-- Card Body --}}
                             <div class="p-5 flex flex-col flex-1">
 
-                                {{-- Meta --}}
-                                <div class="flex items-center gap-3 mb-3">
-                                    <time class="text-xs text-gray-400 flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                        {{ $item->created_at->translatedFormat('d M Y') }}
-                                    </time>
-                                    @if($item->author)
-                                        <span class="text-gray-300">•</span>
-                                        <span class="text-xs text-gray-400">{{ $item->author }}</span>
-                                    @endif
-                                </div>
+                                {{-- Division --}}
+                                <p class="text-xs font-semibold text-[#2e86ab] uppercase tracking-wider mb-1.5">
+                                    {{ $event->division }}
+                                </p>
 
                                 {{-- Title --}}
-                                <h2 class="text-base font-bold text-[#1e3a5f] leading-snug mb-2 line-clamp-2 flex-1">
-                                    <a href="{{ route('news.show', $item->slug) }}" class="hover:text-[#2e86ab] transition-colors duration-200">
-                                        {{ $item->title }}
+                                <h2 class="text-base font-bold text-[#1e3a5f] leading-snug mb-3 line-clamp-2 flex-1">
+                                    <a href="{{ route('events.show', $event->id) }}" class="hover:text-[#2e86ab] transition-colors duration-200">
+                                        {{ $event->name }}
                                     </a>
                                 </h2>
 
-                                {{-- Excerpt --}}
-                                <p class="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-4">
-                                    {{ $item->excerpt ?? Str::limit(strip_tags($item->content ?? ''), 100) }}
-                                </p>
+                                {{-- Info Grid --}}
+                                <div class="space-y-1.5 mb-4">
+                                    <div class="flex items-center gap-2 text-xs text-gray-500">
+                                        <svg class="w-3.5 h-3.5 text-[#2e86ab] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span>
+                                            {{ optional($event->date_start)->translatedFormat('d M Y') }} —
+                                            {{ optional($event->date_end)->translatedFormat('d M Y') }}
+                                        </span>
+                                    </div>
+                                    @if($event->location)
+                                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                                            <svg class="w-3.5 h-3.5 text-[#2e86ab] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            <span class="line-clamp-1">{{ $event->location }}</span>
+                                        </div>
+                                    @endif
+                                    @if($quota)
+                                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                                            <svg class="w-3.5 h-3.5 text-[#2e86ab] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            <span>{{ $regCount }} / {{ $quota }} peserta</span>
+                                        </div>
+                                    @endif
+                                </div>
 
-                                {{-- Read More --}}
-                                <a href="{{ route('news.show', $item->slug) }}"
-                                   class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#2e86ab] hover:text-[#1e3a5f] transition-colors duration-200 mt-auto">
-                                    Baca Selengkapnya
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                                    </svg>
+                                {{-- CTA --}}
+                                <a href="{{ route('events.show', $event->id) }}"
+                                   class="inline-flex items-center justify-center gap-2 w-full py-2.5 text-sm font-semibold rounded-xl transition-all duration-200
+                                   {{ $isOpen
+                                       ? 'bg-[#1e3a5f] text-white hover:bg-[#2a4f80]'
+                                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                                    @if($isOpen)
+                                        Daftar Sekarang
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                        </svg>
+                                    @else
+                                        Lihat Detail
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                        </svg>
+                                    @endif
                                 </a>
 
                             </div>
@@ -136,9 +210,9 @@
                 </div>
 
                 {{-- Pagination --}}
-                @if($news->hasPages())
+                @if($events->hasPages())
                     <div class="mt-10 flex justify-center">
-                        {{ $news->appends(request()->query())->links('vendor.pagination.custom') }}
+                        {{ $events->links() }}
                     </div>
                 @endif
 
@@ -147,27 +221,27 @@
                 <div class="flex flex-col items-center justify-center py-24 text-center">
                     <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                         <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-700 mb-1">
-                        @if(request('search'))
-                            Berita tidak ditemukan
+                        @if($search || $division || $status)
+                            Event tidak ditemukan
                         @else
-                            Belum ada berita
+                            Belum ada event yang dipublikasikan
                         @endif
                     </h3>
-                    <p class="text-sm text-gray-400">
-                        @if(request('search'))
-                            Coba gunakan kata kunci yang berbeda
+                    <p class="text-sm text-gray-400 mb-4">
+                        @if($search || $division || $status)
+                            Coba ubah filter pencarian kamu
                         @else
-                            Berita akan segera ditambahkan
+                            Event akan segera ditambahkan, pantau terus!
                         @endif
                     </p>
-                    @if(request('search'))
-                        <a href="{{ route('news.index') }}"
-                           class="mt-4 px-4 py-2 bg-[#1e3a5f] text-white text-sm font-semibold rounded-lg hover:bg-[#2a4f80] transition-colors duration-200">
-                            Lihat Semua Berita
+                    @if($search || $division || $status)
+                        <a href="{{ route('events.index') }}"
+                           class="px-5 py-2.5 bg-[#1e3a5f] text-white text-sm font-semibold rounded-xl hover:bg-[#2a4f80] transition-colors duration-200">
+                            Lihat Semua Event
                         </a>
                     @endif
                 </div>

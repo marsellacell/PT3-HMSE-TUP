@@ -48,7 +48,7 @@ class ProposalController extends Controller
             'title' => 'required|string|max:255',
             'background' => 'required|string',
             'objective' => 'required|string',
-            'risk_level' => 'required|in:low,high',
+            'risk_level' => 'required|in:low,medium,high',
             'risk_description' => 'required|string',
             'budget' => 'required|numeric|min:0',
             'timeline' => 'required|string|max:255',
@@ -123,7 +123,7 @@ class ProposalController extends Controller
             'title' => 'required|string|max:255',
             'background' => 'required|string',
             'objective' => 'required|string',
-            'risk_level' => 'required|in:low,high',
+            'risk_level' => 'required|in:low,medium,high',
             'risk_description' => 'required|string',
             'budget' => 'required|numeric|min:0',
             'timeline' => 'required|string|max:255',
@@ -358,7 +358,15 @@ class ProposalController extends Controller
         // Pass raw form data too so the download button can use it
         $formData = $request->except('_token');
 
-        return view('pages.dashboard.proposal.preview', compact('proposal', 'formData'));
+        // Get SOTK Users
+        $sotk = [
+            'ketua_hmse' => \App\Models\User::whereIn('jabatan', ['ketua_hmse', 'President'])->first(),
+            'sekretaris' => \App\Models\User::whereIn('jabatan', ['sekretaris', 'Secretary 1', 'Secretary 2'])->first(),
+            'pembina' => \App\Models\User::where('jabatan', 'pembina')->first(),
+            'kaprodi' => \App\Models\User::where('jabatan', 'kaprodi')->first(),
+        ];
+
+        return view('pages.dashboard.proposal.preview', compact('proposal', 'formData', 'sotk'));
     }
 
     /**

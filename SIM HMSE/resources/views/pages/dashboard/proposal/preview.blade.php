@@ -27,7 +27,13 @@
                 @csrf
                 @if(isset($formData))
                     @foreach($formData as $key => $value)
-                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @if(is_array($value))
+                            @foreach($value as $v)
+                                <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                            @endforeach
+                        @else
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endif
                     @endforeach
                 @elseif(!$isFromForm)
                     {{-- Preview dari DB: kirim semua field proposal sebagai form data --}}
@@ -252,13 +258,39 @@
                     <div class="grid grid-cols-2 gap-8 mb-6">
                         <div>
                             <p class="mb-20">Ketua Panitia</p>
-                            <p class="underline font-bold">{{ isset($proposal->user) ? $proposal->user->name : 'Nama Ketua' }}</p>
-                            <p>NIM. ..........................</p>
+                            @php
+                                $ketuaName = 'Nama Ketua';
+                                $ketuaNim = 'NIM. ..........................';
+                                if (isset($formData['panitia_jabatan'])) {
+                                    foreach ($formData['panitia_jabatan'] as $index => $jabatan) {
+                                        if (strtolower(trim($jabatan)) === 'ketua panitia') {
+                                            $ketuaName = $formData['panitia_nama'][$index];
+                                            $ketuaNim = 'NIM. ' . $formData['panitia_nim'][$index];
+                                            break;
+                                        }
+                                    }
+                                }
+                            @endphp
+                            <p class="underline font-bold">{{ $ketuaName }}</p>
+                            <p>{{ $ketuaNim }}</p>
                         </div>
                         <div>
                             <p class="mb-20">Sekretaris</p>
-                            <p class="underline font-bold">Nama Sekretaris</p>
-                            <p>NIM. ..........................</p>
+                            @php
+                                $sekretarisName = $sotk['sekretaris']->name ?? 'Nama Sekretaris';
+                                $sekretarisNim = isset($sotk['sekretaris']->nim_nip) ? 'NIM. ' . $sotk['sekretaris']->nim_nip : 'NIM. ..........................';
+                                if (isset($formData['panitia_jabatan'])) {
+                                    foreach ($formData['panitia_jabatan'] as $index => $jabatan) {
+                                        if (strtolower(trim($jabatan)) === 'sekretaris') {
+                                            $sekretarisName = $formData['panitia_nama'][$index];
+                                            $sekretarisNim = 'NIM. ' . $formData['panitia_nim'][$index];
+                                            break;
+                                        }
+                                    }
+                                }
+                            @endphp
+                            <p class="underline font-bold">{{ $sekretarisName }}</p>
+                            <p>{{ $sekretarisNim }}</p>
                         </div>
                     </div>
 
@@ -269,14 +301,14 @@
                         <div>
                             <p>Pembina</p>
                             <p class="mb-20">Himpunan Mahasiswa Software Engineering</p>
-                            <p class="underline font-bold">Yudha Islami Sulistya, S.Kom., M.Cs</p>
-                            <p>NIDN. 0609020001</p>
+                            <p class="underline font-bold">{{ $sotk['pembina']->name ?? 'Yudha Islami Sulistya, S.Kom., M.Cs' }}</p>
+                            <p>NIDN. {{ $sotk['pembina']->nim_nip ?? '0609020001' }}</p>
                         </div>
                         <div>
                             <p>Ketua</p>
                             <p class="mb-20">Himpunan Mahasiswa Software Engineering</p>
-                            <p class="underline font-bold">Quratu Ayun Defaren</p>
-                            <p>NIM. 103122400064</p>
+                            <p class="underline font-bold">{{ $sotk['ketua_hmse']->name ?? 'Quratu Ayun Defaren' }}</p>
+                            <p>NIM. {{ $sotk['ketua_hmse']->nim_nip ?? '103122400064' }}</p>
                         </div>
                     </div>
 
@@ -293,8 +325,8 @@
                         <div>
                             <p>Ketua Program Studi</p>
                             <p class="mb-20">S1 Rekayasa Perangkat Lunak</p>
-                            <p class="underline font-bold">Abednego Dwi Septiadi, S.Kom., M.Kom</p>
-                            <p>NIP. 22890018</p>
+                            <p class="underline font-bold">{{ $sotk['kaprodi']->name ?? 'Abednego Dwi Septiadi, S.Kom., M.Kom' }}</p>
+                            <p>NIP. {{ $sotk['kaprodi']->nim_nip ?? '22890018' }}</p>
                         </div>
                     </div>
 
@@ -347,11 +379,21 @@
                     </tr>
 
                     <tr><td class="py-1 align-top pt-4 font-bold" colspan="3">Pelaksana</td></tr>
-                    <tr><td class="py-1">Ketua Panitia</td><td>:</td><td>{{ isset($proposal->user) ? $proposal->user->name : 'Mahasiswa' }} [NIM]</td></tr>
-                    <tr><td class="py-1">Wakil</td><td>:</td><td>Mahasiswa [NIM]</td></tr>
-                    <tr><td class="py-1">Sekretaris</td><td>:</td><td>Nama Sekretaris [NIM]</td></tr>
-                    <tr><td class="py-1 pr-4">Bendahara <br><span class="text-xs font-normal">(apabila menggunakan anggaran besar, dibagian bendahara perlu melibatkan dosen)</span></td><td class="align-top">:</td><td class="align-top">Mahasiswa [NIM]</td></tr>
-                    <tr><td class="py-1 align-top pt-2">Seksi-Seksi</td><td class="align-top pt-2">:</td><td class="pt-2">Mahasiswa [NIM]</td></tr>
+                    @if(isset($formData['panitia_jabatan']))
+                        @foreach($formData['panitia_jabatan'] as $index => $jabatan)
+                            <tr>
+                                <td class="py-1">{{ $jabatan }}</td>
+                                <td>:</td>
+                                <td>{{ $formData['panitia_nama'][$index] ?? '-' }} [NIM. {{ $formData['panitia_nim'][$index] ?? '-' }}]</td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr><td class="py-1">Ketua Panitia</td><td>:</td><td>{{ isset($proposal->user) ? $proposal->user->name : 'Mahasiswa' }} [NIM]</td></tr>
+                        <tr><td class="py-1">Wakil</td><td>:</td><td>Mahasiswa [NIM]</td></tr>
+                        <tr><td class="py-1">Sekretaris</td><td>:</td><td>Nama Sekretaris [NIM]</td></tr>
+                        <tr><td class="py-1 pr-4">Bendahara <br><span class="text-xs font-normal">(apabila menggunakan anggaran besar, dibagian bendahara perlu melibatkan dosen)</span></td><td class="align-top">:</td><td class="align-top">Mahasiswa [NIM]</td></tr>
+                        <tr><td class="py-1 align-top pt-2">Seksi-Seksi</td><td class="align-top pt-2">:</td><td class="pt-2">Mahasiswa [NIM]</td></tr>
+                    @endif
                 </table>
             </div>
         </div>
@@ -384,44 +426,95 @@
                     
                     {{-- PEMASUKAN --}}
                     <tr><td colspan="8" class="border border-black p-1 text-left font-bold bg-gray-100">PEMASUKAN</td></tr>
-                    <tr>
-                        <td class="border border-black p-2">1</td>
-                        <td class="border border-black p-2"></td>
-                        <td class="border border-black p-2 text-left">Subsidi Institusi</td>
-                        <td class="border border-black p-2">1</td>
-                        <td class="border border-black p-2">Paket</td>
-                        <td class="border border-black p-2">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
-                        <td class="border border-black p-2">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
-                        <td class="border border-black p-2"></td>
-                    </tr>
+                    @php $totalPemasukan = 0; @endphp
+                    @if(isset($formData['pemasukan_rincian']))
+                        @foreach($formData['pemasukan_rincian'] as $i => $rincian)
+                            @php 
+                                $vol = $formData['pemasukan_vol'][$i] ?? 0;
+                                $harga = $formData['pemasukan_harga'][$i] ?? 0;
+                                $subtotal = $vol * $harga;
+                                $totalPemasukan += $subtotal;
+                            @endphp
+                            <tr>
+                                <td class="border border-black p-2">{{ $i + 1 }}</td>
+                                <td class="border border-black p-2">-</td>
+                                <td class="border border-black p-2 text-left">{{ $rincian }}</td>
+                                <td class="border border-black p-2">{{ $vol }}</td>
+                                <td class="border border-black p-2">{{ $formData['pemasukan_satuan'][$i] ?? '-' }}</td>
+                                <td class="border border-black p-2">Rp {{ number_format($harga, 0, ',', '.') }}</td>
+                                <td class="border border-black p-2">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                                <td class="border border-black p-2"></td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td class="border border-black p-2">1</td>
+                            <td class="border border-black p-2"></td>
+                            <td class="border border-black p-2 text-left">Subsidi Institusi</td>
+                            <td class="border border-black p-2">1</td>
+                            <td class="border border-black p-2">Paket</td>
+                            <td class="border border-black p-2">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
+                            <td class="border border-black p-2">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
+                            <td class="border border-black p-2"></td>
+                        </tr>
+                        @php $totalPemasukan = $proposal->budget ?? 0; @endphp
+                    @endif
                     <tr>
                         <td colspan="6" class="border border-black p-2 text-right font-bold">Total Pemasukan</td>
-                        <td class="border border-black p-2 font-bold">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
+                        <td class="border border-black p-2 font-bold">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</td>
                         <td class="border border-black p-2"></td>
                     </tr>
 
                     {{-- PENGELUARAN --}}
                     <tr><td colspan="8" class="border border-black p-1 text-left font-bold bg-gray-100">PENGELUARAN</td></tr>
-                    <tr>
-                        <td class="border border-black p-2">1</td>
-                        <td class="border border-black p-2"></td>
-                        <td class="border border-black p-2 text-left">Total Anggaran Kegiatan</td>
-                        <td class="border border-black p-2">1</td>
-                        <td class="border border-black p-2">Paket</td>
-                        <td class="border border-black p-2">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
-                        <td class="border border-black p-2">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
-                        <td class="border border-black p-2">Pembagian Pemasukkan</td>
-                    </tr>
+                    @php $totalPengeluaran = 0; @endphp
+                    @if(isset($formData['pengeluaran_rincian']))
+                        @foreach($formData['pengeluaran_rincian'] as $i => $rincian)
+                            @php 
+                                $vol = $formData['pengeluaran_vol'][$i] ?? 0;
+                                $harga = $formData['pengeluaran_harga'][$i] ?? 0;
+                                $subtotal = $vol * $harga;
+                                $totalPengeluaran += $subtotal;
+                            @endphp
+                            <tr>
+                                <td class="border border-black p-2">{{ $i + 1 }}</td>
+                                <td class="border border-black p-2">-</td>
+                                <td class="border border-black p-2 text-left">
+                                    @if(!empty($formData['pengeluaran_divisi'][$i]))
+                                        <strong>[{{ $formData['pengeluaran_divisi'][$i] }}]</strong><br>
+                                    @endif
+                                    {{ $rincian }}
+                                </td>
+                                <td class="border border-black p-2">{{ $vol }}</td>
+                                <td class="border border-black p-2">{{ $formData['pengeluaran_satuan'][$i] ?? '-' }}</td>
+                                <td class="border border-black p-2">Rp {{ number_format($harga, 0, ',', '.') }}</td>
+                                <td class="border border-black p-2">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                                <td class="border border-black p-2"></td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td class="border border-black p-2">1</td>
+                            <td class="border border-black p-2"></td>
+                            <td class="border border-black p-2 text-left">Total Anggaran Kegiatan</td>
+                            <td class="border border-black p-2">1</td>
+                            <td class="border border-black p-2">Paket</td>
+                            <td class="border border-black p-2">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
+                            <td class="border border-black p-2">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
+                            <td class="border border-black p-2"></td>
+                        </tr>
+                        @php $totalPengeluaran = $proposal->budget ?? 0; @endphp
+                    @endif
                     <tr>
                         <td colspan="6" class="border border-black p-2 text-right font-bold">Total Pengeluaran</td>
-                        <td class="border border-black p-2 font-bold">Rp {{ number_format($proposal->budget ?? 0, 0, ',', '.') }}</td>
+                        <td class="border border-black p-2 font-bold">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</td>
                         <td class="border border-black p-2"></td>
                     </tr>
                     
                     {{-- SELISIH --}}
                     <tr>
                         <td colspan="6" class="border border-black p-2 text-right font-bold">Selisih Pemasukan & Pengeluaran</td>
-                        <td class="border border-black p-2 font-bold">0</td>
+                        <td class="border border-black p-2 font-bold {{ ($totalPemasukan - $totalPengeluaran) < 0 ? 'text-red-600' : '' }}">Rp {{ number_format($totalPemasukan - $totalPengeluaran, 0, ',', '.') }}</td>
                         <td class="border border-black p-2"></td>
                     </tr>
                 </table>
@@ -454,13 +547,33 @@
                         <td class="border border-black p-2">Waktu</td>
                         <td class="border border-black p-2">Durasi</td>
                         <td class="border border-black p-2">Kegiatan</td>
+                        <td class="border border-black p-2">Lokasi</td>
+                        <td class="border border-black p-2">PIC</td>
+                        <td class="border border-black p-2">Deskripsi</td>
                     </tr>
-                    <tr>
-                        <td class="border border-black p-2">1</td>
-                        <td class="border border-black p-2">{{ $proposal->waktu_pelaksanaan ?? '-' }}</td>
-                        <td class="border border-black p-2">-</td>
-                        <td class="border border-black p-2 text-left">Pelaksanaan Acara</td>
-                    </tr>
+                    @if(isset($formData['rundown_kegiatan']))
+                        @foreach($formData['rundown_kegiatan'] as $i => $kegiatan)
+                            <tr>
+                                <td class="border border-black p-2">{{ $i + 1 }}</td>
+                                <td class="border border-black p-2">{{ $formData['rundown_waktu_mulai'][$i] ?? '-' }} - {{ $formData['rundown_waktu_selesai'][$i] ?? '-' }}</td>
+                                <td class="border border-black p-2">{{ $formData['rundown_durasi'][$i] ?? '-' }}</td>
+                                <td class="border border-black p-2 text-left">{{ $kegiatan }}</td>
+                                <td class="border border-black p-2">{{ $formData['rundown_lokasi'][$i] ?? '-' }}</td>
+                                <td class="border border-black p-2">{{ $formData['rundown_pic'][$i] ?? '-' }}</td>
+                                <td class="border border-black p-2 text-left">{{ $formData['rundown_deskripsi'][$i] ?? '-' }}</td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td class="border border-black p-2">1</td>
+                            <td class="border border-black p-2">{{ $proposal->waktu_pelaksanaan ?? '-' }}</td>
+                            <td class="border border-black p-2">-</td>
+                            <td class="border border-black p-2 text-left">Pelaksanaan Acara</td>
+                            <td class="border border-black p-2">-</td>
+                            <td class="border border-black p-2">-</td>
+                            <td class="border border-black p-2">-</td>
+                        </tr>
+                    @endif
                 </table>
             </div>
 
