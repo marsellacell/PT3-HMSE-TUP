@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FinanceInternal;
 use App\Models\FinanceProker;
+use App\Models\Proposal;
 use Illuminate\Http\Request;
 use App\Exports\FinanceExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -21,7 +22,9 @@ class FinanceController extends Controller
 
         $prokerIn = FinanceProker::where('type', 'income')->sum('amount');
         $prokerOut = FinanceProker::where('type', 'outcome')->sum('amount');
-        $totalAnggaranProker = $prokerIn; 
+        $totalAnggaranProker = $prokerIn;
+
+        $proposals = Proposal::all();
 
         return view('pages.dashboard.finance.index', [
             'totalPemasukan' => $internalIn + $prokerIn,
@@ -29,6 +32,7 @@ class FinanceController extends Controller
             'saldoKas' => $saldoInternal,
             'anggaranProker' => $totalAnggaranProker,
             'transaksiInternal' => $transaksiInternal,
+            'proposals' => $proposals,
         ]);
     }
 
@@ -38,8 +42,8 @@ class FinanceController extends Controller
             'income' => 'Pemasukan (Income)',
             'outcome' => 'Pengeluaran (Outcome)'
         ];
-    
-        return view('pages.dashboard.finance.create', compact('transactionTypes')); 
+
+        return view('pages.dashboard.finance.create', compact('transactionTypes'));
     }
 
     public function store(Request $request)
@@ -127,7 +131,7 @@ class FinanceController extends Controller
         return redirect()->route('dashboard.finance.index', ['tab' => 'internal'])
                         ->with('success', 'Transaksi berhasil diperbarui!');
     }
-    
+
     public function destroy(Request $request, $id)
     {
         $finance = FinanceInternal::findOrFail($id);
@@ -139,10 +143,10 @@ class FinanceController extends Controller
         $finance->delete();
 
         return redirect()->route('dashboard.finance.index', ['tab' => $request->query('tab', 'internal')])
-                        ->with('success', 'Transaksi berhasil dihapus!');    
+                        ->with('success', 'Transaksi berhasil dihapus!');
     }
 
-    public function export() 
+    public function export()
     {
         return Excel::download(new FinanceExport, 'Laporan_Keuangan_HMSE_'.now()->format('Y-m-d').'.xlsx');
     }

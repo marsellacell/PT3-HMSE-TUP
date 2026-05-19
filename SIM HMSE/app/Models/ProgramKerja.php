@@ -17,6 +17,7 @@ class ProgramKerja extends Model
         'description',
         'location',
         'target_participants',
+        'risk_level',
         'progress',
         'color',
         'timeline',

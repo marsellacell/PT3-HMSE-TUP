@@ -73,6 +73,7 @@ class ProkerController extends Controller
     public function store(Request $request)
     {
         $allowedAccountIds = collect($this->dummyAccounts())->pluck('id')->all();
+        $today = now()->format('Y-m-d');
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -81,7 +82,8 @@ class ProkerController extends Controller
             'description' => ['nullable', 'string'],
             'location' => ['nullable', 'string', 'max:255'],
             'target_participants' => ['nullable', 'integer', 'min:1'],
-            'date_start' => ['required', 'date'],
+            'risk_level' => ['required', 'in:rendah,sedang,tinggi'],
+            'date_start' => ['required', 'date', 'date_format:Y-m-d', 'after_or_equal:' . $today],
             'date_end' => ['required', 'date', 'after_or_equal:date_start'],
             'timeline_titles' => ['array'],
             'timeline_titles.*' => ['nullable', 'string', 'max:255'],
@@ -110,6 +112,7 @@ class ProkerController extends Controller
             'description' => $validated['description'] ?? null,
             'location' => $validated['location'] ?? null,
             'target_participants' => $validated['target_participants'] ?? null,
+            'risk_level' => $validated['risk_level'],
             'progress' => 0,
             'color' => $this->prokerDivisionColor($validated['division']),
             'timeline' => $timelines,
@@ -140,6 +143,7 @@ class ProkerController extends Controller
             'target_participants' => $proker->target_participants,
             'date_start' => optional($proker->date_start)->format('Y-m-d'),
             'date_end' => optional($proker->date_end)->format('Y-m-d'),
+            'risk_level' => $proker->risk_level ?? 'rendah',
             'timeline' => $proker->timeline ?? [],
             'budget_items' => $proker->budget_items ?? [],
             'status' => $proker->status,
@@ -152,6 +156,7 @@ class ProkerController extends Controller
     {
         $allowedAccountIds = collect($this->dummyAccounts())->pluck('id')->all();
         $proker = ProgramKerja::query()->findOrFail((int) $id);
+        $today = now()->format('Y-m-d');
 
         $validated = $request->validate([
             'name'                  => ['required', 'string', 'max:255'],
@@ -265,6 +270,7 @@ class ProkerController extends Controller
             'date_end' => $prokerRow->date_end?->format('d M Y') ?? '-',
             'location' => $prokerRow->location ?: '-',
             'target_participants' => (int) ($prokerRow->target_participants ?? 0),
+            'risk_level' => $riskLevelLabel,
             'description' => $prokerRow->description ?: '-',
             'timeline' => $timelineSteps->all(),
             'documents' => $prokerRow->documents ?? [],
@@ -320,7 +326,7 @@ class ProkerController extends Controller
                 $unit = trim((string) ($units[$index] ?? ''));
                 $price = (float) ($prices[$index] ?? 0);
 
-                if ($name === '' && $qty === '' && $price <= 0) {
+                if ($name === '' && $qty <= 0 && $price <= 0) {
                     return null;
                 }
 

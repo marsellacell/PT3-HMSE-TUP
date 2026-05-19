@@ -62,6 +62,11 @@
         stepLabels: ['Info Dasar', 'Jadwal', 'Anggaran', 'Review'],
         milestones: @js($timelineItems),
         items: @js($budgetItems),
+        dateStart: '',
+        dateEnd: '',
+        minDate: new Date().toISOString().split('T')[0],
+        satuanOptions: ['Pcs', 'Box', 'Buah', 'Lembar', 'Paket', 'Set', 'Meter', 'Kg', 'Liter', 'Orang', 'Hari', 'Jam'],
+        riskLevel: @js(old('risk_level', $formState['risk_level'] ?? 'rendah')),
     }"
         class="max-w-4xl">
         @csrf
@@ -75,7 +80,7 @@
                             <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
                                 :class="i + 1 < step ? 'bg-emerald-500 text-white' : (i + 1 === step ?
                                     'bg-[#2C3DA6] text-white ring-4 ring-[#2C3DA6]/20' : 'bg-gray-200 text-gray-400'
-                                    )">
+                                )">
                                 <template x-if="i + 1 < step">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -128,9 +133,25 @@
                         <option value="">Pilih Penanggung Jawab</option>
                         @foreach ($accounts as $account)
                             <option value="{{ $account['id'] }}" @selected((string) old('pj_user_id', $formState['pj_user_id']) === (string) $account['id'])>{{ $account['name'] }}
-                                ({{ $account['division'] }})</option>
+                                ({{ $account['division'] }})
+                            </option>
                         @endforeach
                     </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tingkat Risiko *</label>
+                    <select name="risk_level" x-model="riskLevel"
+                        class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] text-gray-600">
+                        <option value="">Pilih Tingkat Risiko</option>
+                        <option value="rendah" @selected(old('risk_level', $formState['risk_level'] ?? '') === 'rendah')>Rendah</option>
+                        <option value="sedang" @selected(old('risk_level', $formState['risk_level'] ?? '') === 'sedang')>Sedang</option>
+                        <option value="tinggi" @selected(old('risk_level', $formState['risk_level'] ?? '') === 'tinggi')>Tinggi</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-2">Tingkat risiko akan mempengaruhi konteks dan template proposal
+                        yang dibuat</p>
                 </div>
             </div>
 
@@ -245,16 +266,22 @@
             <h3 class="text-sm font-bold text-gray-800">Jadwal & Timeline</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Mulai *</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Mulai * <span
+                            class="text-xs text-gray-400">(minimal hari ini)</span></label>
                     <input type="date" name="date_start" value="{{ old('date_start', $formState['date_start']) }}"
                         min="{{ date('Y-m-d') }}"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
+                    <p class="text-xs text-gray-400 mt-1">Tanggal mulai tidak boleh lebih awal dari hari ini</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Selesai *</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Selesai * <span
+                            class="text-xs text-gray-400" x-show="!dateStart">(pilih tanggal mulai
+                            dulu)</span></label>
                     <input type="date" name="date_end" value="{{ old('date_end', $formState['date_end']) }}"
                         min="{{ date('Y-m-d') }}"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
+                    <p class="text-xs text-gray-400 mt-1" x-show="dateStart">Tanggal selesai harus sama atau lebih
+                        lambat dari tanggal mulai</p>
                 </div>
             </div>
 
@@ -295,7 +322,7 @@
 
         <div x-show="step === 3" style="display:none;"
             class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
-            <h3 class="text-sm font-bold text-gray-800">Rencana Anggaran</h3>
+            <h3 class="text-sm font-bold text-gray-800">Rencana Anggaran (RAB)</h3>
             <div class="space-y-3">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
@@ -327,10 +354,11 @@
                                     </td>
                                     <td class="py-2 pr-3"><input type="number" :name="`budget_prices[${i}]`"
                                             x-model.number="item.price" placeholder="0"
-                                            class="w-36 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
+                                            class="w-32 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
                                     </td>
                                     <td class="py-2 text-right font-semibold text-gray-600"
-                                        x-text="'Rp ' + (item.price || 0).toLocaleString('id-ID')"></td>
+                                        x-text="'Rp ' + ((item.price || 0) * (item.qty || 0)).toLocaleString('id-ID')">
+                                    </td>
                                     <td class="py-2 text-center">
                                         <button type="button" @click="items.splice(i, 1)" x-show="items.length > 1"
                                             class="text-gray-400 hover:text-red-500">
@@ -348,7 +376,7 @@
                             <tr class="border-t-2 border-gray-200">
                                 <td colspan="4" class="py-3 text-right font-bold text-gray-700">Total</td>
                                 <td class="py-3 text-right font-black text-[#2C3DA6]"
-                                    x-text="'Rp ' + items.reduce((s, i) => s + (i.price || 0), 0).toLocaleString('id-ID')">
+                                    x-text="'Rp ' + items.reduce((s, i) => s + ((i.price || 0) * (i.qty || 0)), 0).toLocaleString('id-ID')">
                                 </td>
                                 <td></td>
                             </tr>
