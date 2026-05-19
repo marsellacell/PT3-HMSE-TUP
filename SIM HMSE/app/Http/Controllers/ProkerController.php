@@ -101,8 +101,8 @@ class ProkerController extends Controller
 
         $timelines = $this->buildTimeline($request->input('timeline_titles', []), $request->input('timeline_dates', []));
         $budgetItems = $this->buildBudgetItems(
-            $request->input('budget_item_names', []), 
-            $request->input('budget_qtys', []), 
+            $request->input('budget_item_names', []),
+            $request->input('budget_qtys', []),
             $request->input('budget_units', []),
             $request->input('budget_prices', [])
         );
@@ -190,8 +190,8 @@ class ProkerController extends Controller
 
         $timelines = $this->buildTimeline($request->input('timeline_titles', []), $request->input('timeline_dates', []), true);
         $budgetItems = $this->buildBudgetItems(
-            $request->input('budget_item_names', []), 
-            $request->input('budget_qtys', []), 
+            $request->input('budget_item_names', []),
+            $request->input('budget_qtys', []),
             $request->input('budget_units', []),
             $request->input('budget_prices', [])
         );

@@ -140,7 +140,8 @@
                                             <td class="py-3 pr-4 text-right">Rp
                                                 {{ number_format($budget['price'], 0, ',', '.') }}</td>
                                             <td class="py-3 text-right font-semibold">Rp
-                                                {{ number_format((int)($budget['qty'] ?? 0) * $budget['price'], 0, ',', '.') }}</td>
+                                                {{ number_format((int) ($budget['qty'] ?? 0) * $budget['price'], 0, ',', '.') }}
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -153,7 +154,7 @@
                                     <tr class="border-t-2 border-gray-200 font-bold text-gray-800">
                                         <td colspan="4" class="py-3 text-right">Total Anggaran</td>
                                         <td class="py-3 text-right text-[#2C3DA6]">Rp
-                                            {{ number_format(collect($proker['budget_items'])->sum(fn($item) => ((int)($item['qty'] ?? 0) * $item['price'])), 0, ',', '.') }}
+                                            {{ number_format(collect($proker['budget_items'])->sum(fn($item) => (int) ($item['qty'] ?? 0) * $item['price']), 0, ',', '.') }}
                                         </td>
                                     </tr>
                                 </tfoot>

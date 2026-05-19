@@ -101,7 +101,8 @@
                         <option value="">Pilih Penanggung Jawab</option>
                         @foreach ($accounts as $account)
                             <option value="{{ $account['id'] }}" @selected((string) old('pj_user_id') === (string) $account['id'])>{{ $account['name'] }}
-                                ({{ $account['division'] }})</option>
+                                ({{ $account['division'] }})
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -117,7 +118,8 @@
                         <option value="sedang" @selected(old('risk_level') === 'sedang')>Sedang</option>
                         <option value="tinggi" @selected(old('risk_level') === 'tinggi')>Tinggi</option>
                     </select>
-                    <p class="text-xs text-gray-400 mt-2">Tingkat risiko akan mempengaruhi konteks dan template proposal yang dibuat</p>
+                    <p class="text-xs text-gray-400 mt-2">Tingkat risiko akan mempengaruhi konteks dan template proposal
+                        yang dibuat</p>
                 </div>
             </div>
 
@@ -149,20 +151,23 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Mulai * <span class="text-xs text-gray-400">(minimal hari ini)</span></label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Mulai * <span
+                            class="text-xs text-gray-400">(minimal hari ini)</span></label>
                     <input type="date" name="date_start" value="{{ old('date_start') }}" x-model="dateStart"
                         :min="minDate"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
                     <p class="text-xs text-gray-400 mt-1">Tanggal mulai tidak boleh lebih awal dari hari ini</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Selesai * <span class="text-xs text-gray-400" x-show="!dateStart">(pilih tanggal mulai dulu)</span></label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Selesai * <span
+                            class="text-xs text-gray-400" x-show="!dateStart">(pilih tanggal mulai
+                            dulu)</span></label>
                     <input type="date" name="date_end" value="{{ old('date_end') }}" x-model="dateEnd"
-                        :min="dateStart || minDate"
-                        :disabled="!dateStart"
+                        :min="dateStart || minDate" :disabled="!dateStart"
                         :class="!dateStart ? 'opacity-50 cursor-not-allowed' : ''"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
-                    <p class="text-xs text-gray-400 mt-1" x-show="dateStart">Tanggal selesai harus sama atau lebih lambat dari tanggal mulai</p>
+                    <p class="text-xs text-gray-400 mt-1" x-show="dateStart">Tanggal selesai harus sama atau lebih
+                        lambat dari tanggal mulai</p>
                 </div>
             </div>
 
@@ -243,7 +248,8 @@
                                             class="w-32 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#2C3DA6]">
                                     </td>
                                     <td class="py-2 text-right font-semibold text-gray-600"
-                                        x-text="'Rp ' + ((item.price || 0) * (item.qty || 0)).toLocaleString('id-ID')"></td>
+                                        x-text="'Rp ' + ((item.price || 0) * (item.qty || 0)).toLocaleString('id-ID')">
+                                    </td>
                                     <td class="py-2 text-center">
                                         <button type="button" @click="items.splice(i, 1)" x-show="items.length > 1"
                                             class="text-gray-400 hover:text-red-500">
