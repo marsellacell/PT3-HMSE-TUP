@@ -31,14 +31,14 @@
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Transaksi</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Transaksi *</label>
                 <input type="text" name="title" required value="{{ old('title', $transaction->title) }}"
                     placeholder="Contoh: Laporan Keuangan Bulan Januari 2024"
                     class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Transaksi</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Transaksi *</label>
                 <input type="date" name="transaction_date" required
                     value="{{ old('transaction_date', $transaction->transaction_date) }}"
                     class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
@@ -46,7 +46,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tipe Transaksi</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tipe Transaksi *</label>
                     <select name="type" required
                         placeholder="Pilih tipe transaksi"
                         class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] text-gray-600">
@@ -55,12 +55,12 @@
                     </select>
                 </div>
                 <div x-data="{ 
-                    displayAmount: '',
+                    displayAmount: '{{ number_format(old('amount', $transaction->amount), 0, ',', '.') }}',
                     get rawAmount() {
-                            return this.displayAmount.replace(/\D/g, '');
-                        }
+                        return this.displayAmount.replace(/\D/g, '');
+                    }
                 }">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nominal (Rp)</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nominal (Rp) *</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">Rp</span>
                         <input type="text" 
@@ -75,8 +75,9 @@
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Metode Transaksi</label>
-                <input type="text" name="method" value="{{ old('method', $transaction->method) }}"
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Metode Transaksi *</label>
+                <input type="text" name="method" 
+                    value="{{ old('method', $transaction->method) }}"
                     placeholder="Contoh: Transfer Bank, Tunai, dsb."
                     class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
             </div>
@@ -93,23 +94,23 @@
                     <input type="file" name="attachment" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     
                     {{-- Area Tampilan Awal --}}
-                    <div id="placeholder-view" class="space-y-2">
+                    <div id="placeholder-view" class="{{ $transaction->attachment ? 'hidden' : '' }} space-y-2">
                         <svg class="w-12 h-12 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                         </svg>
-                        <p class="text-sm text-gray-500 font-semibold text-gray-500 mb-1">Klik atau Drag & Drop nota di sini</p>
-                        <p class="text-xs text-gray-500">klik untuk memilih file (JPEG, JPG, PNG — maks 5MB)</p>
+                        <p class="text-sm text-gray-500 font-semibold text-gray-500 mb-1">Klik untuk memilih file</p>
+                        <p class="text-xs text-gray-500">(JPEG, JPG, PNG — maks 5MB)</p>
                     </div>
 
                     {{-- Area Preview (Akan Muncul Setelah Pilih File) --}}
-                    <div id="preview-container" class="hidden space-y-2">
-                        <img id="image-preview" class="mx-auto max-h-40 rounded-lg shadow-sm border border-gray-100">
-                        <p id="file-name-display" class="text-sm font-bold text-emerald-600"></p>
+                    <div id="preview-container" class="{{ $transaction->attachment ? '' : 'hidden' }} space-y-2">
+                        <img id="image-preview" 
+                            src="{{ $transaction->attachment ? asset('storage/' . $transaction->attachment) : '' }}"
+                            class="mx-auto max-h-40 rounded-lg shadow-sm border border-gray-100">
+                        <p id="file-name-display" class="text-sm font-bold text-emerald-600">
+                            {{ $transaction->attachment ? : '' }}
+                        </p>
                     </div>
-
-                    <p id="error-size" class="hidden mt-2 text-xs font-bold text-red-600 bg-red-50 p-2 rounded-lg border border-red-100">
-                        ⚠️ Ukuran file terlalu besar! Maksimal 5MB. Silakan kompres atau pilih file lain.
-                    </p>
                 </div>
 
                 <div id="upload-notif" class="hidden mt-3 p-2 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-lg text-center animated fade-in">
@@ -164,20 +165,6 @@
                     }
                     reader.readAsDataURL(file);
                 }
-            });
-
-            ['dragenter', 'dragover'].forEach(name => {
-                dropArea.addEventListener(name, (e) => {
-                    e.preventDefault();
-                    dropArea.classList.add('bg-blue-50', 'border-[#2C3DA6]');
-                });
-            });
-
-            ['dragleave', 'drop'].forEach(name => {
-                dropArea.addEventListener(name, (e) => {
-                    e.preventDefault();
-                    dropArea.classList.remove('bg-blue-50', 'border-[#2C3DA6]');
-                });
             });
         });
         </script>

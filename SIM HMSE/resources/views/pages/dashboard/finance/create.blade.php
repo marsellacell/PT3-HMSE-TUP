@@ -89,15 +89,15 @@
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1">Bukti Transaksi (Nota/Struk) *</label>
                 <div id="drop-area" class="relative bg-white rounded-xl border-2 border-dashed border-gray-200 p-8 text-center hover:border-[#2C3DA6]/40 transition-colors cursor-pointer">
-                    <input type="file" name="attachment" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <input type="file" name="attachment" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50">
                     
                     {{-- Area Tampilan Awal --}}
                     <div id="placeholder-view" class="space-y-2">
                         <svg class="w-12 h-12 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                         </svg>
-                        <p class="text-sm text-gray-500 font-semibold text-gray-500 mb-1">Drag & Drop file di sini</p>
-                        <p class="text-xs text-gray-500">klik untuk memilih file (JPEG, JPG, PNG — maks 5MB)</p>
+                        <p class="text-sm text-gray-500 font-semibold text-gray-500 mb-1">Klik untuk memilih file</p>
+                        <p class="text-xs text-gray-500">(JPEG, JPG, PNG — maks 5MB)</p>
                     </div>
 
                     {{-- Area Preview (Akan Muncul Setelah Pilih File) --}}
@@ -119,7 +119,7 @@
                     class="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
                     Batal
                 </a>
-                <button type="submit" action="{{ route('dashboard.finance.index', ['tab' => 'internal']) }}"
+                <button type="submit" 
                     class="px-6 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-md shadow-emerald-600/20">
                     Simpan Laporan Keuangan
                 </button>
@@ -140,39 +140,63 @@
 
             if (!dropArea || !fileInput) return;
 
+            function handleFile(file) {
+                if (file.size > 5 * 1024 * 1024) { 
+                    alert('Jangan gede-gede boss! Maksimal 5MB aja.');
+                    fileInput.value = ""; 
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewContainer.classList.remove('hidden');
+                    placeholderView.classList.add('hidden');
+                    imagePreview.src = e.target.result;
+                    fileNameDisplay.innerText = `${file.name}`;
+                    
+                    dropArea.classList.remove('border-gray-200', 'bg-white', 'bg-emerald-50', 'border-emerald-500');
+                    dropArea.classList.add('border-emerald-500', 'bg-emerald-50');
+                }
+                reader.readAsDataURL(file);
+            }
+
             fileInput.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
-                    const file = this.files[0];
-                    const reader = new FileReader();
-                    if (file.size > 5 * 1024 * 1024) { 
-                        alert('Jangan gede-gede boss! Maksimal 5MB aja.');
-                        this.value = ""; 
-                        return;
-                    }
-
-                    reader.onload = function(e) {
-                        previewContainer.classList.remove('hidden');
-                        placeholderView.classList.add('hidden');
-                        imagePreview.src = e.target.result;
-                        fileNameDisplay.innerText = `${file.name}`;
-                        dropArea.classList.add('border-emerald-500', 'bg-emerald-50');
-                    }
-                    reader.readAsDataURL(file);
+                    handleFile(this.files[0]);
                 }
             });
 
             ['dragenter', 'dragover'].forEach(name => {
                 dropArea.addEventListener(name, (e) => {
                     e.preventDefault();
-                    dropArea.classList.add('bg-blue-50', 'border-[#2C3DA6]');
+                    e.stopPropagation();
+                    dropArea.classList.add('bg-emerald-50', 'border-emerald-500');
                 });
             });
 
-            ['dragleave', 'drop'].forEach(name => {
+            ['dragleave'].forEach(name => {
                 dropArea.addEventListener(name, (e) => {
                     e.preventDefault();
-                    dropArea.classList.remove('bg-blue-50', 'border-[#2C3DA6]');
+                    e.stopPropagation();
+                    if (!fileInput.value) {
+                        dropArea.classList.remove('bg-emerald-50', 'border-emerald-500');
+                    }
                 });
+            });
+
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                dropArea.classList.remove('bg-emerald-50', 'border-emerald-500');
+
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const droppedFiles = e.dataTransfer.files;
+                    
+                    fileInput.files = droppedFiles; 
+                    
+                    handleFile(droppedFiles[0]);
+                }
             });
         });
         </script>

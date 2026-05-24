@@ -1,7 +1,7 @@
 <x-layouts.dashboard title="Keuangan">
 
     {{-- Tabs: Internal / Per-Proker --}}
-    <div x-data="{ tab: 'overview' }" class="space-y-6">
+    <div x-data="{ tab: new URLSearchParams(window.location.search).get('tab') || 'overview' }" class="space-y-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -82,8 +82,11 @@
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                     <h3 class="text-sm font-bold text-gray-800">Catatan Kas Internal</h3>
-                    <button class="text-xs font-semibold text-[#2C3DA6] hover:text-[#00C4D8] flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    <a href="{{ route('dashboard.finance.create') }}"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2C3DA6] text-white text-sm font-semibold rounded-xl hover:bg-[#2C3DA6]/90 transition-all duration-200 shadow-md shadow-[#2C3DA6]/20 hover:shadow-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
                         Tambah Transaksi
                     </a>
                 </div>
@@ -101,34 +104,118 @@
                             <th class="px-4 py-3 text-center">Aksi</th>
                         </tr></thead>
                         <tbody class="divide-y divide-gray-50">
-                            @php $saldo = 0; @endphp
-                            @foreach([
-                                ['date' => '01 Mar', 'desc' => 'Iuran anggota Maret', 'debit' => 1600000, 'credit' => 0, 'method' => 'Transfer'],
-                                ['date' => '05 Mar', 'desc' => 'Cetak sertifikat Bootcamp', 'debit' => 0, 'credit' => 150000, 'method' => 'Cash'],
-                                ['date' => '10 Mar', 'desc' => 'Sponsor Tech Week', 'debit' => 3000000, 'credit' => 0, 'method' => 'Transfer'],
-                                ['date' => '15 Mar', 'desc' => 'Sewa sound system', 'debit' => 0, 'credit' => 750000, 'method' => 'Transfer'],
-                                ['date' => '20 Mar', 'desc' => 'Penjualan merchandise', 'debit' => 850000, 'credit' => 0, 'method' => 'Cash'],
-                                ['date' => '25 Mar', 'desc' => 'Konsumsi rapat koordinasi', 'debit' => 0, 'credit' => 300000, 'method' => 'E-Wallet'],
-                            ] as $tx)
-                                @php $saldo += $tx['debit'] - $tx['credit']; @endphp
+                            @php $currentSaldo = 0; @endphp
+                            @forelse($transaksiInternal as $tx)
+                                @php 
+                                    if($tx->type == 'income') {
+                                        $currentSaldo += $tx->amount;
+                                    } else {
+                                        $currentSaldo -= $tx->amount;
+                                    } 
+                                @endphp
                                 <tr class="hover:bg-gray-50/50 transition-colors">
-                                    <td class="px-6 py-3 text-gray-500">{{ $tx['date'] }}</td>
-                                    <td class="px-4 py-3 font-medium text-gray-700">{{ $tx['desc'] }}</td>
-                                    <td class="px-4 py-3 text-right {{ $tx['debit'] > 0 ? 'text-emerald-600 font-semibold' : 'text-gray-300' }}">
-                                        {{ $tx['debit'] > 0 ? '+ Rp ' . number_format($tx['debit'], 0, ',', '.') : '-' }}
+                                    {{-- Ambil tanggal berdasarkan input --}}
+                                    <td class="px-6 py-3 text-gray-500">{{ date('d M Y', strtotime($tx->transaction_date)) }}</td>
+        
+                                    {{-- Ambil judul transaksi --}}
+                                    <td class="px-4 py-3 font-medium text-gray-700">{{ $tx->title }}</td>
+        
+                                    {{-- Logika kolom Pemasukan --}}
+                                    <td class="px-4 py-3 text-right {{ $tx->type == 'income' ? 'text-emerald-600 font-semibold' : 'text-gray-300' }}">
+                                        @if($tx->type == 'income')
+                                            <span class="text-emerald-600 font-bold">+ Rp {{ number_format($tx->amount, 0, ',', '.') }}</span>
+                                        @else
+                                            <span class="text-gray-300">-</span>
+                                        @endif
                                     </td>
-                                    <td class="px-4 py-3 text-right {{ $tx['credit'] > 0 ? 'text-red-500 font-semibold' : 'text-gray-300' }}">
-                                        {{ $tx['credit'] > 0 ? '- Rp ' . number_format($tx['credit'], 0, ',', '.') : '-' }}
+        
+                                    {{-- Logika kolom Pengeluaran --}}
+                                    <td class="px-4 py-3 text-right {{ $tx->type == 'outcome' ? 'text-red-500 font-semibold' : 'text-gray-300' }}">
+                                        @if($tx->type == 'outcome')
+                                            <span class="text-red-500 font-bold">- Rp {{ number_format($tx->amount, 0, ',', '.') }}</span>
+                                        @else
+                                            <span class="text-gray-300">-</span>
+                                        @endif
                                     </td>
-                                    <td class="px-4 py-3 text-right font-bold text-gray-700">Rp {{ number_format($saldo, 0, ',', '.') }}</td>
-                                    <td class="px-4 py-3 text-center"><span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ $tx['method'] }}</span></td>
-                                    <td class="px-4 py-3 text-center">
-                                        <button class="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-[#2C3DA6] transition-colors" title="Upload bukti">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                        </button>
+        
+                                    <td class="px-4 py-3 text-right font-bold text-gray-700">
+                                        Rp {{ number_format($currentSaldo, 0, ',', '.') }}
+                                    </td>
+        
+                                    {{-- Bagian metode bisa kamu tambah kolomnya nanti di DB atau biarkan dummy dulu --}}
+                                    <td class="px-4 py-3">
+                                        <span class="text-center font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                                            {{ $tx->method ?? 'N/A' }}
+                                        </span>
+                                    </td>
+        
+                                    {{-- Kolom Deskripsi Tambahan --}}
+                                    <td class="px-4 py-4 text-center text-gray-500 italic">
+                                        {{ $tx->description ?? '-' }}
+                                    </td>
+                                    
+                                    {{-- Kolom Bukti Transaksi --}}
+                                    <td class="px-4 py-4 text-sm justify-center gap">
+                                        @if($tx->attachment)
+                                            <a href="{{ asset('storage/' . $tx->attachment) }}" target="_blank" 
+                                            class="inline-flex p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" 
+                                            title="Lihat Bukti">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </a>
+                                        @else
+                                            <span class="text-gray-300">-</span>
+                                        @endif
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm">
+                                        <div class="flex justify-center items-center gap-1">
+                                            {{-- Tombol Edit --}}
+                                            <a href="{{ route('dashboard.finance.edit', $tx->id) }}" 
+                                                class="flex p-2 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" 
+                                                title="Edit Transaksi">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </a>
+                                            {{-- Tombol Hapus --}}
+                                            <form action="{{ route('dashboard.finance.destroy', $tx->id) }}" 
+                                                    method="POST" 
+                                                    class="inline-block"
+                                                    onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                
+                                                {{-- Atribut class dipindahkan ke sini agar tombol membungkus SVG tong sampah dengan pas --}}
+                                                <button type="submit" 
+                                                        class="flex p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:outline-none" 
+                                                        title="Hapus Transaksi">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>                             
+                                </tr>
+                            @empty
+                                <tr>
+                                    {{-- colspan="7" artinya kotak ini akan memanjang dari kolom 1 sampai 7 --}}
+                                    <td colspan="7" class="px-6 py-12">
+                                        <div class="flex flex-col items-center justify-center text-center">
+                                            <div class="bg-gray-50 rounded-full p-4 mb-4">
+                                                <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                                </svg>
+                                            </div>
+                                            <h3 class="text-sm font-bold text-gray-700 mb-1">Belum ada Laporan Keuangan</h3>
+                                            <p class="text-xs text-gray-400">Tambahkan transaksi baru untuk melihat laporan keuangan.</p>
+                                        </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -140,11 +227,10 @@
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                 <div class="flex items-center gap-4 mb-6">
                     <label class="text-sm font-semibold text-gray-700">Pilih Proker:</label>
-                    <select class="px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6] text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#2C3DA6]/20 min-w-[250px]">
-                        <option value="">Pilih Program Kerja...</option>
-                        @foreach($proposals as $p)
-                            <option value="{{ $p->id }}">{{ $p->proker }}</option>
-                        @endforeach
+                    <select class="px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:border-[#2C3DA6] text-gray-600">
+                        <option>Workshop UI/UX Design</option>
+                        <option>Seminar Tech Week</option>
+                        <option>Bazaar Kewirausahaan</option>
                     </select>
                 </div>
 
@@ -177,131 +263,6 @@
                             @endforeach
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-
-        {{-- Modal Tambah Transaksi --}}
-        <div x-show="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" style="display: none;">
-            <div @click.away="showAddModal = false" x-transition.opacity.duration.300ms
-                 class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-gray-100">
-                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                    <h3 class="text-base font-bold text-gray-800">Tambah Transaksi Baru</h3>
-                    <button @click="showAddModal = false" class="text-gray-400 hover:text-red-500 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <div class="p-6 space-y-4">
-                    <form method="POST" action="{{ route('dashboard.finance.store') }}" enctype="multipart/form-data">
-                    @csrf
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Tanggal</label>
-                            <input type="date" name="date" required class="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-[#2C3DA6] focus:outline-none focus:ring-2 focus:ring-[#2C3DA6]/20">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Jenis Transaksi</label>
-                            <select name="type" required class="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-[#2C3DA6] focus:outline-none focus:ring-2 focus:ring-[#2C3DA6]/20">
-                                <option value="pemasukan">Pemasukan (Debit)</option>
-                                <option value="pengeluaran">Pengeluaran (Kredit)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Keterangan</label>
-                        <input type="text" name="description" required placeholder="Contoh: Pembelian alat tulis" class="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-[#2C3DA6] focus:outline-none focus:ring-2 focus:ring-[#2C3DA6]/20">
-                    </div>
-
-                    <div class="mt-4">
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Kaitkan dengan Proker (Opsional)</label>
-                        <select name="proposal_id" class="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-[#2C3DA6] focus:outline-none focus:ring-2 focus:ring-[#2C3DA6]/20">
-                            <option value="">-- Tidak dikaitkan (Kas Internal Umum) --</option>
-                            @foreach($proposals as $p)
-                                <option value="{{ $p->id }}">{{ $p->proker }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 mt-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Nominal (Rp)</label>
-                            <input type="number" name="amount" required min="0" placeholder="0" class="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-[#2C3DA6] focus:outline-none focus:ring-2 focus:ring-[#2C3DA6]/20">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Metode</label>
-                            <select name="method" required class="w-full px-3 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-[#2C3DA6] focus:outline-none focus:ring-2 focus:ring-[#2C3DA6]/20">
-                                <option value="Transfer">Transfer</option>
-                                <option value="Cash">Cash</option>
-                                <option value="E-Wallet">E-Wallet</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Bukti Transaksi (Wajib: JPG/PNG/PDF)</label>
-                        <input type="file" name="proof_file" required accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:border-[#2C3DA6] focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#2C3DA6]/10 file:text-[#2C3DA6] hover:file:bg-[#2C3DA6]/20">
-                    </div>
-
-                    <div class="mt-8 flex items-center justify-end gap-3">
-                        <button type="button" @click="showAddModal = false" class="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
-                            Batal
-                        </button>
-                        <button type="submit" class="px-5 py-2.5 text-sm font-bold text-white bg-[#2C3DA6] rounded-xl hover:bg-[#1E2D8F] shadow-lg shadow-[#2C3DA6]/20 transition-all">
-                            Simpan Transaksi
-                        </button>
-                    </div>
-                </form>
-                </div>
-            </div>
-        </div>
-
-        {{-- Modal Detail Transaksi --}}
-        <div x-show="showDetailModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" style="display: none;">
-            <div @click.away="showDetailModal = false" x-transition.opacity.duration.300ms
-                 class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-gray-100">
-                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                    <h3 class="text-base font-bold text-gray-800">Detail Transaksi</h3>
-                    <button @click="showDetailModal = false" class="text-gray-400 hover:text-red-500 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                <div class="p-6 space-y-4" x-show="selectedTx">
-                    <div class="grid grid-cols-2 gap-y-4 text-sm">
-                        <div>
-                            <p class="text-xs text-gray-400 mb-1">Tanggal</p>
-                            <p class="font-semibold text-gray-800" x-text="selectedTx?.date"></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400 mb-1">Jenis</p>
-                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold"
-                                  :class="selectedTx?.type === 'pemasukan' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'"
-                                  x-text="selectedTx?.type === 'pemasukan' ? 'Debit (Masuk)' : 'Kredit (Keluar)'"></span>
-                        </div>
-                        <div class="col-span-2">
-                            <p class="text-xs text-gray-400 mb-1">Keterangan</p>
-                            <p class="font-medium text-gray-800" x-text="selectedTx?.desc"></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400 mb-1">Nominal</p>
-                            <p class="font-bold text-gray-800 text-lg">Rp <span x-text="selectedTx?.amount"></span></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400 mb-1">Metode Pembayaran</p>
-                            <p class="font-semibold text-gray-800" x-text="selectedTx?.method"></p>
-                        </div>
-                        <div class="col-span-2">
-                            <p class="text-xs text-gray-400 mb-1">Terkait Proker</p>
-                            <p class="font-semibold text-[#2C3DA6]" x-text="selectedTx?.proker"></p>
-                        </div>
-                        <div class="col-span-2 pt-4 border-t border-gray-100">
-                            <p class="text-xs text-gray-400 mb-2">Bukti Transaksi</p>
-                            <a :href="selectedTx?.proof_url" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-[#2C3DA6] text-sm font-semibold rounded-lg hover:bg-blue-100 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                Lihat Berkas Asli
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

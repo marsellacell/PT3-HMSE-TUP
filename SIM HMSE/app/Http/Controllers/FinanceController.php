@@ -48,7 +48,6 @@ class FinanceController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $request->validate([
             'transaction_date' => 'required|date',
             'title' => 'required|string|max:255',
@@ -56,7 +55,7 @@ class FinanceController extends Controller
             'amount' => 'required|numeric|min:0',
             'method' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'attachment' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'attachment' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $attachmentPath = null;
@@ -75,13 +74,8 @@ class FinanceController extends Controller
             'created_by' => auth()->id() ?? 1, // Gunakan ID user yang login
         ]);
 
-        $attachmentPath = null;
-        if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('attachments', 'public');
-            \App\Models\FinanceInternal::latest()->first()->update(['attachment' => $attachmentPath]);
-        }
-
-        return redirect()->route('dashboard.finance.index')->with('success', 'Transaksi berhasil ditambahkan!');
+        return redirect()->route('dashboard.finance.index', ['tab' => 'internal'])
+                        ->with('success', 'Laporan berhasil disimpan!');
     }
 
     public function edit($id)
@@ -106,7 +100,7 @@ class FinanceController extends Controller
             'amount' => 'required|numeric|min:0',
             'method' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'attachment' => 'nullable|image|mimes:jpeg,png,jpg|max:5120'
+            'attachment' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ], [
             'title.required' => 'Judul transaksi wajib diisi.',
             'type.required' => 'Tipe transaksi wajib dipilih.',
