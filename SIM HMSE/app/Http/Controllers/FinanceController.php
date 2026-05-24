@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use App\Models\FinanceInternal;
 use App\Models\FinanceProker;
 use App\Models\Proposal;
@@ -11,20 +13,70 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class FinanceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $transaksiInternal = \App\Models\FinanceInternal::orderBy('transaction_date', 'asc')
-                            ->orderBy('created_at', 'asc') // Urutan kedua jika tanggalnya sama
+                            ->orderBy('created_at', 'asc') 
                             ->get();
         $internalIn = FinanceInternal::where('type', 'income')->sum('amount');
         $internalOut = FinanceInternal::where('type', 'outcome')->sum('amount');
         $saldoInternal = $internalIn - $internalOut;
+
+        $listProker = \App\Models\ProgramKerja::all(); 
+
+        $selectedProkerId = $request->query('proker_id', optional($listProker->first())->id);
+
+        $transaksiProker = [];
+        $summaryProker = ['budget' => 0, 'actual' => 0, 'leftover' => 0];
+
+        if ($selectedProkerId) {
+            $transaksiProker = FinanceProker::where('proker_id', $selectedProkerId)->get();
+            
+            $anggaran = FinanceProker::where('proker_id', $selectedProkerId)->where('type', 'income')->sum('amount');
+            $realisasi = FinanceProker::where('proker_id', $selectedProkerId)->where('type', 'outcome')->sum('amount');
+            
+            $summaryProker = [
+                'budget' => $anggaran,
+                'actual' => $realisasi,
+                'leftover' => $anggaran - $realisasi
+            ];
+        }
 
         $prokerIn = FinanceProker::where('type', 'income')->sum('amount');
         $prokerOut = FinanceProker::where('type', 'outcome')->sum('amount');
         $totalAnggaranProker = $prokerIn;
 
         $proposals = Proposal::all();
+
+        $chartDataRaw = FinanceInternal::select(
+                DB::raw("DATE_FORMAT(transaction_date, '%b') as month_name"),
+                DB::raw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income"),
+                DB::raw("SUM(CASE WHEN type = 'outcome' THEN amount ELSE 0 END) as total_outcome")
+            )
+            ->groupBy(DB::raw("DATE_FORMAT(transaction_date, '%Y-%m')"), 'month_name')
+            ->orderBy(DB::raw("DATE_FORMAT(transaction_date, '%Y-%m')"), 'desc') 
+            ->limit(6) 
+            ->get()
+            ->reverse() 
+            ->values();
+
+        $maxAmount = 0;
+        foreach ($chartDataRaw as $data) {
+            if ($data->total_income > $maxAmount) $maxAmount = $data->total_income;
+            if ($data->total_outcome > $maxAmount) $maxAmount = $data->total_outcome;
+        }
+        if ($maxAmount == 0) $maxAmount = 1; 
+
+        $chartData = [];
+        foreach ($chartDataRaw as $data) {
+            $chartData[] = [
+                'month' => $data->month_name,
+                'in'    => ($data->total_income / $maxAmount) * 100,
+                'out'   => ($data->total_outcome / $maxAmount) * 100,
+                'raw_in'  => $data->total_income,
+                'raw_out' => $data->total_outcome,
+            ];
+        }
 
         return view('pages.dashboard.finance.index', [
             'totalPemasukan' => $internalIn + $prokerIn,
@@ -33,6 +85,11 @@ class FinanceController extends Controller
             'anggaranProker' => $totalAnggaranProker,
             'transaksiInternal' => $transaksiInternal,
             'proposals' => $proposals,
+            'chartData' => $chartData, 
+            'listProker' => $listProker,
+            'selectedProkerId' => $selectedProkerId,
+            'transaksiProker' => $transaksiProker,
+            'summaryProker' => $summaryProker
         ]);
     }
 

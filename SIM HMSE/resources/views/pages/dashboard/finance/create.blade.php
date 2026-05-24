@@ -29,21 +29,23 @@
 
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
 
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Transaksi *</label>
-                <input type="text" name="title" required value="{{ old('title') }}"
-                    placeholder="Contoh: Laporan Keuangan Bulan Januari 2024"
-                    class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Transaksi *</label>
-                <input type="date" name="transaction_date" required
-                    value="{{ date('Y-m-d') }}"
-                    class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
-            </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Transaksi *</label>
+                    <input type="text" name="title" required value="{{ old('title') }}"
+                        placeholder="Contoh: Laporan Keuangan Bulan Januari 2024"
+                        class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tanggal Transaksi *</label>
+                    <input type="date" name="transaction_date" required
+                        value="{{ date('Y-m-d') }}"
+                        class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Tipe Transaksi *</label>
                     <select name="type" required
@@ -71,14 +73,16 @@
                         <input type="hidden" name="amount" :value="rawAmount">
                     </div>
                 </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Metode Transaksi *</label>
+                    <input type="text" name="method" value="{{ old('method') }}"
+                        placeholder="Contoh: Transfer Bank, Tunai, dsb."
+                        class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
+                </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Metode Transaksi *</label>
-                <input type="text" name="method" value="{{ old('method') }}"
-                    placeholder="Contoh: Transfer Bank, Tunai, dsb."
-                    class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:border-[#2C3DA6] focus:ring-2 focus:ring-[#2C3DA6]/20 transition-all">
-            </div>
+            
             
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi Tambahan</label>
