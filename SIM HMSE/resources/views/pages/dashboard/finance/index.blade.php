@@ -25,34 +25,33 @@
             <button @click="tab = 'proker'" :class="tab === 'proker' ? 'bg-[#2C3DA6] text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'" class="px-5 py-2.5 text-sm font-semibold rounded-xl transition-all">Per-Proker</button>
         </div>
 
-        {{-- Chart --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            @foreach([
-                ['label' => 'Total Pemasukan', 'value' => 'Rp ' . number_format($totalPemasukan, 0, ',', '.'), 'icon' => 'trending-up', 'color' => 'emerald', 'change' => '+15%'],
-                ['label' => 'Total Pengeluaran', 'value' => 'Rp ' . number_format($totalPengeluaran, 0, ',', '.'), 'icon' => 'trending-down', 'color' => 'red', 'change' => '+8%'],
-                ['label' => 'Saldo Kas', 'value' => 'Rp ' . number_format($saldoKas, 0, ',', '.'), 'icon' => 'wallet', 'color' => 'blue', 'change' => 'Aktif'],
-                ['label' => 'Anggaran Proker', 'value' => 'Rp ' . number_format($anggaranProker, 0, ',', '.'), 'icon' => 'chart', 'color' => 'purple', 'change' => '5 proker'],
-            ] as $stat)
-                <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-10 h-10 rounded-xl bg-{{ $stat['color'] }}-50 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-{{ $stat['color'] }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1"/>
-                            </svg>
+        {{-- Overview --}}
+        <div x-show="tab === 'overview'" class="space-y-6">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                @foreach([
+                    ['label' => 'Total Pemasukan', 'value' => 'Rp ' . number_format($totalPemasukan, 0, ',', '.'), 'icon' => 'trending-up', 'color' => 'emerald', 'change' => '+15%'],
+                    ['label' => 'Total Pengeluaran', 'value' => 'Rp ' . number_format($totalPengeluaran, 0, ',', '.'), 'icon' => 'trending-down', 'color' => 'red', 'change' => '+8%'],
+                    ['label' => 'Saldo Kas', 'value' => 'Rp ' . number_format($saldoKas, 0, ',', '.'), 'icon' => 'wallet', 'color' => 'blue', 'change' => 'Aktif'],
+                    ['label' => 'Anggaran Proker', 'value' => 'Rp ' . number_format($anggaranProker, 0, ',', '.'), 'icon' => 'chart', 'color' => 'purple', 'change' => '5 proker'],
+                ] as $stat)
+                    <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-{{ $stat['color'] }}-50 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-{{ $stat['color'] }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1"/>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold text-{{ $stat['color'] }}-600 bg-{{ $stat['color'] }}-50 px-2 py-0.5 rounded-full">{{ $stat['change'] }}</span>
                         </div>
-                        <span class="text-xs font-semibold text-{{ $stat['color'] }}-600 bg-{{ $stat['color'] }}-50 px-2 py-0.5 rounded-full">{{ $stat['change'] }}</span>
+                        <p class="text-xl font-black text-gray-800">{{ $stat['value'] }}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">{{ $stat['label'] }}</p>
                     </div>
-                    <p class="text-xl font-black text-gray-800">{{ $stat['value'] }}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">{{ $stat['label'] }}</p>
-                </div>
-            @endforeach
-        </div>
+                @endforeach
+            </div>
 
-        
-        {{-- Kunci biar Chart cuma muncul di Overview --}}
-        <div x-show="tab === 'overview'">
-            {{-- Simple Bar Chart --}}
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
+            {{-- 2. Simple Bar Chart --}}
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                 <h3 class="text-sm font-bold text-gray-800 mb-6">Ringkasan Keuangan Transaksi Berisi Data</h3>
                 
                 <div class="flex items-end justify-between gap-2 h-48">
@@ -63,11 +62,9 @@
                                     style="height: 160px;" 
                                     title="Pemasukan: Rp {{ number_format($bar['raw_in'], 0, ',', '.') }} | Pengeluaran: Rp {{ number_format($bar['raw_out'], 0, ',', '.') }}">
                                     
-                                    {{-- Balok Pemasukan --}}
                                     <div class="w-5 bg-[#2C3DA6] rounded-t-md transition-all duration-500" 
                                         style="height: {{ $bar['in'] }}%;"></div>
                                     
-                                    {{-- Balok Pengeluaran --}}
                                     <div class="w-5 bg-red-400 rounded-t-md transition-all duration-500" 
                                         style="height: {{ $bar['out'] }}%;"></div>
                                 </div>
