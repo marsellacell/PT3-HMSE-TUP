@@ -259,7 +259,8 @@ class ProkerController extends Controller
             ->count();
         $totalSteps = $timelineSteps->count();
 
-        $proposal = \App\Models\Proposal::where('proker', $prokerRow->name)->first();
+        $proposal = \App\Models\Proposal::where('proker_id', $prokerRow->name)->first();
+        $riskLevelLabel = $this->prokerRiskLevelLabel($prokerRow->risk_level ?? 'rendah');
 
         $proker = [
             'id' => $prokerRow->id,
@@ -397,6 +398,16 @@ class ProkerController extends Controller
             'completed' => 100,
             'cancelled' => 0,
             default => 0,
+        };
+    }
+
+    private function prokerRiskLevelLabel(string $riskLevel): string
+    {
+        return match ($riskLevel) {
+            'rendah' => 'Resiko Rendah',
+            'sedang' => 'Resiko Sedang',
+            'tinggi' => 'Resiko Tinggi',
+            default => 'Resiko Rendah',
         };
     }
 }
