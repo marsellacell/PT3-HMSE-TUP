@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,30 +15,49 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Role::create([
+        DB::table('roles')->updateOrInsert([
             'id' => 1,
-            'name' => 'Admin',
-        ]);  
-        
-        \App\Models\Role::create([
-            'id' => 2,
-            'name' => 'Pengurus',
-        ]); 
-    
-        // Akun Admin
-        \App\Models\User::create([
-            'name' => 'Admin HMSE',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password123'), // Wajib di-encrypt
-            'role_id' => 1,
+        ], [
+            'name' => 'admin',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        // Akun Pengurus
-        \App\Models\User::create([
-            'name' => 'Pengurus HMSE',
-            'email' => 'pengurus@example.com',
-            'password' => bcrypt('password123'),
-            'role_id' => 2,
+        DB::table('roles')->updateOrInsert([
+            'id' => 2,
+        ], [
+            'name' => 'pengurus',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
+
+        // Akun Admin
+        DB::table('users')->updateOrInsert(
+            ['email' => 'admin@hmse.ac.id'],
+            [
+                'name' => 'Admin HMSE',
+                'email' => 'admin@hmse.ac.id',
+                'password' => bcrypt('adminHMSE2026!'),
+                'role_id' => 1,
+                'role' => 'admin',
+                'jabatan' => 'admin',
+                'divisi' => 'Administrasi',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        // Akun Pengurus
+        DB::table('users')->updateOrInsert(
+            ['email' => 'pengurus@example.com'],
+            [
+                'name' => 'Pengurus HMSE',
+                'email' => 'pengurus@example.com',
+                'password' => bcrypt('password123'),
+                'role_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
     }
 }

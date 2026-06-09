@@ -30,10 +30,10 @@ class FinanceController extends Controller
         $summaryProker = ['budget' => 0, 'actual' => 0, 'leftover' => 0];
 
         if ($selectedProkerId) {
-            $transaksiProker = FinanceProker::where('program_kerja_id', $selectedProkerId)->get();
+            $transaksiProker = FinanceProker::where('proker_id', $selectedProkerId)->get();
 
-            $anggaran = FinanceProker::where('program_kerja_id', $selectedProkerId)->where('type', 'income')->sum('amount');
-            $realisasi = FinanceProker::where('program_kerja_id', $selectedProkerId)->where('type', 'outcome')->sum('amount');
+            $anggaran = FinanceProker::where('proker_id', $selectedProkerId)->where('type', 'income')->sum('amount');
+            $realisasi = FinanceProker::where('proker_id', $selectedProkerId)->where('type', 'outcome')->sum('amount');
 
             $summaryProker = [
                 'budget' => $anggaran,
@@ -120,6 +120,13 @@ class FinanceController extends Controller
             $attachmentPath = $request->file('attachment')->store('attachments', 'public');
         }
 
+        $createdBy = auth()->id();
+        if (!$createdBy) {
+            return back()
+                ->withInput()
+                ->withErrors(['auth' => 'Silakan login kembali sebelum menyimpan laporan keuangan.']);
+        }
+
         \App\Models\FinanceInternal::create([
             'transaction_date' => $validated['transaction_date'],
             'title' => $validated['title'],
@@ -128,7 +135,7 @@ class FinanceController extends Controller
             'method' => $validated['method'],
             'description' => $validated['description'],
             'attachment' => $attachmentPath,
-            'created_by' => auth()->id() ?? 1, // Gunakan ID user yang login
+            'created_by' => $createdBy,
         ]);
 
         return redirect()->route('dashboard.finance.index', ['tab' => 'internal'])

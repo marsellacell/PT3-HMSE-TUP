@@ -10,33 +10,111 @@ class ProkerController extends Controller
     public function index(Request $request)
     {
         $accounts = collect($this->dummyAccounts())->keyBy('id');
+        $statusLabels = $this->prokerStatusOptions();
+        $statusOptions = $statusLabels;
+
+        $divisionOptions = collect($this->defaultDivisionOptions())
+            ->mapWithKeys(fn (string $division) => [trim($division) => trim($division)])
+            ->all();
 
         $filters = [
             'search' => trim((string) $request->query('search', '')),
-            'status' => (string) $request->query('status', ''),
-            'divisi' => (string) $request->query('divisi', ''),
+            'status' => trim((string) $request->query('status', '')),
+            'divisi' => trim((string) $request->query('divisi', '')),
         ];
 
         $query = ProgramKerja::query()
-            ->when($filters['search'] !== '', function ($q) use ($filters, $accounts) {
+            ->when($filters['search'] !== '', function ($q) use ($filters, $accounts, $statusLabels) {
+                $search = mb_strtolower($filters['search']);
+
                 $matchedAccountIds = $accounts
-                    ->filter(fn (array $account) => str_contains(strtolower($account['name']), strtolower($filters['search'])))
+                    ->filter(function (array $account) use ($search) {
+                        $haystack = mb_strtolower(implode(' ', [
+                            $account['name'] ?? '',
+                            $account['email'] ?? '',
+                            $account['role'] ?? '',
+                            $account['division'] ?? '',
+                        ]));
+
+                        return str_contains($haystack, $search);
+                    })
                     ->keys()
                     ->values()
                     ->all();
 
-                $q->where(function ($innerQuery) use ($filters, $matchedAccountIds) {
+                $matchedStatuses = collect($statusLabels)
+                    ->filter(function (string $label, string $value) use ($search) {
+                        return str_contains(mb_strtolower($value . ' ' . $label), $search);
+                    })
+                    ->keys()
+                    ->values()
+                    ->all();
+
+                $q->where(function ($innerQuery) use ($search, $matchedAccountIds, $matchedStatuses) {
                     $innerQuery
-                        ->where('name', 'like', '%' . $filters['search'] . '%')
-                        ->orWhereIn('pj_user_id', $matchedAccountIds);
+                        ->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('division', 'like', '%' . $search . '%')
+                        ->orWhere('description', 'like', '%' . $search . '%')
+                        ->orWhere('location', 'like', '%' . $search . '%')
+                        ->orWhere('risk_level', 'like', '%' . $search . '%')
+                        ->orWhereIn('pj_user_id', $matchedAccountIds)
+                        ->orWhereIn('status', $matchedStatuses);
                 });
             })
-            ->when($filters['status'] !== '', fn ($q) => $q->where('status', $filters['status']))
-            ->when($filters['divisi'] !== '', fn ($q) => $q->where('division', $filters['divisi']))
+            ->when($filters['status'] !== '', function ($q) use ($filters) {
+                $status = mb_strtolower($filters['status']);
+
+                $q->whereRaw('LOWER(TRIM(status)) = ?', [$status]);
+            })
+            ->when($filters['divisi'] !== '', function ($q) use ($filters) {
+                $division = mb_strtolower($filters['divisi']);
+
+                $q->whereRaw('LOWER(TRIM(division)) = ?', [$division]);
+            })
             ->latest();
 
         $prokers = $query
             ->get()
+            ->filter(function (ProgramKerja $proker) use ($filters, $accounts, $statusLabels) {
+                if ($filters['status'] !== '' && mb_strtolower(trim((string) $proker->status)) !== mb_strtolower($filters['status'])) {
+                    return false;
+                }
+
+                if ($filters['divisi'] !== '' && mb_strtolower(trim((string) $proker->division)) !== mb_strtolower($filters['divisi'])) {
+                    return false;
+                }
+
+                if ($filters['search'] === '') {
+                    return true;
+                }
+
+                $search = mb_strtolower($filters['search']);
+
+                $pj = $accounts->get($proker->pj_user_id);
+                $pjHaystack = mb_strtolower(implode(' ', [
+                    $pj['name'] ?? '',
+                    $pj['email'] ?? '',
+                    $pj['role'] ?? '',
+                    $pj['division'] ?? '',
+                ]));
+
+                $statusHaystack = mb_strtolower(implode(' ', [
+                    $proker->status ?? '',
+                    $statusLabels[$proker->status] ?? '',
+                ]));
+
+                $prokerHaystack = mb_strtolower(implode(' ', [
+                    $proker->name ?? '',
+                    $proker->division ?? '',
+                    $proker->description ?? '',
+                    $proker->location ?? '',
+                    $proker->risk_level ?? '',
+                ]));
+
+                return str_contains($prokerHaystack, $search)
+                    || str_contains($pjHaystack, $search)
+                    || str_contains($statusHaystack, $search);
+            })
             ->map(function (ProgramKerja $proker) use ($accounts): array {
                 $pj = $accounts->get($proker->pj_user_id);
 
@@ -53,10 +131,6 @@ class ProkerController extends Controller
                 ];
             })
             ->values();
-
-        $statusOptions = $this->prokerStatusOptions();
-
-        $divisionOptions = collect($this->defaultDivisionOptions());
 
         return view('pages.dashboard.proker.index', compact('prokers', 'filters', 'statusOptions', 'divisionOptions'));
     }
@@ -165,6 +239,7 @@ class ProkerController extends Controller
             'description'           => ['nullable', 'string'],
             'location'              => ['nullable', 'string', 'max:255'],
             'target_participants'   => ['nullable', 'integer', 'min:1'],
+            'risk_level'            => ['required', 'in:rendah,sedang,tinggi'],
             'date_start'            => ['required', 'date'],
             'date_end'              => ['required', 'date', 'after_or_equal:date_start'],
             'status'                => ['required', 'in:draft,preparation,on-progress,completed,cancelled'],
@@ -207,6 +282,7 @@ class ProkerController extends Controller
             'description'           => $validated['description'] ?? null,
             'location'              => $validated['location'] ?? null,
             'target_participants'   => $validated['target_participants'] ?? null,
+            'risk_level'            => $validated['risk_level'],
             'progress'              => $this->prokerProgressFromStatus($validated['status']),
             'color'                 => $this->prokerDivisionColor($validated['division']),
             'timeline'              => $timelines,
