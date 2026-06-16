@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,23 +15,31 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Role::create([
+        DB::table('roles')->updateOrInsert([
             'id' => 1,
-            'name' => 'admin',
+            'name' => 'Admin',
         ]);  
         
         \App\Models\Role::create([
             'id' => 2,
-            'name' => 'pengurus',
+            'name' => 'Pengurus',
         ]); 
     
         // Akun Admin
-        \App\Models\User::create([
-            'name' => 'Admin HMSE',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password123'), // Wajib di-encrypt
-            'role_id' => 1,
-        ]);
+        DB::table('users')->updateOrInsert(
+            ['email' => 'admin@hmse.ac.id'],
+            [
+                'name' => 'Admin HMSE',
+                'email' => 'admin@hmse.ac.id',
+                'password' => bcrypt('adminHMSE2026!'),
+                'role_id' => 1,
+                'role' => 'admin',
+                'jabatan' => 'admin',
+                'divisi' => 'Administrasi',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
 
         // Akun Pengurus
         \App\Models\User::create([
@@ -39,12 +47,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'pengurus@example.com',
             'password' => bcrypt('password123'),
             'role_id' => 2,
-        ]);
-
-        $this->call([
-            UserSeeder::class,
-            ProposalSeeder::class,
-            ProgramKerjaSeeder::class,
         ]);
     }
 }
