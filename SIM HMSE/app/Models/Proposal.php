@@ -12,6 +12,7 @@ class Proposal extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'proker_id',
         'user_id',
         'title',
         'proker',
@@ -51,6 +52,11 @@ class Proposal extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function proker(): BelongsTo
+    {
+        return $this->belongsTo(ProgramKerja::class, 'proker_id');
     }
 
     /**

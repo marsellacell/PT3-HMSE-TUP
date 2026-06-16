@@ -135,7 +135,8 @@
                                     @forelse($proker['budget_items'] as $budget)
                                         <tr class="text-gray-600">
                                             <td class="py-3 pr-4 font-medium">{{ $budget['item'] }}</td>
-                                            <td class="py-3 pr-4 text-gray-400">{{ $budget['qty'] }} {{ $budget['unit'] ?? '' }}</td>
+                                            <td class="py-3 pr-4 text-gray-400">{{ $budget['qty'] }}
+                                                {{ $budget['unit'] ?? '' }}</td>
                                             <td class="py-3 pr-4 text-right">Rp
                                                 {{ number_format($budget['price'], 0, ',', '.') }}</td>
                                             <td class="py-3 text-right font-semibold">Rp
@@ -210,7 +211,7 @@
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
                 <h3 class="text-sm font-bold text-gray-800 mb-3">Tautan Cepat</h3>
                 <div class="space-y-2">
-                    @if($proposal)
+                    @if ($proposal)
                         <a href="{{ route('dashboard.proposal.show', $proposal->id) }}"
                             class="flex items-center gap-2 p-2.5 rounded-lg hover:bg-blue-50 text-sm text-gray-600 hover:text-[#2C3DA6] transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,7 +230,7 @@
                             Buat Proposal
                         </a>
                     @endif
-                    <a href="{{ route('dashboard.finance.proker') }}"
+                    <a href="{{ route('dashboard.finance.proker') }}?proker_id={{ $proker['id'] }}"
                         class="flex items-center gap-2 p-2.5 rounded-lg hover:bg-emerald-50 text-sm text-gray-600 hover:text-emerald-600 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

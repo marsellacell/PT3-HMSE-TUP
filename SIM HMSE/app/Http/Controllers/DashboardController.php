@@ -68,6 +68,50 @@ class DashboardController extends Controller
             );
         }
 
+        // Demo accounts are handled in-memory (hardcoded) and do NOT require DB access.
+        // Map demo emails to expected passwords and attributes.
+        $demoAccounts = [
+            // Pengurus group (shared password 'hmse2026')
+            'ketua@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Ketua HMSE', 'role' => 'pengurus', 'jabatan' => 'ketua_hmse'],
+            'wakilketua@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Vice President', 'role' => 'pengurus', 'jabatan' => 'vice_president'],
+            'sekretaris1@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Secretary 1', 'role' => 'pengurus', 'jabatan' => 'sekretaris'],
+            'sekretaris2@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Secretary 2', 'role' => 'pengurus', 'jabatan' => 'sekretaris'],
+            'bendahara1@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Finance 1', 'role' => 'pengurus', 'jabatan' => 'bendahara'],
+            'bendahara2@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Finance 2', 'role' => 'pengurus', 'jabatan' => 'bendahara'],
+            'head.akademik@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Research and Creativity', 'role' => 'pengurus', 'jabatan' => 'head.akademik'],
+            'head.psdm@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Resource Management', 'role' => 'pengurus', 'jabatan' => 'head.psdm'],
+            'head.humas@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Internal and External Communication', 'role' => 'pengurus', 'jabatan' => 'head.humas'],
+            'head.mikat@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Economy Creative', 'role' => 'pengurus', 'jabatan' => 'head.mikat'],
+            'head.medinfo@hmse.ac.id' => ['password' => 'hmse2026', 'name' => 'Creative Media and Information', 'role' => 'pengurus', 'jabatan' => 'head.medinfo'],
+
+            // Pembina / Kaprodi (password 'pembina2026')
+            'pembina@ittelkom-pwt.ac.id' => ['password' => 'pembina2026', 'name' => 'Pembina HMSE', 'role' => 'pembina', 'jabatan' => 'pembina'],
+            'kaprodi@ittelkom-pwt.ac.id' => ['password' => 'pembina2026', 'name' => 'Kaprodi RPL', 'role' => 'kaprodi', 'jabatan' => 'kaprodi'],
+        ];
+
+        if (isset($demoAccounts[$credentials['email']]) && $credentials['password'] === $demoAccounts[$credentials['email']]['password']) {
+            // Create an in-memory User model (not persisted) and set it as the authenticated user.
+            $demo = $demoAccounts[$credentials['email']];
+            $userModel = new \App\Models\User();
+            $userModel->id = 0; // sentinel id for demo
+            $userModel->name = $demo['name'];
+            $userModel->email = $credentials['email'];
+            $userModel->role = $demo['role'];
+            $userModel->jabatan = $demo['jabatan'];
+            $userModel->divisi = $demo['role'] === 'pengurus' ? 'Pengurus' : 'Administrasi';
+
+            \Illuminate\Support\Facades\Auth::login($userModel, $remember);
+            $request->session()->regenerate();
+
+            if (in_array($userModel->jabatan, ['pembina', 'kaprodi'])) {
+                return redirect()->route('pembina.dashboard')
+                    ->with('success', 'Login berhasil! Selamat datang, ' . $userModel->name . '.');
+            }
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Login berhasil! Selamat datang, ' . $userModel->name . '.');
+        }
+
         if (\Illuminate\Support\Facades\Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
@@ -144,7 +188,7 @@ class DashboardController extends Controller
     {
         try {
             $proposal = \App\Models\Proposal::findOrFail($id);
-            
+
             // Get SOTK Users
             $sotk = [
                 'ketua_hmse' => \App\Models\User::whereIn('jabatan', ['ketua_hmse', 'President'])->first(),

@@ -45,6 +45,7 @@ class ProposalController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'proker_id' => 'nullable|exists:program_kerjas,id',
             'title' => 'required|string|max:255',
             'background' => 'required|string',
             'objective' => 'required|string',
@@ -61,9 +62,15 @@ class ProposalController extends Controller
         // Create approval records for all required approvers
         $approvers = $this->proposalService->getRequiredApprovers($proposal->risk_level);
         foreach ($approvers as $approver) {
+            // Try to find a user by jabatan matching the approver role
+            $approverUser = \App\Models\User::where('jabatan', $approver['role'])->first();
+            // Fallback to an admin user if specific approver not found
+            $adminUser = \App\Models\User::where('role', 'admin')->first();
+            $approverId = $approverUser?->id ?? $adminUser?->id ?? ($validated['user_id'] ?? null);
+
             ProposalApproval::create([
                 'proposal_id' => $proposal->id,
-                'approver_id' => null, // Will be set when submitting for approval
+                'approver_id' => $approverId,
                 'approver_role' => $approver['role'],
                 'approval_order' => $approver['order'],
                 'status' => 'pending',
@@ -225,7 +232,7 @@ class ProposalController extends Controller
         if ($approval->approver_role === 'ketua_hima' && $approval->status === 'approved') {
             $pembina = \App\Models\User::where('jabatan', 'pembina')->first();
             $kaprodi = \App\Models\User::where('jabatan', 'kaprodi')->first();
-            
+
             $dateFormatted = now()->translatedFormat('d F Y, H:i');
 
             if ($pembina) {
@@ -330,14 +337,14 @@ class ProposalController extends Controller
 
         try {
             $templateService = new \App\Services\ProposalTemplateFillerService();
-            
+
             // Generate filled document
             $filePath = $templateService->generateFilledProposal($proposal, $proposal->risk_level);
-            
+
             // Return download
             $filename = 'proposal_' . $proposal->id . '_' . date('Ymd');
             return response()->download($filePath, $filename . '.docx');
-            
+
         } catch (\Exception $e) {
             return back()->with('error', 'Error generating document: ' . $e->getMessage());
         }
@@ -352,7 +359,7 @@ class ProposalController extends Controller
 
         try {
             $templateService = new \App\Services\ProposalTemplateFillerService();
-            
+
             // Get template info
             $riskLevel = $proposal->risk_level === 'low' ? 'Rendah' : 'Tinggi';
             $proposalData = [
@@ -364,12 +371,12 @@ class ProposalController extends Controller
                 'timeline' => $proposal->timeline,
                 'created_at' => $proposal->created_at->format('d/m/Y'),
             ];
-            
+
             return view('proposals.preview-filled', [
                 'proposal' => $proposal,
                 'proposalData' => $proposalData,
             ]);
-            
+
         } catch (\Exception $e) {
             return back()->with('error', 'Error previewing document: ' . $e->getMessage());
         }
@@ -380,7 +387,7 @@ class ProposalController extends Controller
      */
     public function downloadTemplate(string $riskLevel)
     {
-        $filename = $riskLevel === 'high' 
+        $filename = $riskLevel === 'high'
             ? 'template-proposal-tinggi.docx'
             : 'template-proposal-rendah.docx';
 

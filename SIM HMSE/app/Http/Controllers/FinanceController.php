@@ -32,7 +32,19 @@ class FinanceController extends Controller
         if ($selectedProkerId) {
             $transaksiProker = FinanceProker::where('proker_id', $selectedProkerId)->get();
 
-            $anggaran = FinanceProker::where('proker_id', $selectedProkerId)->where('type', 'income')->sum('amount');
+            // Prefer planned budget from ProgramKerja->budget_items if available.
+            $prokerModel = \App\Models\ProgramKerja::find($selectedProkerId);
+            if ($prokerModel && !empty($prokerModel->budget_items)) {
+                $anggaran = collect($prokerModel->budget_items)->sum(function ($item) {
+                    $qty = (int) ($item['qty'] ?? 0);
+                    $price = (float) ($item['price'] ?? 0);
+                    return $qty * $price;
+                });
+            } else {
+                // Fallback: use income-type entries from FinanceProker as anggaran
+                $anggaran = FinanceProker::where('proker_id', $selectedProkerId)->where('type', 'income')->sum('amount');
+            }
+
             $realisasi = FinanceProker::where('proker_id', $selectedProkerId)->where('type', 'outcome')->sum('amount');
 
             $summaryProker = [

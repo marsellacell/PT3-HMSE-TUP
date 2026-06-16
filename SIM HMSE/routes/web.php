@@ -77,11 +77,14 @@ Route::prefix('dashboard')->name('dashboard')->group(function () {
 
     // Keuangan
     Route::prefix('/finance')->name('.finance')->group(function () {
-        Route::get('/', [FinanceController::class, 'financeIndex'])->name('.index');
+        // Use existing controller method names: `index`, `create`, `store`.
+        // The controller's `index` handles both internal and proker views via query params.
+        Route::get('/', [FinanceController::class, 'index'])->name('.index');
         Route::get('/transaction', [FinanceController::class, 'create'])->name('.transaction');
         Route::post('/transaction', [FinanceController::class, 'store'])->name('.store');
-        Route::get('/internal', [FinanceController::class, 'financeInternal'])->name('.internal');
-        Route::get('/proker', [FinanceController::class, 'financeProker'])->name('.proker');
+        // Map internal/proker routes to the same `index` handler which reads `tab` or `proker_id`.
+        Route::get('/internal', [FinanceController::class, 'index'])->name('.internal');
+        Route::get('/proker', [FinanceController::class, 'index'])->name('.proker');
     });
 
     // SOTK / Keanggotaan
