@@ -48,17 +48,43 @@ class FinanceController extends Controller
 
         $proposals = Proposal::all();
 
-        $chartDataRaw = FinanceInternal::select(
-                DB::raw("DATE_FORMAT(transaction_date, '%b') as month_name"),
-                DB::raw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income"),
-                DB::raw("SUM(CASE WHEN type = 'outcome' THEN amount ELSE 0 END) as total_outcome")
-            )
-            ->groupBy(DB::raw("DATE_FORMAT(transaction_date, '%Y-%m')"), 'month_name')
-            ->orderBy(DB::raw("DATE_FORMAT(transaction_date, '%Y-%m')"), 'desc')
-            ->limit(6)
-            ->get()
-            ->reverse()
-            ->values();
+        $driver = DB::connection()->getDriverName();
+
+        if ($driver === 'sqlite') {
+            $chartDataRaw = FinanceInternal::select(
+                    DB::raw("strftime('%m', transaction_date) as month_num"),
+                    DB::raw("strftime('%Y-%m', transaction_date) as month_key"),
+                    DB::raw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income"),
+                    DB::raw("SUM(CASE WHEN type = 'outcome' THEN amount ELSE 0 END) as total_outcome")
+                )
+                ->groupBy('month_key', 'month_num')
+                ->orderBy('month_key', 'desc')
+                ->limit(6)
+                ->get()
+                ->reverse()
+                ->values();
+
+            $monthNames = [
+                '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
+                '05' => 'May', '06' => 'Jun', '07' => 'Jul', '08' => 'Aug',
+                '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Dec'
+            ];
+            foreach ($chartDataRaw as $data) {
+                $data->month_name = $monthNames[$data->month_num] ?? $data->month_num;
+            }
+        } else {
+            $chartDataRaw = FinanceInternal::select(
+                    DB::raw("DATE_FORMAT(transaction_date, '%b') as month_name"),
+                    DB::raw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as total_income"),
+                    DB::raw("SUM(CASE WHEN type = 'outcome' THEN amount ELSE 0 END) as total_outcome")
+                )
+                ->groupBy(DB::raw("DATE_FORMAT(transaction_date, '%Y-%m')"), 'month_name')
+                ->orderBy(DB::raw("DATE_FORMAT(transaction_date, '%Y-%m')"), 'desc')
+                ->limit(6)
+                ->get()
+                ->reverse()
+                ->values();
+        }
 
         $maxAmount = 0;
         foreach ($chartDataRaw as $data) {
