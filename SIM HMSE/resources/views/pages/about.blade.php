@@ -315,4 +315,111 @@
         </div>
     </section>
 
+    {{-- ===== LOKASI SEKRETARIAT ===== --}}
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            {{-- Section Header --}}
+            <div class="text-center mb-14">
+                <span class="inline-block px-4 py-1.5 bg-[#1e3a5f]/10 text-[#1e3a5f] text-sm font-semibold rounded-full mb-4 tracking-wide uppercase">
+                    Temukan Kami
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-black text-[#1e3a5f] mb-3">Lokasi <span class="text-[#f4a261]">Sekretariat</span></h2>
+                <div class="w-16 h-1.5 bg-[#f4a261] rounded-full mx-auto mb-4"></div>
+                <p class="text-gray-500 text-sm max-w-xl mx-auto">
+                    Jl. D. I. Panjaitan No. 128 Purwokerto, Gedung IOT Lantai 3,<br>
+                    Telkom University Purwokerto, Purwokerto Selatan, Banyumas, Jawa Tengah 53147
+                </p>
+            </div>
+
+            {{-- Map + Info Grid --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+
+                {{-- Google Maps Embed --}}
+                <div>
+                    <a href="https://www.google.com/maps/search/Jl.+D.+I.+Panjaitan+No.+128+Purwokerto+Gedung+IOT+Lantai+3,+Telkom+University+Purwokerto,+Purwokerto+Selatan,+Banyumas,+Jawa+Tengah,+53147"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="block rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.0!2d109.3!3d-7.4!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sTelkom+University+Purwokerto!5e0!3m2!1sid!2sid!4v1"
+                            width="100%"
+                            height="320"
+                            style="border:0; pointer-events: none; display: block;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </a>
+                    <a href="https://www.google.com/maps/search/Jl.+D.+I.+Panjaitan+No.+128+Purwokerto+Gedung+IOT+Lantai+3,+Telkom+University+Purwokerto,+Purwokerto+Selatan,+Banyumas,+Jawa+Tengah,+53147"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="mt-3 inline-flex items-center gap-2 text-sm font-semibold transition-colors duration-200"
+                       style="color: #2C3DA6;">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        Buka di Google Maps →
+                    </a>
+                </div>
+
+                {{-- Info Kontak --}}
+                <div class="space-y-6">
+
+                    {{-- Alamat --}}
+                    <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background: #2C3DA6;">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Alamat</p>
+                            <p class="text-sm text-gray-700 leading-relaxed">
+                                Jl. D. I. Panjaitan No. 128 Purwokerto<br>
+                                Gedung IOT Lantai 3<br>
+                                Telkom University Purwokerto<br>
+                                Purwokerto Selatan, Banyumas<br>
+                                Jawa Tengah 53147
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Email --}}
+                    <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background: #00C4D8;">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Email</p>
+                            <a href="mailto:hmse@ittelkom-pwt.ac.id" class="text-sm font-medium transition-colors duration-200 hover:underline" style="color: #2C3DA6;">
+                                hmse@ittelkom-pwt.ac.id
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- WhatsApp --}}
+                    <div class="flex items-start gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background: #25D366;">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">WhatsApp</p>
+                            <a href="https://wa.me/6285385782684" target="_blank" class="text-sm font-medium transition-colors duration-200 hover:underline" style="color: #25D366;">
+                                +62 853-8578-2684
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
 </x-layouts.public>

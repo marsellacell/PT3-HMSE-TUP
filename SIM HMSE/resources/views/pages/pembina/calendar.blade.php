@@ -1,8 +1,16 @@
-<x-layouts.dashboard title="Kalender Kegiatan">
+@php
+    $user = auth()->user();
+    $isKaprodi = $user && $user->jabatan === 'kaprodi';
+    $themeColor = $isKaprodi ? '#7c3aed' : '#00C4D8';
+    $themeBg = $isKaprodi ? 'bg-violet-50' : 'bg-cyan-50';
+    $themeText = $isKaprodi ? 'text-[#7c3aed]' : 'text-[#00C4D8]';
+    $themeHoverBg = $isKaprodi ? 'hover:bg-violet-100' : 'hover:bg-cyan-100';
+    $themeActiveBg = $isKaprodi ? 'bg-violet-50/50' : 'bg-cyan-50/50';
+@endphp
+<x-layouts.dashboard-pembina title="Kalender Kegiatan">
 
     <div x-data="{
         currentDate: new Date(),
-        view: 'month',
         selectedDate: null,
 
         events: [
@@ -39,11 +47,6 @@
         prevMonth() { this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1); },
         nextMonth() { this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1); },
         goToday() { this.currentDate = new Date(); },
-
-        getEventsForDate(dateStr) {
-            return this.events.filter(e => e.date === dateStr);
-        },
-
         get selectedEvents() {
             if (!this.selectedDate) return [];
             return this.events.filter(e => e.date === this.selectedDate);
@@ -52,15 +55,19 @@
 
         {{-- Header --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+                <h2 class="text-xl font-black text-gray-800">Kalender Kegiatan</h2>
+                <p class="text-sm text-gray-400 mt-0.5">Jadwal program kerja dan kegiatan himpunan</p>
+            </div>
             <div class="flex items-center gap-3">
                 <button @click="prevMonth()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <h2 class="text-xl font-black text-gray-800 min-w-[200px] text-center" x-text="monthName"></h2>
+                <h3 class="text-base font-bold text-gray-700 min-w-[160px] text-center" x-text="monthName"></h3>
                 <button @click="nextMonth()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
-                <button @click="goToday()" class="ml-2 px-3 py-1.5 text-xs font-semibold text-[#2C3DA6] bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                <button @click="goToday()" class="px-3 py-1.5 text-xs font-semibold {{ $themeText }} {{ $themeBg }} rounded-lg {{ $themeHoverBg }} transition-colors">
                     Hari Ini
                 </button>
             </div>
@@ -69,7 +76,6 @@
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {{-- Calendar Grid --}}
             <div class="lg:col-span-3 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                {{-- Weekday Headers --}}
                 <div class="grid grid-cols-7 border-b border-gray-100">
                     @foreach(['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'] as $day)
                         <div class="px-2 py-3 text-center text-xs font-bold text-gray-400 uppercase tracking-wider {{ $day === 'Minggu' ? 'text-red-400' : '' }}">
@@ -77,14 +83,13 @@
                         </div>
                     @endforeach
                 </div>
-
-                {{-- Days --}}
                 <div class="grid grid-cols-7">
                     <template x-for="(cell, i) in calendarDays" :key="i">
                         <div @click="cell.day && (selectedDate = cell.date)"
                              class="min-h-[100px] border-b border-r border-gray-50 p-2 transition-colors duration-150"
                              :class="{
-                                 'bg-blue-50/50': selectedDate === cell.date,
+                                 'bg-violet-50/50': '{{ $isKaprodi }}' && selectedDate === cell.date,
+                                 'bg-cyan-50/50': !'{{ $isKaprodi }}' && selectedDate === cell.date,
                                  'hover:bg-gray-50 cursor-pointer': cell.day,
                                  'bg-gray-50/30 cursor-default': !cell.day
                              }">
@@ -92,7 +97,7 @@
                                 <div class="flex flex-col h-full">
                                     <div class="flex justify-center mb-1.5">
                                         <span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-semibold transition-all duration-200"
-                                              :class="isToday(cell.day) ? 'bg-[#2C3DA6] text-white font-bold shadow-md shadow-[#2C3DA6]/30' : 'text-gray-600 hover:bg-gray-100'"
+                                              :class="isToday(cell.day) ? 'bg-[{{ $themeColor }}] text-white font-bold shadow-md shadow-[{{ $themeColor }}]/30' : 'text-gray-600 hover:bg-gray-100'"
                                               x-text="cell.day"></span>
                                     </div>
                                     <div class="mt-1 flex-1 space-y-1">
@@ -109,7 +114,7 @@
                 </div>
             </div>
 
-            {{-- Sidebar: Event Details --}}
+            {{-- Sidebar --}}
             <div class="space-y-4">
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
                     <h3 class="text-sm font-bold text-gray-800 mb-4">
@@ -125,7 +130,7 @@
                                         <div class="w-2.5 h-2.5 rounded-full" :style="'background:' + ev.color"></div>
                                         <span class="text-sm font-semibold text-gray-700" x-text="ev.title"></span>
                                     </div>
-                                    <p class="text-xs text-gray-400 ml-4.5" x-text="ev.divisi"></p>
+                                    <p class="text-xs text-gray-400 ml-4" x-text="ev.divisi"></p>
                                 </div>
                             </template>
                         </div>
@@ -175,4 +180,4 @@
 
     </div>
 
-</x-layouts.dashboard>
+</x-layouts.dashboard-pembina>

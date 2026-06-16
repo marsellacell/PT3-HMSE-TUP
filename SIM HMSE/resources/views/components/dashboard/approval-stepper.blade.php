@@ -1,7 +1,22 @@
 @props([
+    'proposal' => null,
+    'signedCount' => 0,
     'steps' => [],
     'current' => 0,
 ])
+
+@php
+if ($proposal) {
+    $steps = [
+        ['label' => 'Ketua Panitia', 'name' => $proposal->ketua_panitia ?? 'Ketua Panitia'],
+        ['label' => 'Sekretaris HMSE', 'name' => $proposal->sekretaris ?? 'Sekretaris'],
+        ['label' => 'Ketua HMSE', 'name' => 'Quratu Ayun Defaren'],
+        ['label' => 'Pembina HMSE', 'name' => 'Yudha Islami Sulistya, S.Kom., M.Cs'],
+        ['label' => 'Kaprodi RPL', 'name' => 'Abednego Dwi Septiadi, S.Kom., M.Kom'],
+    ];
+    $current = $signedCount;
+}
+@endphp
 
 <div class="flex items-center w-full">
     @foreach($steps as $i => $step)

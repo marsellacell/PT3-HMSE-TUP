@@ -7,7 +7,7 @@
         <div class="absolute bottom-0 left-1/3 w-48 h-48 rounded-full opacity-5 blur-3xl bg-white"></div>
         <div class="relative z-10">
             <p class="text-white/60 text-sm font-medium mb-1">Selamat datang kembali 👋</p>
-            <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">Admin HMSE</h2>
+            <h2 class="text-2xl sm:text-3xl font-black text-white mb-2">{{ auth()->user()?->name ?? 'Admin HMSE' }}</h2>
             <p class="text-white/50 text-sm max-w-lg">Kelola program kerja, proposal, keuangan, dan administrasi himpunan dari satu dashboard.</p>
         </div>
     </div>

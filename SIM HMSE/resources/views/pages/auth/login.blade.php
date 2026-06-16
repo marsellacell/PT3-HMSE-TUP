@@ -16,11 +16,11 @@
 </head>
 <body class="antialiased font-sans">
 
-    <div class="min-h-screen flex" x-data="{ showPassword: false }">
+    <div class="min-h-screen flex" x-data="{ showPassword: false, email: '{{ old('email') }}', password: '' }">
 
         {{-- Left: Branding Panel --}}
         <div class="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden items-center justify-center"
-             style="background: linear-gradient(135deg, #1a2a6c 0%, #2C3DA6 30%, #1E2D8F 60%, #00C4D8 100%);">
+             style="background: linear-gradient(135deg, #1a2a6c 0%, #2C3DA6 30%, #1E2D8F 60%, #00C4D8 100%); height: 100vh; position: sticky; top: 0; align-self: flex-start;">
 
             {{-- Animated Background Shapes --}}
             <div class="absolute inset-0 overflow-hidden">
@@ -43,7 +43,7 @@
             {{-- Content --}}
             <div class="relative z-10 max-w-lg px-12 text-center">
                 {{-- Logo --}}
-                <div class="mt-12 mb-12 inline-flex items-center justify-center">
+                <div class="mt-6 mb-6 inline-flex items-center justify-center">
                     <div class="w-40 h-40 flex items-center justify-center">
                         <img src="{{ asset('images/logo-zenit.png') }}" alt="HMSE Logo" class="w-24 h-24 object-contain">
                     </div>
@@ -51,7 +51,7 @@
 
                 <h1 class="text-4xl font-black text-white mb-3 tracking-tight">SIM HMSE</h1>
                 <p class="text-lg text-white/60 font-medium mb-2">Sistem Informasi Manajemen</p>
-                <p class="text-sm text-white/40 leading-relaxed mb-12">
+                <p class="text-sm text-white/40 leading-relaxed mb-6">
                     Himpunan Mahasiswa Software Engineering<br>
                     Telkom University Purwokerto
                 </p>
@@ -78,7 +78,7 @@
                 </div>
 
                 {{-- Bottom Decoration --}}
-                <div class="mt-12 flex items-center justify-center gap-3">
+                <div class="mt-6 flex items-center justify-center gap-3">
                     <div class="w-8 h-0.5 bg-white/20 rounded-full"></div>
                     <span class="text-[10px] text-white/30 uppercase tracking-widest font-semibold">Secure Platform</span>
                     <div class="w-8 h-0.5 bg-white/20 rounded-full"></div>
@@ -107,16 +107,19 @@
                     </div>
                     <p class="text-sm text-gray-400 mb-3">Masuk ke akun kamu untuk melanjutkan</p>
                     @if(isset($role))
-                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold
-                            {{ $role === 'pengurus' ? 'bg-[#2C3DA6]/10 text-[#2C3DA6]' : 'bg-[#00C4D8]/10 text-[#00C4D8]' }}">
+                        @php
+                            $roleConfig = match($role) {
+                                'pengurus' => ['label' => 'Pengurus HMSE', 'color' => 'bg-[#2C3DA6]/10 text-[#2C3DA6]', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
+                                'pembina'  => ['label' => 'Pembina HMSE', 'color' => 'bg-[#00C4D8]/10 text-[#00C4D8]', 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
+                                'kaprodi'  => ['label' => 'Kaprodi RPL', 'color' => 'bg-[#7c3aed]/10 text-[#7c3aed]', 'icon' => 'M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z'],
+                                default    => ['label' => 'Pembina / Kaprodi', 'color' => 'bg-[#00C4D8]/10 text-[#00C4D8]', 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
+                            };
+                        @endphp
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold {{ $roleConfig['color'] }}">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                @if($role === 'pengurus')
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                @else
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                @endif
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $roleConfig['icon'] }}"/>
                             </svg>
-                            Masuk sebagai {{ $role === 'pengurus' ? 'Pengurus' : 'Pembina / Kaprodi' }}
+                            Masuk sebagai {{ $roleConfig['label'] }}
                         </div>
                     @endif
                 </div>
@@ -139,8 +142,8 @@
                                 id="email"
                                 type="email"
                                 name="email"
-                                value="{{ old('email') }}"
-                                placeholder="nama@student.telkomuniversity.ac.id"
+                                x-model="email"
+                                placeholder="{{ ($role ?? 'pengurus') === 'pembina' ? 'pembina@ittelkom-pwt.ac.id' : (($role ?? 'pengurus') === 'kaprodi' ? 'kaprodi@ittelkom-pwt.ac.id' : 'nama@student.telkomuniversity.ac.id') }}"
                                 required
                                 autofocus
                                 class="w-full pl-11 pr-4 py-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-3 focus:ring-[#2C3DA6]/10 transition-all duration-200 placeholder:text-gray-300"
@@ -170,6 +173,7 @@
                                 id="password"
                                 :type="showPassword ? 'text' : 'password'"
                                 name="password"
+                                x-model="password"
                                 placeholder="Masukkan password"
                                 required
                                 class="w-full pl-11 pr-12 py-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#2C3DA6] focus:ring-3 focus:ring-[#2C3DA6]/10 transition-all duration-200 placeholder:text-gray-300"
@@ -218,10 +222,20 @@
                     {{-- Submit Button --}}
                     <button
                         type="submit"
-                        class="w-full py-3.5 text-sm font-bold text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-4 focus:ring-[#2C3DA6]/20"
+                        class="w-full py-3.5 text-sm font-bold text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 focus:outline-none"
+                        @if(($role ?? 'pengurus') === 'pembina')
+                        style="background: linear-gradient(135deg, #00C4D8 0%, #0891b2 100%);"
+                        onmouseover="this.style.background='linear-gradient(135deg, #06b6d4 0%, #00C4D8 100%)'"
+                        onmouseout="this.style.background='linear-gradient(135deg, #00C4D8 0%, #0891b2 100%)'"
+                        @elseif(($role ?? 'pengurus') === 'kaprodi')
+                        style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);"
+                        onmouseover="this.style.background='linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'"
+                        onmouseout="this.style.background='linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)'"
+                        @else
                         style="background: linear-gradient(135deg, #2C3DA6 0%, #1E2D8F 100%);"
                         onmouseover="this.style.background='linear-gradient(135deg, #3548b8 0%, #2C3DA6 100%)'"
                         onmouseout="this.style.background='linear-gradient(135deg, #2C3DA6 0%, #1E2D8F 100%)'"
+                        @endif
                     >
                         Masuk ke Dashboard
                     </button>
@@ -247,6 +261,65 @@
                     </svg>
                     Login dengan Google (SSO Kampus)
                 </button>
+
+                {{-- Collapsible Quick Login Helper (visible for testing) --}}
+                <div x-data="{ openHelper: false }" class="mt-5 border border-gray-200 bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-300">
+                    <button type="button" @click="openHelper = !openHelper" class="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider hover:bg-gray-100 transition-colors">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-4.5 h-4.5 text-[#2C3DA6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Akun Demo / Quick Login
+                        </span>
+                        <svg class="w-4 h-4 transform transition-transform" :class="{ 'rotate-180': openHelper }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div x-show="openHelper" class="p-3 bg-white divide-y divide-gray-100 max-h-56 overflow-y-auto" style="display: none;">
+                        @if(($role ?? 'pengurus') === 'pengurus')
+                            @foreach([
+                                ['role' => 'Ketua HMSE', 'email' => 'ketua@hmse.ac.id'],
+                                ['role' => 'Vice President', 'email' => 'wakilketua@hmse.ac.id'],
+                                ['role' => 'Secretary 1', 'email' => 'sekretaris1@hmse.ac.id'],
+                                ['role' => 'Secretary 2', 'email' => 'sekretaris2@hmse.ac.id'],
+                                ['role' => 'Finance 1', 'email' => 'bendahara1@hmse.ac.id'],
+                                ['role' => 'Finance 2', 'email' => 'bendahara2@hmse.ac.id'],
+                                ['role' => 'Research and Creativity', 'email' => 'head.akademik@hmse.ac.id'],
+                                ['role' => 'Resource Management', 'email' => 'head.psdm@hmse.ac.id'],
+                                ['role' => 'Internal and External Communication', 'email' => 'head.humas@hmse.ac.id'],
+                                ['role' => 'Economy Creative', 'email' => 'head.mikat@hmse.ac.id'],
+                                ['role' => 'Creative Media and Information', 'email' => 'head.medinfo@hmse.ac.id'],
+                            ] as $demoUser)
+                                <button type="button" 
+                                        @click="email = '{{ $demoUser['email'] }}'; password = 'hmse2026'"
+                                        class="w-full text-left py-2 px-2.5 rounded-lg hover:bg-blue-50/50 flex flex-col gap-0.5 group transition-colors cursor-pointer">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-gray-700 group-hover:text-[#2C3DA6]">{{ $demoUser['role'] }}</span>
+                                    </div>
+                                    <span class="text-[10px] text-gray-400">{{ $demoUser['email'] }}</span>
+                                </button>
+                            @endforeach
+                        @elseif(($role ?? 'pengurus') === 'pembina')
+                            <button type="button" 
+                                    @click="email = 'pembina@ittelkom-pwt.ac.id'; password = 'pembina2026'"
+                                    class="w-full text-left py-2 px-2.5 rounded-lg hover:bg-cyan-50/50 flex flex-col gap-0.5 group transition-colors cursor-pointer">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-700 group-hover:text-cyan-600">Pembina HMSE</span>
+                                </div>
+                                <span class="text-[10px] text-gray-400">pembina@ittelkom-pwt.ac.id</span>
+                            </button>
+                        @elseif(($role ?? 'pengurus') === 'kaprodi')
+                            <button type="button" 
+                                    @click="email = 'kaprodi@ittelkom-pwt.ac.id'; password = 'pembina2026'"
+                                    class="w-full text-left py-2 px-2.5 rounded-lg hover:bg-violet-50/50 flex flex-col gap-0.5 group transition-colors cursor-pointer">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-gray-700 group-hover:text-violet-600">Kaprodi RPL</span>
+                                </div>
+                                <span class="text-[10px] text-gray-400">kaprodi@ittelkom-pwt.ac.id</span>
+                            </button>
+                        @endif
+                    </div>
+                </div>
 
                 {{-- Back to Role Selection --}}
                 <div class="mt-8 text-center">

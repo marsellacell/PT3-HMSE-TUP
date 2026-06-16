@@ -1,14 +1,28 @@
 <x-layouts.dashboard title="Detail Proposal">
 
     @php
-        $statusMap = [
-            'approved'  => ['label' => 'Disetujui',            'color' => 'emerald', 'icon' => 'check'],
-            'pending'   => ['label' => 'Menunggu TTD Pembina', 'color' => 'amber',   'icon' => 'clock'],
-            'reviewing' => ['label' => 'Menunggu TTD Ketua',   'color' => 'blue',    'icon' => 'clock'],
-            'draft'     => ['label' => 'Draft',                'color' => 'gray',    'icon' => 'pencil'],
-            'rejected'  => ['label' => 'Ditolak',              'color' => 'red',     'icon' => 'x'],
+        $roleLabels = [
+            'ketua_panitia' => 'Ketua Panitia',
+            'sekretaris'    => 'Sekretaris',
+            'ketua_hima'    => 'Ketua HMSE',
+            'pembina'       => 'Pembina HMSE',
+            'kaprodi'       => 'Kaprodi RPL',
         ];
-        $st = $statusMap[$proposal->status] ?? ['label' => ucfirst($proposal->status), 'color' => 'gray', 'icon' => 'clock'];
+
+        $nextApproverRole = $proposal->getNextApproverRole();
+
+        if ($proposal->status === 'draft') {
+            $st = ['label' => 'Draft', 'color' => 'gray', 'icon' => 'pencil', 'desc' => 'Proposal masih dalam tahap draft.'];
+        } elseif ($proposal->status === 'approved') {
+            $st = ['label' => 'Disetujui', 'color' => 'emerald', 'icon' => 'check', 'desc' => 'Proposal telah disetujui penuh oleh semua penanda tangan.'];
+        } elseif ($proposal->status === 'rejected') {
+            $st = ['label' => 'Ditolak', 'color' => 'red', 'icon' => 'x', 'desc' => 'Proposal ditolak.'];
+        } elseif ($nextApproverRole) {
+            $nextLabel = $roleLabels[$nextApproverRole] ?? ucfirst($nextApproverRole);
+            $st = ['label' => 'Menunggu TTD ' . $nextLabel, 'color' => 'amber', 'icon' => 'clock', 'desc' => 'Proposal sedang menunggu tanda tangan dari ' . $nextLabel . '.'];
+        } else {
+            $st = ['label' => ucfirst($proposal->status), 'color' => 'blue', 'icon' => 'clock', 'desc' => 'Proposal sedang dalam proses review.'];
+        }
     @endphp
 
     <div class="flex items-center gap-3 mb-6">
@@ -52,11 +66,22 @@
                     @endif
                 </p>
             </div>
-            <a href="{{ route('dashboard.proposal.preview', $proposal->id) }}"
-               class="px-4 py-2 text-xs font-semibold text-{{ $st['color'] }}-700 bg-{{ $st['color'] }}-200 rounded-lg hover:bg-{{ $st['color'] }}-300 transition-colors flex items-center gap-1.5 flex-shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                Lihat Preview
-            </a>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <a href="{{ route('dashboard.proposal.preview', $proposal->id) }}"
+                   class="px-4 py-2 text-xs font-semibold text-{{ $st['color'] }}-700 bg-{{ $st['color'] }}-200 rounded-lg hover:bg-{{ $st['color'] }}-300 transition-colors flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    Lihat Preview
+                </a>
+                @if($proposal->status === 'draft')
+                    <form action="{{ route('proposals.submit', $proposal->id) }}" method="POST" class="inline-block">
+                        @csrf
+                        <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-[#2C3DA6] rounded-lg hover:bg-[#2C3DA6]/90 transition-colors flex items-center gap-1.5 shadow-md shadow-[#2C3DA6]/15">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            Ajukan Proposal
+                        </button>
+                    </form>
+                @endif
+            </div>
         </div>
 
         {{-- Tabs --}}
@@ -78,15 +103,7 @@
                         ['role' => 'Kaprodi RPL',      'name' => 'Abednego Dwi Septiadi, S.Kom., M.Kom'],
                     ];
                     $stepCount = count($approvalSteps);
-                    // Determine how many steps are "signed" based on status
-                    $signedCount = match($proposal->status) {
-                        'draft'     => 0,
-                        'pending'   => 3,
-                        'reviewing' => 2,
-                        'approved'  => 5,
-                        'rejected'  => 0,
-                        default     => 0,
-                    };
+                    $signedCount = $proposal->approvals()->where('status', 'approved')->count();
                     $activeIdx = $proposal->status === 'approved' ? -1 : $signedCount;
                 @endphp
 
@@ -139,10 +156,23 @@
             {{-- Signature Section — auto-detect user yang login --}}
             @php
                 $user        = auth()->user();
-                $myOrder     = $user ? ($user->ttdOrder()) : null;
-                $nextStep    = $signedCount + 1; // step berikutnya yg perlu TTD (1-indexed)
-                $isMyTurn    = $myOrder !== null && $myOrder === $nextStep && $proposal->status !== 'approved';
-                $alreadySigned = $myOrder !== null && $myOrder <= $signedCount;
+                $currentJabatan = $user ? $user->jabatan : null;
+                $dbRole      = ($currentJabatan === 'ketua_hmse') ? 'ketua_hima' : $currentJabatan;
+
+                $userApproval = null;
+                $pendingApproval = null;
+                if ($dbRole) {
+                    $userApproval = $proposal->approvals()
+                        ->where('approver_role', $dbRole)
+                        ->first();
+                    $pendingApproval = $proposal->approvals()
+                        ->where('approver_role', $dbRole)
+                        ->where('status', 'pending')
+                        ->first();
+                }
+
+                $isMyTurn    = $pendingApproval && $nextApproverRole === $dbRole && $proposal->status !== 'approved';
+                $alreadySigned = $userApproval && $userApproval->status === 'approved';
             @endphp
 
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
@@ -180,52 +210,166 @@
                     </div>
                 </div>
 
-                @if($isMyTurn)
+                @if($isMyTurn && $pendingApproval)
                     {{-- ✅ Giliran user ini — tampilkan kanvas TTD --}}
                     <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-xs text-amber-700">
                         ✍️ Proposal ini menunggu tanda tangan kamu sebagai <strong>{{ $user->jabatanLabel() }}</strong>. Silakan tanda tangan di bawah ini.
                     </div>
-                    <div x-data="{
-                            signed: false,
-                            ctx: null, canvas: null, drawing: false,
-                            init() {
-                                this.canvas = this.$refs.sigCanvas;
-                                this.ctx = this.canvas.getContext('2d');
-                                this.ctx.strokeStyle = '#1a1a1a';
-                                this.ctx.lineWidth = 2.5;
-                                this.ctx.lineCap = 'round';
-                            },
-                            startDraw(e) { this.drawing = true; const r = this.canvas.getBoundingClientRect(); this.ctx.beginPath(); this.ctx.moveTo(e.clientX - r.left, e.clientY - r.top); },
-                            draw(e)      { if (!this.drawing) return; const r = this.canvas.getBoundingClientRect(); this.ctx.lineTo(e.clientX - r.left, e.clientY - r.top); this.ctx.stroke(); },
-                            stopDraw()   { this.drawing = false; },
-                            clearCanvas(){ this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); },
-                            submitSign() { this.signed = true; }
-                        }" x-init="init()">
-                        <div x-show="!signed" class="space-y-3">
-                            <div class="border-2 border-dashed border-amber-300 rounded-xl p-2 bg-white">
-                                <canvas x-ref="sigCanvas" width="600" height="160"
-                                    @mousedown="startDraw($event)" @mousemove="draw($event)" @mouseup="stopDraw()"
-                                    @touchstart.prevent="startDraw($event.touches[0])" @touchmove.prevent="draw($event.touches[0])" @touchend="stopDraw()"
-                                    class="w-full cursor-crosshair rounded-lg" style="touch-action:none;"></canvas>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <button @click="clearCanvas()" class="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-100 rounded-lg hover:bg-gray-200">
-                                    Hapus &amp; Ulangi
-                                </button>
-                                <button @click="submitSign()" class="px-6 py-2.5 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    Konfirmasi Tanda Tangan
-                                </button>
-                            </div>
+                    <form action="{{ route('proposals.approve', $pendingApproval->id) }}" method="POST"
+                          x-data="{
+                              drawing: false,
+                              canvas: null,
+                              ctx: null,
+                              lastX: 0,
+                              lastY: 0,
+                              isEmpty: true,
+                              init() {
+                                  this.canvas = this.$refs.sigCanvas;
+                                  this.ctx = this.canvas.getContext('2d');
+                                  this.resizeCanvas();
+                                  window.addEventListener('resize', () => this.resizeCanvas());
+                              },
+                              resizeCanvas() {
+                                  const rect = this.canvas.parentElement.getBoundingClientRect();
+                                  this.canvas.width = rect.width;
+                                  this.canvas.height = 160;
+                                  this.ctx.strokeStyle = '#1a202c';
+                                  this.ctx.lineWidth = 2.5;
+                                  this.ctx.lineCap = 'round';
+                                  this.ctx.lineJoin = 'round';
+                              },
+                              startDraw(e) {
+                                  this.drawing = true;
+                                  const pos = this.getPos(e);
+                                  this.lastX = pos.x;
+                                  this.lastY = pos.y;
+                              },
+                              draw(e) {
+                                  if (!this.drawing) return;
+                                  e.preventDefault();
+                                  const pos = this.getPos(e);
+                                  this.ctx.beginPath();
+                                  this.ctx.moveTo(this.lastX, this.lastY);
+                                  this.ctx.lineTo(pos.x, pos.y);
+                                  this.ctx.stroke();
+                                  this.lastX = pos.x;
+                                  this.lastY = pos.y;
+                                  this.isEmpty = false;
+                              },
+                              stopDraw() {
+                                  this.drawing = false;
+                              },
+                              clearCanvas() {
+                                  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                                  this.isEmpty = true;
+                                  this.$refs.sigInput.value = '';
+                              },
+                              getPos(e) {
+                                  const rect = this.canvas.getBoundingClientRect();
+                                  if (e.touches && e.touches.length > 0) {
+                                      return {
+                                          x: e.touches[0].clientX - rect.left,
+                                          y: e.touches[0].clientY - rect.top
+                                      };
+                                  }
+                                  return {
+                                      x: e.clientX - rect.left,
+                                      y: e.clientY - rect.top
+                                  };
+                              },
+                              trimCanvas(canvas) {
+                                  const ctx = canvas.getContext('2d');
+                                  const copy = document.createElement('canvas');
+                                  const copyCtx = copy.getContext('2d');
+                                  const imgWidth = canvas.width;
+                                  const imgHeight = canvas.height;
+                                  
+                                  const pixels = ctx.getImageData(0, 0, imgWidth, imgHeight);
+                                  const l = pixels.data.length;
+                                  
+                                  let bound = { top: null, left: null, right: null, bottom: null };
+                                  
+                                  for (let i = 0; i < l; i += 4) {
+                                      if (pixels.data[i + 3] > 0) {
+                                          const x = (i / 4) % imgWidth;
+                                          const y = Math.floor((i / 4) / imgWidth);
+                                          
+                                          if (bound.top === null) bound.top = y;
+                                          else if (y < bound.top) bound.top = y;
+                                          
+                                          if (bound.left === null) bound.left = x;
+                                          else if (x < bound.left) bound.left = x;
+                                          
+                                          if (bound.right === null) bound.right = x;
+                                          else if (x > bound.right) bound.right = x;
+                                          
+                                          if (bound.bottom === null) bound.bottom = y;
+                                          else if (y > bound.bottom) bound.bottom = y;
+                                      }
+                                  }
+                                  
+                                  if (bound.top === null) return canvas.toDataURL('image/png');
+                                  
+                                  const padding = 15;
+                                  const startX = Math.max(0, bound.left - padding);
+                                  const startY = Math.max(0, bound.top - padding);
+                                  const endX = Math.min(imgWidth, bound.right + padding);
+                                  const endY = Math.min(imgHeight, bound.bottom + padding);
+                                  
+                                  const trimWidth = endX - startX;
+                                  const trimHeight = endY - startY;
+                                  
+                                  copy.width = trimWidth;
+                                  copy.height = trimHeight;
+                                  
+                                  copyCtx.drawImage(
+                                      canvas,
+                                      startX,
+                                      startY,
+                                      trimWidth,
+                                      trimHeight,
+                                      0,
+                                      0,
+                                      trimWidth,
+                                      trimHeight
+                                  );
+                                  
+                                  return copy.toDataURL('image/png');
+                              },
+                              handleSubmit(e) {
+                                  if (this.isEmpty) {
+                                      alert('Silakan tanda tangan terlebih dahulu pada kanvas.');
+                                      e.preventDefault();
+                                      return false;
+                                  }
+                                  this.$refs.sigInput.value = this.trimCanvas(this.canvas);
+                              }
+                          }" x-init="init()" @submit="handleSubmit($event)">
+                        @csrf
+                        <input type="hidden" name="signature_data" x-ref="sigInput">
+
+                        <div class="border-2 border-dashed border-amber-300 rounded-xl p-2 bg-white mb-3 overflow-hidden cursor-crosshair">
+                            <canvas x-ref="sigCanvas"
+                                @mousedown="startDraw($event)"
+                                @mousemove="draw($event)"
+                                @mouseup="stopDraw()"
+                                @mouseleave="stopDraw()"
+                                @touchstart.prevent="startDraw($event)"
+                                @touchmove.prevent="draw($event)"
+                                @touchend="stopDraw()"
+                                class="w-full" style="touch-action: none;"></canvas>
                         </div>
-                        <div x-show="signed" x-transition class="p-6 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
-                            <div class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                            </div>
-                            <p class="text-sm font-bold text-emerald-700">Tanda Tangan Berhasil!</p>
-                            <p class="text-xs text-emerald-600 mt-1">Proposal diteruskan ke penanda tangan berikutnya.</p>
+
+                        <div class="flex items-center gap-3">
+                            <button type="button" @click="clearCanvas()" class="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-100 rounded-lg hover:bg-gray-200">
+                                Hapus &amp; Ulangi
+                            </button>
+                            <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-[#2C3DA6] rounded-xl hover:bg-[#2C3DA6]/90 shadow-lg shadow-[#2C3DA6]/20 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Konfirmasi Tanda Tangan
+                            </button>
                         </div>
-                    </div>
+                    </form>
 
                 @elseif($alreadySigned)
                     {{-- ✅ User sudah TTD --}}
@@ -240,7 +384,14 @@
                         <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <div>
                             <p class="text-sm font-semibold text-gray-600">Belum giliran kamu</p>
-                            <p class="text-xs text-gray-400 mt-0.5">Kamu akan mendapat giliran TTD di langkah ke-{{ $myOrder }}. Saat ini menunggu langkah ke-{{ $nextStep }}.</p>
+                            @php
+                                $myDbRole = ($user->jabatan === 'ketua_hmse') ? 'ketua_hima' : $user->jabatan;
+                                $targetApproval = $proposal->approvals()->where('approver_role', $myDbRole)->first();
+                                $myStepOrder = $targetApproval ? $targetApproval->approval_order : 1;
+                                $nextApproval = $proposal->approvals()->where('status', 'pending')->orderBy('approval_order')->first();
+                                $currentStepOrder = $nextApproval ? $nextApproval->approval_order : 1;
+                            @endphp
+                            <p class="text-xs text-gray-400 mt-0.5">Kamu akan mendapat giliran TTD di langkah ke-{{ $myStepOrder }}. Saat ini menunggu langkah ke-{{ $currentStepOrder }}.</p>
                         </div>
                     </div>
 

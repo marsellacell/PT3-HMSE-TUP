@@ -170,5 +170,63 @@ class ProposalSeeder extends Seeder
                 $proposal
             );
         }
+
+        // Seed approvals for proposals
+        $usersByRole = [
+            'ketua_panitia' => \App\Models\User::where('jabatan', 'ketua_panitia')->first()?->id ?? 5,
+            'sekretaris'    => \App\Models\User::where('jabatan', 'sekretaris')->first()?->id ?? 3,
+            'ketua_hima'    => \App\Models\User::where('jabatan', 'ketua_hmse')->first()?->id ?? 1,
+            'pembina'       => \App\Models\User::where('jabatan', 'pembina')->first()?->id ?? 9,
+            'kaprodi'       => \App\Models\User::where('jabatan', 'kaprodi')->first()?->id ?? 10,
+        ];
+
+        $approvalStructure = [
+            ['role' => 'ketua_panitia', 'order' => 1],
+            ['role' => 'sekretaris',    'order' => 2],
+            ['role' => 'ketua_hima',    'order' => 3],
+            ['role' => 'pembina',       'order' => 4],
+            ['role' => 'kaprodi',       'order' => 5],
+        ];
+
+        foreach ($proposals as $proposalData) {
+            $status = $proposalData['status'];
+            
+            // Delete old approvals for this proposal if any
+            DB::table('proposal_approvals')->where('proposal_id', $proposalData['id'])->delete();
+
+            foreach ($approvalStructure as $app) {
+                $order = $app['order'];
+                $role = $app['role'];
+                
+                $appStatus = 'pending';
+                $signedAt = null;
+
+                if ($status === 'approved') {
+                    $appStatus = 'approved';
+                    $signedAt = now()->subDays(6 - $order);
+                } elseif ($status === 'pending') {
+                    if ($order < 4) { // Pembina is order 4, so 1, 2, 3 are already approved
+                        $appStatus = 'approved';
+                        $signedAt = now()->subDays(5 - $order);
+                    }
+                } elseif ($status === 'reviewing') {
+                    if ($order < 3) { // Ketua HMSE is order 3, so 1, 2 are approved
+                        $appStatus = 'approved';
+                        $signedAt = now()->subDays(4 - $order);
+                    }
+                }
+
+                DB::table('proposal_approvals')->insert([
+                    'proposal_id' => $proposalData['id'],
+                    'approver_id' => $usersByRole[$role],
+                    'approver_role' => $role,
+                    'status' => $appStatus,
+                    'approved_at' => $signedAt,
+                    'approval_order' => $order,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
     }
 }

@@ -70,7 +70,7 @@ class ProposalController extends Controller
             ]);
         }
 
-        return redirect()->route('proposals.show', $proposal)
+        return redirect()->route('dashboard.proposal.show', $proposal->id)
             ->with('success', 'Proposal berhasil dibuat. Lanjutkan dengan melengkapi dan submit.');
     }
 
@@ -161,7 +161,29 @@ class ProposalController extends Controller
             return back()->with('error', 'Hanya proposal draft yang dapat disubmit.');
         }
 
-        $proposal->update(['status' => 'submitted']);
+        $proposal->update(['status' => 'reviewing']);
+
+        // NOTE: Auto-approval untuk ketua_panitia dan sekretaris dinonaktifkan
+        // agar proses tanda tangan berjalan berurutan dari awal secara manual untuk simulasi.
+        /*
+        $panitiaApproval = $proposal->approvals()->where('approver_role', 'ketua_panitia')->first();
+        if ($panitiaApproval) {
+            $panitiaApproval->update([
+                'status' => 'approved',
+                'approved_at' => now(),
+                'approver_id' => \App\Models\User::where('jabatan', 'ketua_panitia')->first()?->id ?? 5
+            ]);
+        }
+
+        $sekretarisApproval = $proposal->approvals()->where('approver_role', 'sekretaris')->first();
+        if ($sekretarisApproval) {
+            $sekretarisApproval->update([
+                'status' => 'approved',
+                'approved_at' => now(),
+                'approver_id' => \App\Models\User::where('jabatan', 'sekretaris')->first()?->id ?? 3
+            ]);
+        }
+        */
 
         // Generate initial PDF
         try {
@@ -170,7 +192,7 @@ class ProposalController extends Controller
             \Log::error('PDF generation failed: ' . $e->getMessage());
         }
 
-        return redirect()->route('proposals.show', $proposal)
+        return redirect()->route('dashboard.proposal.show', $proposal->id)
             ->with('success', 'Proposal berhasil disubmit untuk persetujuan.');
     }
 
@@ -192,7 +214,38 @@ class ProposalController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
+        // Set approver_id ke user yang sedang login jika belum di-assign
+        if (!$approval->approver_id && auth()->id()) {
+            $approval->update(['approver_id' => auth()->id()]);
+        }
+
         $approval->approve($validated['signature_data'] ?? null, $validated['notes'] ?? null);
+
+        // Kirim notifikasi ke Pembina dan Kaprodi jika Pengurus (Ketua Hima) baru saja tanda tangan
+        if ($approval->approver_role === 'ketua_hima' && $approval->status === 'approved') {
+            $pembina = \App\Models\User::where('jabatan', 'pembina')->first();
+            $kaprodi = \App\Models\User::where('jabatan', 'kaprodi')->first();
+            
+            $dateFormatted = now()->translatedFormat('d F Y, H:i');
+
+            if ($pembina) {
+                \App\Models\ProposalNotification::create([
+                    'proposal_id' => $proposal->id,
+                    'user_id' => $pembina->id,
+                    'type' => 'pengurus_signed',
+                    'message' => "Proposal '{$proposal->title}' telah ditandatangani oleh Pengurus pada {$dateFormatted}. Silakan tinjau dan lakukan tanda tangan.",
+                ]);
+            }
+
+            if ($kaprodi) {
+                \App\Models\ProposalNotification::create([
+                    'proposal_id' => $proposal->id,
+                    'user_id' => $kaprodi->id,
+                    'type' => 'pengurus_signed',
+                    'message' => "Proposal '{$proposal->title}' telah ditandatangani oleh Pengurus pada {$dateFormatted}. Silakan tinjau dan lakukan tanda tangan.",
+                ]);
+            }
+        }
 
         // Check if all approvals are done
         if ($proposal->isFullyApproved()) {
@@ -203,9 +256,17 @@ class ProposalController extends Controller
             } catch (\Exception $e) {
                 \Log::error('Final PDF generation failed: ' . $e->getMessage());
             }
+        } else {
+            // Update status proposal based on next approver
+            $nextRole = $proposal->getNextApproverRole();
+            if (in_array($nextRole, ['pembina', 'kaprodi'])) {
+                $proposal->update(['status' => 'pending']);
+            } else {
+                $proposal->update(['status' => 'reviewing']);
+            }
         }
 
-        return back()->with('success', 'Proposal berhasil disetujui.');
+        return back()->with('success', 'Tanda tangan berhasil disimpan! Proposal telah disetujui.');
     }
 
     /**
@@ -217,13 +278,13 @@ class ProposalController extends Controller
         // $this->authorize('view', $proposal);
 
         $validated = $request->validate([
-            'reason' => 'required|string|max:1000',
+            'rejection_reason' => 'required|string|max:1000',
         ]);
 
-        $approval->reject($validated['reason']);
+        $approval->reject($validated['rejection_reason']);
         $proposal->update([
             'status' => 'rejected',
-            'rejection_reason' => $validated['reason'],
+            'rejection_reason' => $validated['rejection_reason'],
         ]);
 
         return back()->with('success', 'Proposal berhasil ditolak.');

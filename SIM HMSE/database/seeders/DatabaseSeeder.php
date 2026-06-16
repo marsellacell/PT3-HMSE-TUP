@@ -17,12 +17,12 @@ class DatabaseSeeder extends Seeder
     {
         \App\Models\Role::create([
             'id' => 1,
-            'name' => 'Admin',
+            'name' => 'admin',
         ]);  
         
         \App\Models\Role::create([
             'id' => 2,
-            'name' => 'Pengurus',
+            'name' => 'pengurus',
         ]); 
     
         // Akun Admin
@@ -39,6 +39,12 @@ class DatabaseSeeder extends Seeder
             'email' => 'pengurus@example.com',
             'password' => bcrypt('password123'),
             'role_id' => 2,
+        ]);
+
+        $this->call([
+            UserSeeder::class,
+            ProposalSeeder::class,
+            ProgramKerjaSeeder::class,
         ]);
     }
 }

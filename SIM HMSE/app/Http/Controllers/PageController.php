@@ -12,7 +12,40 @@ class PageController extends Controller
     {
         // Nanti diganti dengan query dari database
         $news    = collect();
-        $gallery = collect();
+        $gallery = collect([
+            (object)[
+                'image' => 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&auto=format&fit=crop&q=60',
+                'title' => 'HMSE Tech Talk Series',
+            ],
+            (object)[
+                'image' => 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&auto=format&fit=crop&q=60',
+                'title' => 'Rapat Kerja Pengurus HMSE',
+            ],
+            (object)[
+                'image' => 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop&q=60',
+                'title' => 'Sharing Session Mahasiswa',
+            ],
+            (object)[
+                'image' => 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=600&auto=format&fit=crop&q=60',
+                'title' => 'Seminar Literasi Digital',
+            ],
+            (object)[
+                'image' => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=60',
+                'title' => 'Workshop UI/UX Design',
+            ],
+            (object)[
+                'image' => 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&auto=format&fit=crop&q=60',
+                'title' => 'HMSE Mengabdi Masyarakat',
+            ],
+            (object)[
+                'image' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=60',
+                'title' => 'Pemberantasan Gagap Teknologi',
+            ],
+            (object)[
+                'image' => 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=60',
+                'title' => 'Fun Gathering & bonding HMSE',
+            ],
+        ]);
 
         return view('pages.home', compact('news', 'gallery'));
     }
