@@ -126,7 +126,7 @@
                             <a href="{{ route('events.show', $ev->id) }}">
                                 <div class="aspect-video bg-gray-100">
                                     @if($ev->poster)
-                                        <img src="{{ asset('storage/' . $ev->poster) }}" alt="{{ $ev->name }}" class="w-full h-full object-cover">
+                                        <img src="{{ str_starts_with($ev->poster, 'http') ? $ev->poster : asset('storage/' . $ev->poster) }}" alt="{{ $ev->name }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center"
                                              style="background: linear-gradient(135deg, {{ $ev->color ?? '#2C3DA6' }}18, {{ $ev->color ?? '#2C3DA6' }}35)">
@@ -199,7 +199,7 @@
                 @if(isset($gallery) && $gallery->count() > 0)
                     @foreach($gallery->take(8) as $item)
                         <div class="group relative aspect-square overflow-hidden rounded-xl cursor-pointer bg-gray-100">
-                            <img src="{{ asset('storage/' . $item->image) }}" alt="Dokumentasi HMSE"
+                            <img src="{{ str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . $item->image) }}" alt="Dokumentasi HMSE"
                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
                                  style="background: rgba(44,61,166,0.5);">

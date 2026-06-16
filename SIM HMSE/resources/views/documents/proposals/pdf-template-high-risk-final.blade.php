@@ -304,9 +304,15 @@
                         </div>
 
                         @if($approval->status === 'approved')
-                            <div class="approved-stamp">✓ DISETUJUI</div>
+                            @if($approval->signature_data)
+                                <div style="text-align: center; margin: 5px 0;">
+                                    <img src="{{ $approval->signature_data }}" style="height: 50px; max-width: 150px; display: block; margin: 0 auto;" alt="Tanda Tangan">
+                                </div>
+                            @else
+                                <div class="approved-stamp">✓ DISETUJUI</div>
+                            @endif
                             @if($approval->approver)
-                                <div class="signature-name">{{ $approval->approver->name }}</div>
+                                <div class="signature-name" style="margin-top: 5px; font-weight: bold;">{{ $approval->approver->name }}</div>
                             @endif
                             @if($approval->approved_at)
                                 <div class="signature-date">{{ $approval->approved_at->format('d/m/Y H:i') }}</div>

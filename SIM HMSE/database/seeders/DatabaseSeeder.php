@@ -17,20 +17,14 @@ class DatabaseSeeder extends Seeder
     {
         DB::table('roles')->updateOrInsert([
             'id' => 1,
-        ], [
-            'name' => 'admin',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('roles')->updateOrInsert([
+            'name' => 'Admin',
+        ]);  
+        
+        \App\Models\Role::create([
             'id' => 2,
-        ], [
-            'name' => 'pengurus',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
+            'name' => 'Pengurus',
+        ]); 
+    
         // Akun Admin
         DB::table('users')->updateOrInsert(
             ['email' => 'admin@hmse.ac.id'],
@@ -48,16 +42,11 @@ class DatabaseSeeder extends Seeder
         );
 
         // Akun Pengurus
-        DB::table('users')->updateOrInsert(
-            ['email' => 'pengurus@example.com'],
-            [
-                'name' => 'Pengurus HMSE',
-                'email' => 'pengurus@example.com',
-                'password' => bcrypt('password123'),
-                'role_id' => 2,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        );
+        \App\Models\User::create([
+            'name' => 'Pengurus HMSE',
+            'email' => 'pengurus@example.com',
+            'password' => bcrypt('password123'),
+            'role_id' => 2,
+        ]);
     }
 }

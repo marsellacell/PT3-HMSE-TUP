@@ -18,7 +18,7 @@
 
         {{-- Left: Branding Panel --}}
         <div class="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden items-center justify-center"
-             style="background: linear-gradient(135deg, #1a2a6c 0%, #2C3DA6 30%, #1E2D8F 60%, #00C4D8 100%);">
+              style="background: linear-gradient(135deg, #1a2a6c 0%, #2C3DA6 30%, #1E2D8F 60%, #00C4D8 100%); height: 100vh; position: sticky; top: 0; align-self: flex-start;">
 
             {{-- Animated Background Shapes --}}
             <div class="absolute inset-0 overflow-hidden">
@@ -37,7 +37,7 @@
 
             {{-- Content --}}
             <div class="relative z-10 max-w-lg px-12 text-center">
-                <div class="mt-12 mb-12 inline-flex items-center justify-center">
+                <div class="mt-6 mb-6 inline-flex items-center justify-center">
                     <div class="w-40 h-40 flex items-center justify-center">
                         <img src="{{ asset('images/logo-zenit.png') }}" alt="HMSE Logo" class="w-24 h-24 object-contain">
                     </div>
@@ -45,7 +45,7 @@
 
                 <h1 class="text-4xl font-black text-white mb-3 tracking-tight">SIM HMSE</h1>
                 <p class="text-lg text-white/60 font-medium mb-2">Sistem Informasi Manajemen</p>
-                <p class="text-sm text-white/40 leading-relaxed mb-12">
+                <p class="text-sm text-white/40 leading-relaxed mb-6">
                     Himpunan Mahasiswa Software Engineering<br>
                     Telkom University Purwokerto
                 </p>
@@ -71,7 +71,7 @@
                     @endforeach
                 </div>
 
-                <div class="mt-12 flex items-center justify-center gap-3">
+                <div class="mt-6 flex items-center justify-center gap-3">
                     <div class="w-8 h-0.5 bg-white/20 rounded-full"></div>
                     <span class="text-[10px] text-white/30 uppercase tracking-widest font-semibold">Secure Platform</span>
                     <div class="w-8 h-0.5 bg-white/20 rounded-full"></div>
@@ -121,7 +121,7 @@
                         </div>
                     </a>
 
-                    {{-- 2. Pembina & Kaprodi --}}
+                    {{-- 2. Pembina --}}
                     <a href="{{ route('login.form', 'pembina') }}"
                        class="group block w-full p-5 bg-white border-2 border-gray-100 rounded-2xl hover:border-[#00C4D8] hover:shadow-lg hover:shadow-[#00C4D8]/10 transition-all duration-300 hover:-translate-y-0.5">
                         <div class="flex items-center gap-4">
@@ -132,7 +132,10 @@
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="text-base font-bold text-gray-800 group-hover:text-[#00C4D8] transition-colors">Pembina & Kaprodi</h3>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-base font-bold text-gray-800 group-hover:text-[#00C4D8] transition-colors">Pembina</h3>
+                                    <span class="text-[10px] font-bold text-[#00C4D8] bg-cyan-50 px-2 py-0.5 rounded-full border border-cyan-100">HMSE</span>
+                                </div>
                                 <p class="text-xs text-gray-400 mt-0.5">Login untuk menandatangani dan menyetujui proposal kegiatan himpunan</p>
                             </div>
                             <svg class="w-5 h-5 text-gray-300 group-hover:text-[#00C4D8] group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +144,31 @@
                         </div>
                     </a>
 
-                    {{-- 3. Tamu --}}
+                    {{-- 3. Kaprodi --}}
+                    <a href="{{ route('login.form', 'kaprodi') }}"
+                       class="group block w-full p-5 bg-white border-2 border-gray-100 rounded-2xl hover:border-[#7c3aed] hover:shadow-lg hover:shadow-[#7c3aed]/10 transition-all duration-300 hover:-translate-y-0.5">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                                 style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-base font-bold text-gray-800 group-hover:text-[#7c3aed] transition-colors">Kaprodi</h3>
+                                    <span class="text-[10px] font-bold text-[#7c3aed] bg-violet-50 px-2 py-0.5 rounded-full border border-violet-100">RPL</span>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-0.5">Login sebagai Ketua Program Studi untuk menyetujui proposal kegiatan</p>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-300 group-hover:text-[#7c3aed] group-hover:translate-x-1 transition-all duration-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </a>
+
+                    {{-- 3. Tamu (sementara disembunyikan)
                     <div class="group block w-full p-5 bg-white border-2 border-gray-100 rounded-2xl opacity-60 cursor-not-allowed">
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 rounded-xl bg-gray-200 flex items-center justify-center flex-shrink-0">
@@ -161,6 +188,7 @@
                             </svg>
                         </div>
                     </div>
+                    --}}
                 </div>
 
                 {{-- Back to Home --}}

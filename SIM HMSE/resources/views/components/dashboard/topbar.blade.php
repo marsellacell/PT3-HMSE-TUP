@@ -40,6 +40,28 @@
                 </div>
             </div>
 
+            @php
+                $user = auth()->user();
+                $pendingProposals = [];
+                if ($user) {
+                    $dbRole = ($user->jabatan === 'ketua_hmse') ? 'ketua_hima' : $user->jabatan;
+                    
+                    // Ambil proposal yang butuh persetujuan user ini
+                    $approvals = \App\Models\ProposalApproval::where('approver_role', $dbRole)
+                        ->where('status', 'pending')
+                        ->with('proposal')
+                        ->get();
+                        
+                    foreach ($approvals as $app) {
+                        $prop = $app->proposal;
+                        if ($prop && $prop->getNextApproverRole() === $dbRole) {
+                            $pendingProposals[] = $prop;
+                        }
+                    }
+                }
+                $notifCount = count($pendingProposals);
+            @endphp
+
             {{-- Notifications --}}
             <div class="relative" x-data="{ notifOpen: false }">
                 <button @click="notifOpen = !notifOpen"
@@ -47,43 +69,45 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
-                    {{-- Badge --}}
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                    @if($notifCount > 0)
+                        {{-- Badge --}}
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                    @endif
                 </button>
                 <div x-show="notifOpen"
                      x-transition
                      @click.outside="notifOpen = false"
                      class="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50"
                      style="display: none;">
-                    <div class="px-4 py-3 border-b border-gray-100">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="text-sm font-bold text-gray-800">Notifikasi</h3>
+                        @if($notifCount > 0)
+                            <span class="px-2 py-0.5 text-[10px] font-bold bg-red-50 text-red-600 rounded-full">{{ $notifCount }} Baru</span>
+                        @endif
                     </div>
                     <div class="max-h-64 overflow-y-auto p-2 space-y-1">
-                        <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-4 h-4 text-[#2C3DA6]" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
+                        @forelse($pendingProposals as $prop)
+                            <a href="{{ route('dashboard.proposal.show', $prop->id) }}" class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer block">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4 text-[#2C3DA6]" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Menunggu TTD Kamu</p>
+                                    <p class="text-sm text-gray-700 font-medium truncate mt-0.5">{{ $prop->title }}</p>
+                                    <p class="text-[10px] text-gray-400 mt-1">Status: Menunggu TTD Ketua HMSE</p>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="text-center py-8 text-gray-400 text-xs">
+                                <svg class="w-8 h-8 mx-auto mb-2 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                Tidak ada notifikasi baru
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm text-gray-700 font-medium">Proposal baru menunggu review</p>
-                                <p class="text-xs text-gray-400 mt-0.5">2 menit yang lalu</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm text-gray-700 font-medium">Proker Workshop UI/UX selesai</p>
-                                <p class="text-xs text-gray-400 mt-0.5">1 jam yang lalu</p>
-                            </div>
-                        </div>
+                        @endforelse
                     </div>
                     <div class="px-4 py-2.5 border-t border-gray-100 text-center">
-                        <a href="#" class="text-xs font-semibold text-[#2C3DA6] hover:text-[#00C4D8]">Lihat Semua</a>
+                        <a href="{{ route('dashboard.proposal.index') }}" class="text-xs font-semibold text-[#2C3DA6] hover:text-[#00C4D8]">Lihat Semua Proposal</a>
                     </div>
                 </div>
             </div>
@@ -91,16 +115,24 @@
             {{-- Divider --}}
             <div class="w-px h-8 bg-gray-200 mx-1 hidden sm:block"></div>
 
+            @php
+                $currentUser = auth()->user();
+                $initials = 'G';
+                if ($currentUser && $currentUser->name) {
+                    $words = explode(' ', $currentUser->name);
+                    $initials = strtoupper(substr($words[0], 0, 1) . (isset($words[1]) ? substr($words[1], 0, 1) : ''));
+                }
+            @endphp
             {{-- User Dropdown --}}
             <div class="relative" x-data="{ userOpen: false }">
                 <button @click="userOpen = !userOpen"
                         class="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-gray-50 transition-colors duration-200">
                     <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2C3DA6] to-[#00C4D8] flex items-center justify-center">
-                        <span class="text-white text-xs font-bold">AD</span>
+                        <span class="text-white text-xs font-bold">{{ $initials }}</span>
                     </div>
                     <div class="hidden sm:block text-left">
-                        <p class="text-sm font-semibold text-gray-700 leading-none">Admin HMSE</p>
-                        <p class="text-[10px] text-gray-400 leading-none mt-0.5">Ketua Umum</p>
+                        <p class="text-sm font-semibold text-gray-700 leading-none">{{ $currentUser?->name ?? 'Guest' }}</p>
+                        <p class="text-[10px] text-gray-400 leading-none mt-0.5">{{ $currentUser ? $currentUser->jabatanLabel() : 'Guest' }}</p>
                     </div>
                     <svg class="w-4 h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -112,8 +144,8 @@
                      class="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50"
                      style="display: none;">
                     <div class="px-4 py-3 border-b border-gray-100">
-                        <p class="text-sm font-semibold text-gray-700">Admin HMSE</p>
-                        <p class="text-xs text-gray-400">admin@hmse.ac.id</p>
+                        <p class="text-sm font-semibold text-gray-700">{{ $currentUser?->name ?? 'Guest' }}</p>
+                        <p class="text-xs text-gray-400">{{ $currentUser?->email ?? 'guest@hmse.ac.id' }}</p>
                     </div>
                     <a href="{{ route('dashboard.settings') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 hover:text-[#2C3DA6] hover:bg-blue-50">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

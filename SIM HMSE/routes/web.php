@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PembinaController;
 use App\Http\Controllers\ProkerController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\FinanceController;
@@ -32,7 +33,7 @@ Route::redirect('/news', '/events')->name('news.index');
 */
 
 Route::get('/login', [DashboardController::class, 'loginSelect'])->name('login');
-Route::get('/login/{role}', [DashboardController::class, 'loginForm'])->name('login.form')->where('role', 'pengurus|pembina');
+Route::get('/login/{role}', [DashboardController::class, 'loginForm'])->name('login.form')->where('role', 'pengurus|pembina|kaprodi');
 Route::post('/login', [DashboardController::class, 'loginSubmit'])->name('login.submit');
 Route::post('/logout', [DashboardController::class, 'logout'])->name('logout');
 
@@ -105,6 +106,29 @@ Route::prefix('dashboard')->name('dashboard')->group(function () {
 
     // Pengaturan
     Route::get('/settings', [DashboardController::class, 'settings'])->name('.settings');
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Pembina / Kaprodi Routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('pembina')->name('pembina.')->group(function () {
+
+    Route::get('/',                   [PembinaController::class, 'dashboard'])->name('dashboard');
+    Route::get('/proker',             [PembinaController::class, 'proker'])->name('proker');
+    Route::get('/calendar',           [PembinaController::class, 'calendar'])->name('calendar');
+    Route::get('/keuangan',           [PembinaController::class, 'keuangan'])->name('keuangan');
+
+    // Proposal
+    Route::get('/proposal',           [PembinaController::class, 'proposalIndex'])->name('proposal');
+    Route::get('/proposal/{id}',      [PembinaController::class, 'proposalShow'])->name('proposal.show');
+    Route::get('/proposal/{id}/preview', [PembinaController::class, 'proposalPreview'])->name('proposal.preview');
+
+    // Notifications
+    Route::get('/notifications/unread', [PembinaController::class, 'getUnreadNotifications'])->name('notifications.unread');
+    Route::post('/notifications/mark-read', [PembinaController::class, 'markNotificationsRead'])->name('notifications.mark-read');
 
 });
 

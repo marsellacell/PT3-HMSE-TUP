@@ -70,7 +70,17 @@ class DashboardController extends Controller
 
         if (\Illuminate\Support\Facades\Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            return redirect()->route('dashboard')->with('success', 'Login berhasil! Selamat datang, ' . auth()->user()->name . '.');
+
+            $user = auth()->user();
+
+            // Redirect berdasarkan jabatan user
+            if (in_array($user->jabatan, ['pembina', 'kaprodi'])) {
+                return redirect()->route('pembina.dashboard')
+                    ->with('success', 'Login berhasil! Selamat datang, ' . $user->name . '.');
+            }
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Login berhasil! Selamat datang, ' . $user->name . '.');
         }
 
         return back()
@@ -134,7 +144,22 @@ class DashboardController extends Controller
     {
         try {
             $proposal = \App\Models\Proposal::findOrFail($id);
-            return view('pages.dashboard.proposal.preview', compact('proposal'));
+            
+            // Get SOTK Users
+            $sotk = [
+                'ketua_hmse' => \App\Models\User::whereIn('jabatan', ['ketua_hmse', 'President'])->first(),
+                'sekretaris' => \App\Models\User::whereIn('jabatan', ['sekretaris', 'Secretary 1', 'Secretary 2'])->first(),
+                'pembina' => \App\Models\User::where('jabatan', 'pembina')->first(),
+                'kaprodi' => \App\Models\User::where('jabatan', 'kaprodi')->first(),
+            ];
+
+            // Ambil data approvals (TTD) yang sudah ada, keyed by approver_role
+            $approvals = $proposal->approvals()->with('approver')->get()->keyBy('approver_role');
+
+            $isFromForm = false;
+            $formData   = null;
+
+            return view('pages.dashboard.proposal.preview', compact('proposal', 'sotk', 'approvals', 'isFromForm', 'formData'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             abort(404, 'Proposal tidak ditemukan');
         }

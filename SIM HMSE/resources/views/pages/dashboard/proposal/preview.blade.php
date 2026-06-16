@@ -246,6 +246,18 @@
         </div>
 
         {{-- PAGE: HALAMAN PENGESAHAN --}}
+        @php
+            $approvals = $approvals ?? collect();
+            // Helper: cek apakah role tertentu sudah TTD
+            $getSignature = function($role) use ($approvals) {
+                $approval = $approvals[$role] ?? null;
+                if (!$approval || $approval->status !== 'approved') return null;
+                return $approval;
+            };
+
+            // Juga cek ketua_hima sebagai alias untuk ketua_hmse
+            $ketuaApproval = $getSignature('ketua_hmse') ?? $getSignature('ketua_hima');
+        @endphp
         <div class="bg-white shadow-xl border border-gray-300 rounded-sm w-full max-w-[210mm] min-h-[297mm]"
              style="padding:25mm; font-family:'Times New Roman', serif; font-size:12pt;">
             {{-- HALAMAN PENGESAHAN --}}
@@ -257,9 +269,9 @@
                     {{-- Row 1: Panitia --}}
                     <div class="grid grid-cols-2 gap-8 mb-6">
                         <div>
-                            <p class="mb-20">Ketua Panitia</p>
+                            <p class="mb-2">Ketua Panitia</p>
                             @php
-                                $ketuaName = 'Nama Ketua';
+                                $ketuaName = $proposal->ketua_panitia ?? 'Nama Ketua';
                                 $ketuaNim = 'NIM. ..........................';
                                 if (isset($formData['panitia_jabatan'])) {
                                     foreach ($formData['panitia_jabatan'] as $index => $jabatan) {
@@ -270,12 +282,22 @@
                                         }
                                     }
                                 }
+                                $kpApproval = $getSignature('ketua_panitia');
                             @endphp
+                            @if($kpApproval && $kpApproval->signature_data)
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <img src="{{ $kpApproval->signature_data }}" alt="TTD Ketua Panitia" style="height:60px; max-width:140px; object-fit:contain;">
+                                </div>
+                            @else
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <span class="text-gray-300 text-xs italic">— belum ditandatangani —</span>
+                                </div>
+                            @endif
                             <p class="underline font-bold">{{ $ketuaName }}</p>
                             <p>{{ $ketuaNim }}</p>
                         </div>
                         <div>
-                            <p class="mb-20">Sekretaris</p>
+                            <p class="mb-2">Sekretaris</p>
                             @php
                                 $sekretarisName = $sotk['sekretaris']->name ?? 'Nama Sekretaris';
                                 $sekretarisNim = isset($sotk['sekretaris']->nim_nip) ? 'NIM. ' . $sotk['sekretaris']->nim_nip : 'NIM. ..........................';
@@ -288,7 +310,17 @@
                                         }
                                     }
                                 }
+                                $sekApproval = $getSignature('sekretaris');
                             @endphp
+                            @if($sekApproval && $sekApproval->signature_data)
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <img src="{{ $sekApproval->signature_data }}" alt="TTD Sekretaris" style="height:60px; max-width:140px; object-fit:contain;">
+                                </div>
+                            @else
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <span class="text-gray-300 text-xs italic">— belum ditandatangani —</span>
+                                </div>
+                            @endif
                             <p class="underline font-bold">{{ $sekretarisName }}</p>
                             <p>{{ $sekretarisNim }}</p>
                         </div>
@@ -300,13 +332,32 @@
                     <div class="grid grid-cols-2 gap-8 mb-6">
                         <div>
                             <p>Pembina</p>
-                            <p class="mb-20">Himpunan Mahasiswa Software Engineering</p>
+                            <p class="mb-2">Himpunan Mahasiswa Software Engineering</p>
+                            @php $pembinaApproval = $getSignature('pembina'); @endphp
+                            @if($pembinaApproval && $pembinaApproval->signature_data)
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <img src="{{ $pembinaApproval->signature_data }}" alt="TTD Pembina" style="height:60px; max-width:140px; object-fit:contain;">
+                                </div>
+                            @else
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <span class="text-gray-300 text-xs italic">— belum ditandatangani —</span>
+                                </div>
+                            @endif
                             <p class="underline font-bold">{{ $sotk['pembina']->name ?? 'Yudha Islami Sulistya, S.Kom., M.Cs' }}</p>
                             <p>NIDN. {{ $sotk['pembina']->nim_nip ?? '0609020001' }}</p>
                         </div>
                         <div>
                             <p>Ketua</p>
-                            <p class="mb-20">Himpunan Mahasiswa Software Engineering</p>
+                            <p class="mb-2">Himpunan Mahasiswa Software Engineering</p>
+                            @if($ketuaApproval && $ketuaApproval->signature_data)
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <img src="{{ $ketuaApproval->signature_data }}" alt="TTD Ketua HMSE" style="height:60px; max-width:140px; object-fit:contain;">
+                                </div>
+                            @else
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <span class="text-gray-300 text-xs italic">— belum ditandatangani —</span>
+                                </div>
+                            @endif
                             <p class="underline font-bold">{{ $sotk['ketua_hmse']->name ?? 'Quratu Ayun Defaren' }}</p>
                             <p>NIM. {{ $sotk['ketua_hmse']->nim_nip ?? '103122400064' }}</p>
                         </div>
@@ -318,13 +369,26 @@
                     <div class="grid grid-cols-2 gap-8 mb-6">
                         <div>
                             <p>Kepala Urusan</p>
-                            <p class="mb-20">Kemahasiswaan, Karier dan Alumni</p>
+                            <p class="mb-2">Kemahasiswaan, Karier dan Alumni</p>
+                            <div class="flex items-center justify-center" style="min-height:80px;">
+                                <span class="text-gray-300 text-xs italic">— belum ditandatangani —</span>
+                            </div>
                             <p class="underline font-bold">Kadarisman, S.Si</p>
                             <p>NIP. 22960016</p>
                         </div>
                         <div>
                             <p>Ketua Program Studi</p>
-                            <p class="mb-20">S1 Rekayasa Perangkat Lunak</p>
+                            <p class="mb-2">S1 Rekayasa Perangkat Lunak</p>
+                            @php $kaprodiApproval = $getSignature('kaprodi'); @endphp
+                            @if($kaprodiApproval && $kaprodiApproval->signature_data)
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <img src="{{ $kaprodiApproval->signature_data }}" alt="TTD Kaprodi" style="height:60px; max-width:140px; object-fit:contain;">
+                                </div>
+                            @else
+                                <div class="flex items-center justify-center" style="height:80px;">
+                                    <span class="text-gray-300 text-xs italic">— belum ditandatangani —</span>
+                                </div>
+                            @endif
                             <p class="underline font-bold">{{ $sotk['kaprodi']->name ?? 'Abednego Dwi Septiadi, S.Kom., M.Kom' }}</p>
                             <p>NIP. {{ $sotk['kaprodi']->nim_nip ?? '22890018' }}</p>
                         </div>
@@ -334,7 +398,10 @@
                     <div class="flex justify-center mt-8">
                         <div>
                             <p>Wakil Direktur</p>
-                            <p class="mb-20">Bidang Akademik & Riset</p>
+                            <p class="mb-2">Bidang Akademik & Riset</p>
+                            <div class="flex items-center justify-center" style="min-height:80px;">
+                                <span class="text-gray-300 text-xs italic">— belum ditandatangani —</span>
+                            </div>
                             <p class="underline font-bold">Dr. Catur Nugroho, S.Sos., M.I.Kom.</p>
                             <p>NIP. 14780035-1</p>
                         </div>
